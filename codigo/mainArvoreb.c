@@ -5,7 +5,7 @@
 int main () {
 
    Arvore *a = criar();
-   
+
    /*Exercicio 18-2.1 Cormen*/
    a = inserir (a, 'F');
    a = inserir (a, 'S');
@@ -32,5 +32,7 @@ int main () {
 
    imprimir (a, 0);
 
-   return 0;
+   //return 0;
+   int oi;
+   scanf("%d",&oi);
 }
