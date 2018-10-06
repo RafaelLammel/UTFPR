@@ -37,12 +37,12 @@ Arvore* inserir_arvore_nao_cheia (Arvore *x, TIPO k) {
     printf("Entrei aqui Nao cheia!\n");
    int i = x->n;
    if(x->folha){
-        while(i>=0 && k < x->chaves[i-1]){
+        while(i>0 && k < x->chaves[i-1]){
             x->chaves[i] = x->chaves[i-1];
             i=i-1;
         }
         x->chaves[i] = k;
-        x->chaves[i] += 1;
+        x->n++;
         return x;
    }
    else{
@@ -52,9 +52,6 @@ Arvore* inserir_arvore_nao_cheia (Arvore *x, TIPO k) {
         //i = i+1;
         if(x->filhos[i]->n = (2*T)-1){
             dividir_no(x,i,x->filhos[i]);
-        }
-        if(k > x->chaves[i]){
-            i = i+1;
         }
         inserir_arvore_nao_cheia (x->filhos[i], k);
    }
