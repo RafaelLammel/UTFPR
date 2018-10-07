@@ -2,7 +2,7 @@
 
 /*Descrição: Divide o nó em dois quando ele está cheio*/
 Arvore* dividir_no (Arvore *x, int i, Arvore *y) {
-   //Cria um novo nó que receberá os maiores elemntos de y;
+   //Cria um novo nó que será o filho à direita da chave mediana;
    Arvore *z = criar();
    z->folha = y->folha;
    z->n = T-1;
@@ -18,12 +18,12 @@ Arvore* dividir_no (Arvore *x, int i, Arvore *y) {
    }
    y->n = T-1;
    //Movendo os filhos para abrir espaço para o novo nó Z;
-   for (int j = x->n; j > i; j--){
+   for (int j = x->n+1; j >= i+1; j--){
         x->filhos[j] = x->filhos[j-1];
    }
    x->filhos[i+1] = z;
    //movendo as chaves para colocar a mediana de Y em X;
-   for (int j = x->n; j > i; j--){
+   for (int j = x->n; j >= i; j--){
         x->chaves[j] = x->chaves[j-1];
    }
    x->chaves[i] = y->chaves[T-1]; //jogando a mediana para cima;
@@ -31,7 +31,7 @@ Arvore* dividir_no (Arvore *x, int i, Arvore *y) {
    return x;
 }
 
-/*Descrição: ????*/
+/*Descrição: Insere chave na arvore quando seu nó não está cheio*/
 Arvore* inserir_arvore_nao_cheia (Arvore *x, TIPO k) {
    int i = x->n;
    if(x->folha){
@@ -48,10 +48,11 @@ Arvore* inserir_arvore_nao_cheia (Arvore *x, TIPO k) {
         while(i>0 && k < x->chaves[i-1]){
             i--;
         }
-        //i = i+1;
         if(x->filhos[i]->n == (2*T)-1){  //Verificar se o filho está cheio.
-            //imprimir(x,0);
             dividir_no(x,i,x->filhos[i]);
+            if (k > x->chaves[i]){
+              i=i+1;
+            }
         }
         inserir_arvore_nao_cheia (x->filhos[i], k);
    }
@@ -73,5 +74,3 @@ Arvore *inserir (Arvore *raiz, TIPO chave) {
       return inserir_arvore_nao_cheia (r, chave);
    }
 }
-
-
