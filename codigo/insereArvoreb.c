@@ -2,28 +2,29 @@
 
 /*Descrição: Divide o nó em dois quando ele está cheio*/
 Arvore* dividir_no (Arvore *x, int i, Arvore *y) {
+    int j = 0;
    //Cria um novo nó que será o filho à direita da chave mediana;
    Arvore *z = criar();
    z->folha = y->folha;
    z->n = T-1;
    //Faz com que Z receba as chaves maiores após a mediana de y;
-   for (int j = 0; j < T-1; j++){
+   for (j = 0; j < T-1; j++){
         z->chaves[j] = y->chaves[j+T];
    }
    //Verifica se y é uma folha e se for, passa os filhos das chaves maiores para Z;
    if (!y->folha){
-       for(int j = 0; j < T; j++){
+       for(j = 0; j < T; j++){
             z->filhos[j] = y->filhos[j+T];
        }
    }
    y->n = T-1;
    //Movendo os filhos para abrir espaço para o novo nó Z;
-   for (int j = x->n+1; j >= i+1; j--){
+   for (j = x->n+1; j >= i+1; j--){
         x->filhos[j] = x->filhos[j-1];
    }
    x->filhos[i+1] = z;
    //movendo as chaves para colocar a mediana de Y em X;
-   for (int j = x->n; j >= i; j--){
+   for (j = x->n; j >= i; j--){
         x->chaves[j] = x->chaves[j-1];
    }
    x->chaves[i] = y->chaves[T-1]; //jogando a mediana para cima;

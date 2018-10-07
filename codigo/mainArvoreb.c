@@ -63,6 +63,7 @@ int main () {
    Arvore *a = criar();
    //a = testeAlfabeto(a);
    a = testeNumerico(a);
+   a = remover(a,44);
    imprimir(a,0);
 
    getchar();

@@ -2,32 +2,34 @@
 
 /*Descrição Remove chave de nó folha (Caso 1)*/
 Arvore* remover_de_folha (Arvore *a, int index){
+   int i = 0;
    a->n--;
-   for (int i = index; i < a->n ; i++){
+   for (i = index; i < a->n ; i++){
     a->chaves[i] = a->chaves[i+1];
    }
    return a;
 }
 
 
-/*Descrição ...*/
+/*Remove quando a chave está em um nó que não é árvore. (Todos os casos 2)*/
 Arvore* remover_de_nao_folha (Arvore *a, int index){
+    int i = 0;
    TIPO k = a->chaves[index];
    TIPO predecessor, sucessor;
 
-   /*Verfica se o filho à esquerda tem n de chaves maior que o mínimo*/
+   /*Verfica se o filho à esquerda tem número de chaves maior que o mínimo (Caso 2A)*/
    if (a->filhos[index]->n >= T){
       a->chaves[index] = a->filhos[index]->chaves[a->filhos[index]->n-1];
-      a->filhos[index]->n--;
+      a->filhos[index] = remover(a->filhos[index],a->filhos[index]->chaves[a->filhos[index]->n-1]);
    }
-  /*Descrição ...*/
+   /*Verfica se o filho à direita tem número de chaves maior que o mínimo (Caso 2B)*/
    else if (a->filhos[index+1]->n >= T){
       a->chaves[index] = a->filhos[index+1]->chaves[0];
+      a->filhos[index+1] = remover(a->filhos[index+1],a->filhos[index+1]->chaves[0]);
    }
-   /*Descrição ...*/
+   /*Quando nenhum dos filhos tem número de chaves maior que o mínimo (Caso 2C)*/
    else{
-       /*Completar!!!!*/
-       printf("Completar\n");
+
    }
 
    return a;
