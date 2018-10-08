@@ -1,6 +1,6 @@
 #include "arvoreb.h"
 
-/*Alterar tipo para char em arvoreb.h*/
+/*Alterar tipo para char em arvoreb.h e printf para %c no arquivo que imprime*/
 Arvore* testeAlfabeto(Arvore* a){
 
     /*Exercicio 18-2.1 Cormen*/
@@ -28,7 +28,7 @@ Arvore* testeAlfabeto(Arvore* a){
 
 }
 
-/*Alterar tipo para int em arvoreb.h*/
+/*Alterar tipo para int em arvoreb.h e printf para %d no arquivo que imprime*/
 Arvore* testeNumerico(Arvore* a){
 
     a = inserir(a,91);
@@ -55,6 +55,7 @@ Arvore* testeNumerico(Arvore* a){
     a = inserir(a,21);
     a = inserir(a,67);
 
+    a = remover(a,44);
 }
 
 /*Função principal:*/
@@ -63,7 +64,6 @@ int main () {
    Arvore *a = criar();
    //a = testeAlfabeto(a);
    a = testeNumerico(a);
-   a = remover(a,44);
    imprimir(a,0);
 
    getchar();

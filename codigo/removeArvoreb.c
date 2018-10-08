@@ -1,6 +1,6 @@
 #include "arvoreb.h"
 
-/*Descrição Remove chave de nó folha (Caso 1)*/
+/*Remove chave de nó folha (Caso 1)*/
 Arvore* remover_de_folha (Arvore *a, int index){
    int i = 0;
    a->n--;
@@ -11,21 +11,27 @@ Arvore* remover_de_folha (Arvore *a, int index){
 }
 
 
-/*Remove quando a chave está em um nó que não é árvore. (Todos os casos 2)*/
+/*Remove quando a chave está em um nó que não é folha. (Todos os casos 2)*/
 Arvore* remover_de_nao_folha (Arvore *a, int index){
-    int i = 0;
    TIPO k = a->chaves[index];
    TIPO predecessor, sucessor;
-
+   Arvore* maxEsq = buscaMaxEsq(a->filhos[index]);
+   Arvore* minDir = buscaMinDir(a->filhos[index+1]);
    /*Verfica se o filho à esquerda tem número de chaves maior que o mínimo (Caso 2A)*/
-   if (a->filhos[index]->n >= T){
-      a->chaves[index] = a->filhos[index]->chaves[a->filhos[index]->n-1];
-      a->filhos[index] = remover(a->filhos[index],a->filhos[index]->chaves[a->filhos[index]->n-1]);
+   if (maxEsq->n >= T){
+      //a->chaves[index] = a->filhos[index]->chaves[a->filhos[index]->n-1];
+      //a->filhos[index] = remover(a->filhos[index],a->filhos[index]->chaves[a->filhos[index]->n-1]);
+      predecessor = maxEsq->chaves[maxEsq->n-1];
+      a->chaves[index] = predecessor;
+      a->filhos[index] = remover(a->filhos[index],predecessor);
    }
    /*Verfica se o filho à direita tem número de chaves maior que o mínimo (Caso 2B)*/
-   else if (a->filhos[index+1]->n >= T){
-      a->chaves[index] = a->filhos[index+1]->chaves[0];
-      a->filhos[index+1] = remover(a->filhos[index+1],a->filhos[index+1]->chaves[0]);
+   else if (minDir->n >= T){
+      //a->chaves[index] = a->filhos[index+1]->chaves[0];
+      //a->filhos[index+1] = remover(a->filhos[index+1],a->filhos[index+1]->chaves[0]);
+      sucessor = minDir->chaves[0];
+      a->chaves[index] = sucessor;
+      a->filhos[index+1] = remover(a->filhos[index+1],sucessor);
    }
    /*Quando nenhum dos filhos tem número de chaves maior que o mínimo (Caso 2C)*/
    else{
