@@ -55,7 +55,7 @@ Arvore* testeNumerico(Arvore* a){
     a = inserir(a,21);
     a = inserir(a,67);
 
-    a = remover(a,44);
+    a = remover(a,71);
 }
 
 /*Função principal:*/

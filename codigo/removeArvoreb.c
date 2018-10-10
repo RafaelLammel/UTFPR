@@ -3,10 +3,10 @@
 /*Remove chave de nó folha (Caso 1)*/
 Arvore* remover_de_folha (Arvore *a, int index){
    int i = 0;
-   a->n--;
-   for (i = index; i < a->n ; i++){
-    a->chaves[i] = a->chaves[i+1];
-   }
+    a->n--;
+    for (i = index; i < a->n ; i++){
+        a->chaves[i] = a->chaves[i+1];
+    }
    return a;
 }
 
@@ -35,6 +35,8 @@ Arvore* remover_de_nao_folha (Arvore *a, int index){
    }
    /*Quando nenhum dos filhos tem número de chaves maior que o mínimo (Caso 2C)*/
    else{
+     predecessor = maxEsq->chaves[maxEsq->n-1];
+     a->chaves[index] = predecessor;
 
    }
 
@@ -92,15 +94,27 @@ Arvore *remover (Arvore *a, TIPO k){
    else{
       //Se este nó é um nó folha, então a chave não está na árvore
       if (a->folha){
-  	 printf("\nA chave %c não está na árvore.\n",k);
-  	 //printf("\nA chave %d não está na árvore.\n",k);
+  	 //printf("\nA chave %c não está na árvore.\n",k);
+  	 printf("\nA chave %d não está na árvore.\n",k);
          return a;
       }
 
       /*Chama a função recursivamente pra até que chegue no nó que contém a chave, ou em uma folha, caso a árvore não possua a chave*/
       remover(a->filhos[index],k);
-
-
+      if (a->filhos[index]->n < T-1){
+        if (a->filhos[index+1]->n > T-1){
+            a->filhos[index]->n++;
+            a->filhos[index]->chaves[a->filhos[index]->n-1] = a->chaves[index];
+            a->chaves[index] = a->filhos[index+1]->chaves[0];
+            remover(a->filhos[index+1],a->filhos[index+1]->chaves[0]);
+        }
+        else if (a->filhos[index-1]->n > T-1){
+            a->filhos[index]->n++;
+            a->filhos[index]->chaves[a->filhos[index]->n-1] = a->chaves[index];
+            a->chaves[index] = a->filhos[index-1]->chaves[0];
+            remover(a->filhos[index-1],a->filhos[index-1]->chaves[0]);
+        }
+      }
    }
    a = verificar_raiz_vazia(a);
 
