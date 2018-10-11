@@ -47,11 +47,13 @@ Arvore* remover_de_nao_folha (Arvore *a, int index){
 //Função para verificar se raiz ficou vazia
 Arvore *verificar_raiz_vazia (Arvore *raiz){
     /*Se após a remoção a raiz tiver 0 chaves, tornar o primeiro filho a nova raiz se existir filho; caso contrário ajustar a raiz para NULL. Liberar a raiz antiga*/
+   if(raiz->n == 0){
+    Arvore* a = raiz;
+     raiz = raiz->filhos[0];
+     free(a);
+   }
 
-   /*Completar!!!! */
-   printf("Completar\n");
-
-    return raiz;
+   return raiz;
 }
 
 
@@ -94,25 +96,24 @@ Arvore *remover (Arvore *a, TIPO k){
    else{
       //Se este nó é um nó folha, então a chave não está na árvore
       if (a->folha){
-  	 //printf("\nA chave %c não está na árvore.\n",k);
-  	 printf("\nA chave %d não está na árvore.\n",k);
+  	 printf("\nA chave %c não está na árvore.\n",k);
+  	 //printf("\nA chave %d não está na árvore.\n",k);
          return a;
       }
 
-      /*Chama a função recursivamente pra até que chegue no nó que contém a chave, ou em uma folha, caso a árvore não possua a chave*/
+      /*Chama a função recursivamente até que chegue no nó que contém a chave, ou em uma folha, caso a árvore não possua a chave*/
       remover(a->filhos[index],k);
+      /*Verifica como ficou o filho após a remoção, e se necessário balancea a árvore (Caso 3A)*/
       if (a->filhos[index]->n < T-1){
-        if (a->filhos[index+1]->n > T-1){
-            a->filhos[index]->n++;
-            a->filhos[index]->chaves[a->filhos[index]->n-1] = a->chaves[index];
+        if (index+1 < a->n+1 && a->filhos[index+1]->n > T-1){
+            inserir(a->filhos[index],a->chaves[index]);
             a->chaves[index] = a->filhos[index+1]->chaves[0];
             remover(a->filhos[index+1],a->filhos[index+1]->chaves[0]);
         }
-        else if (a->filhos[index-1]->n > T-1){
-            a->filhos[index]->n++;
-            a->filhos[index]->chaves[a->filhos[index]->n-1] = a->chaves[index];
-            a->chaves[index] = a->filhos[index-1]->chaves[0];
-            remover(a->filhos[index-1],a->filhos[index-1]->chaves[0]);
+        else if (index-1 >= 0 && a->filhos[index-1]->n > T-1){
+            inserir(a->filhos[index],a->chaves[index-1]);
+            a->chaves[index-1] = a->filhos[index-1]->chaves[a->filhos[index-1]->n-1];
+            remover(a->filhos[index-1],a->filhos[index-1]->chaves[a->filhos[index-1]->n-1]);
         }
       }
    }

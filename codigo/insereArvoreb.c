@@ -2,7 +2,7 @@
 
 /*Descrição: Divide o nó em dois quando ele está cheio*/
 Arvore* dividir_no (Arvore *x, int i, Arvore *y) {
-    int j = 0;
+   int j = 0;
    //Cria um novo nó que será o filho à direita da chave mediana;
    Arvore *z = criar();
    z->folha = y->folha;

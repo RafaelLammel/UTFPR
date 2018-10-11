@@ -26,6 +26,9 @@ Arvore* testeAlfabeto(Arvore* a){
    a = inserir (a, 'Z');
    a = inserir (a, 'E');
 
+   ///Testes de remoção
+
+    return a;
 }
 
 /*Alterar tipo para int em arvoreb.h e printf para %d no arquivo que imprime*/
@@ -55,7 +58,18 @@ Arvore* testeNumerico(Arvore* a){
     a = inserir(a,21);
     a = inserir(a,67);
 
-    a = remover(a,71);
+    ///Testes de remoção
+
+    /*Teste caso 1*/
+    //a = remover(a,8);
+    /*Teste caso 2A*/
+    //a = remover(a,68);
+    /*Teste caso 2B*/
+    //a = remover(a,50);
+    /*Teste caso 3A*/
+    //a = remover(a,71);
+
+    return a;
 }
 
 /*Função principal:*/
