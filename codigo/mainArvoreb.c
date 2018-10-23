@@ -1,39 +1,48 @@
 #include "arvoreb.h"
 
 /*Alterar tipo para char em arvoreb.h e printf para %c no arquivo que imprime*/
-Arvore* testeAlfabeto(Arvore* a){
-
+Arvore* testeAlfabeto(Arvore* a)
+{
     /*Exercicio 18-2.1 Cormen*/
-   a = inserir (a, 'F');
-   a = inserir (a, 'S');
-   a = inserir (a, 'Q');
-   a = inserir (a, 'K');
-   a = inserir (a, 'C');
-   a = inserir (a, 'L');
-   a = inserir (a, 'H');
-   a = inserir (a, 'T');
-   a = inserir (a, 'V');
-   a = inserir (a, 'W');
-   a = inserir (a, 'M');
-   a = inserir (a, 'R');
-   a = inserir (a, 'N');
-   a = inserir (a, 'P');
-   a = inserir (a, 'A');
-   a = inserir (a, 'B');
-   a = inserir (a, 'X');
-   a = inserir (a, 'Y');
-   a = inserir (a, 'D');
-   a = inserir (a, 'Z');
-   a = inserir (a, 'E');
+    a = inserir (a, 'F');
+    a = inserir (a, 'S');
+    a = inserir (a, 'Q');
+    a = inserir (a, 'K');
+    a = inserir (a, 'C');
+    a = inserir (a, 'L');
+    a = inserir (a, 'H');
+    a = inserir (a, 'T');
+    a = inserir (a, 'V');
+    a = inserir (a, 'W');
+    a = inserir (a, 'M');
+    a = inserir (a, 'R');
+    a = inserir (a, 'N');
+    a = inserir (a, 'P');
+    a = inserir (a, 'A');
+    a = inserir (a, 'B');
+    a = inserir (a, 'X');
+    a = inserir (a, 'Y');
+    a = inserir (a, 'D');
+    a = inserir (a, 'Z');
+    a = inserir (a, 'E');
 
-   ///Testes de remoção
+    ///Testes de remoção
+
+    /*Caso 1*/
+    //a = remover(a, 'E');
+    /*Caso 2A*/
+    //a = remover(a,'Q');
+    /*Caso 2B*/
+    //a = remover(a,'W');
+    /*Caso 3A*/
+    //a = remover(a,'V');
 
     return a;
 }
 
 /*Alterar tipo para int em arvoreb.h e printf para %d no arquivo que imprime*/
-Arvore* testeNumerico(Arvore* a){
-
+Arvore* testeNumerico(Arvore* a)
+{
     a = inserir(a,91);
     a = inserir(a,90);
     a = inserir(a,80);
@@ -73,13 +82,14 @@ Arvore* testeNumerico(Arvore* a){
 }
 
 /*Função principal:*/
-int main () {
+int main ()
+{
 
-   Arvore *a = criar();
-   //a = testeAlfabeto(a);
-   a = testeNumerico(a);
-   imprimir(a,0);
+    Arvore *a = criar();
+    a = testeAlfabeto(a);
+    //a = testeNumerico(a);
+    imprimir(a,0);
 
-   getchar();
-   return 0;
+    getchar();
+    return 0;
 }

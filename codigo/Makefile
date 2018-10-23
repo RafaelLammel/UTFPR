@@ -1,6 +1,6 @@
-all: saida
+﻿all: saida
 	@echo " "
-	@echo "Copilação concluída!!"
+	@echo "Compilação concluída!!"
 	@echo " "
 
 saida: buscaArvoreb.o criaArvoreb.o insereArvoreb.o mainArvoreb.o printArvoreb.o removeArvoreb.o
