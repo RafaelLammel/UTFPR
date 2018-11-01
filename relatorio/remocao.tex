@@ -1,0 +1,14 @@
+\section{Remoção}
+A remoção foi a parte mais complicada desse projeto. Como era necessário escolher 4 das 6 formas de remoção apresentadas, a dupla analisou as formas mais simples para realizar primeiro.
+
+\subsection{Caso 1}
+Começamos pelo caso 1, que é quando queremos remover a chave de uma folha que tem pelo menos T chaves. Essa parte foi super simples e a implementação foi feita em poucos minutos. Basicamente chegamos no nó que contém a chave, removemos e rearranjamos o nó se necessário.
+
+\subsection{Caso 2A e 2B}
+Quando removemos algo de um nó não folha, verificamos se algum dos dois filhos tem pelo menos T chaves, se o da esquerda tiver, é feito o caso 2A, onde pegamos o filho máximo(maior elemento da sub-árvore) da esquerda e trocamos com o elemento que será removido, após essa troca, passamos a tratar a remoção no elemento máximo(por conta das propriedades da árvore B, ele sempre estará em um nó folha), no caso 2B, o filho a direita é quem possui pelo menos T chaves, então ao invés de pegarmos o máximo, fazemos a troca com o mínimo e passamos a tratar a remoção nele, assim como no caso 2A. 
+\par
+Percebe-se que os casos são extremamente parecidos, por esse motivo decidimos que seria melhor deixar ambas na mesma seção para facilitar na descrição.
+\subsection{Caso 3A}
+Esse caso acontece quando a remoção é feita em um nó folha que possui o mínimo de chaves($T-1$) e se pelo menos um dos irmãos possuem pelo menos T chaves, ao remover o elemento, o pai desce para balancear o nó, no irmão pegamos o elemento máximo ou mínimo(depende de qual irmão, esquerdo ou direito) e colocamos no lugar aonde anteriormente o pai estava.
+\par
+Na hora da implementação, nos atentamos á um caso específico, o elemento que estará sendo removido, pode estar em alguma das extremidades da subárvore, nesse caso, dependendo de qual lado está, verificamos a quantidade de elementos de somente um irmão. 
