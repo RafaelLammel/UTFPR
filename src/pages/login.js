@@ -4,12 +4,12 @@ import { View, Text } from 'react-native';
 
 export default class Main extends Component{
     static navigationOptions = {
-        title: 'Home'
+        title: 'Login'
     }
     render(){
         return(
             <View>
-                <Text>Pagina Main</Text>
+                <Text>Pagina Login</Text>
             </View>
         );
     }

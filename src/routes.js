@@ -1,7 +1,11 @@
 import { createStackNavigator } from 'react-navigation';
 
-import Main from './pages/main';
+import Home from './pages/home';
+import Login from './pages/login';
+import Cadastro from './pages/cadastro'
 
 export default createStackNavigator({
-    Main
+    Home,
+    Login,
+    Cadastro
 });
