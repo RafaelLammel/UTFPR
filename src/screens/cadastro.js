@@ -1,15 +1,47 @@
 import React, { Component } from 'react';
+import api from '../services/api'
 
 import { StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native';
 
 export default class Cadastro extends Component{
-    state = {
-        nome: '',
-        email: '',
-        senha: '',
-    };
+    constructor(){
+        super();
+        this.state = {
+            name: "",
+            email: "",
+            password: "",
+        }
+    }
     static navigationOptions = {
         title: 'Cadastro'
+    }
+    async onRegisterPress(){
+
+        if (this.state.email == ""){
+            alert("E-mail é obrigatório.");
+            return;
+        }
+        else if (this.state.name == ""){
+            alert("Nome é obrigatório.");
+            return;
+        }
+        else if (this.state.password == ""){
+            alert("Senha é obrigatório.");
+            return;
+        }
+        const response = await api.post('/usuarios',{
+            nome: this.state.name,
+            email: this.state.email,
+            senha: this.state.password,
+            musico: 0
+        })
+        .then(function (response){
+            console.log(response);
+            alert("Cadastro efetuado com sucesso!");
+        })
+        .catch(function (error){
+            console.log(error);
+        });
     }
     render(){
         return(
@@ -19,21 +51,22 @@ export default class Cadastro extends Component{
                     style={styles.input}
                     placeholder="Digite seu nome"
                     value={this.state.nome}
-                    onChangeText={nome=>this.setState({ nome })}
+                    onChangeText={(val) => this.setState({name: val})}
                 />
                 <TextInput
                     style={styles.input}
                     placeholder="Digite seu e-mail"
                     value={this.state.email}
-                    onChangeText={email=>this.setState({ email })}
+                    onChangeText={(val) => this.setState({email: val})}
                 />
                 <TextInput
                     style={styles.input}
                     placeholder="Digite sua senha"
                     value={this.state.senha}
-                    onChangeText={senha=>this.setState({ senha })}
+                    onChangeText={(val) => this.setState({password: val})}
+                    secureTextEntry={true}
                 />
-                <TouchableOpacity style={styles.button} onPress={() => {}}>
+                <TouchableOpacity style={styles.button} onPress={this.onRegisterPress.bind(this)}>
                     <Text style={styles.buttonText}>Cadastrar</Text>
                 </TouchableOpacity>
             </View>
@@ -46,7 +79,6 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#b7b7b7',
         padding: 20
     },
     title: {

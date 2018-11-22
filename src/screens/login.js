@@ -1,14 +1,45 @@
 import React, { Component } from 'react';
+import api from '../services/api'
 
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 
 export default class Login extends Component{
-    state = {
-        email: '',
-        senha: '',
-    };
+    constructor(){
+        super();
+        this.state = {
+            email: "",
+            password: "",
+        }
+    }
     static navigationOptions = {
         title: 'Login'
+    }
+    async onLoginPress(){
+        const {navigate} = this.props.navigation;
+        if (this.state.email == ""){
+            alert("E-mail é obrigatório.");
+            return;
+        }
+        else if (this.state.password == ""){
+            alert("Senha é obrigatório.");
+            return;
+        }
+        var res;
+        const response = await api.get('/usuarios/' + this.state.email)
+        .then(function (response){
+            console.log(response);
+            res = response;
+        })
+        .catch(function (error){
+            console.log(error);
+        });
+        if(res.data[0] == null){
+            alert("Credenciais invalidas!");
+            return;
+        }
+        if(res.data[0].senha == this.state.password){
+            return navigate("Perfil");
+        }
     }
     render(){
         const { navigate } = this.props.navigation;
@@ -19,15 +50,16 @@ export default class Login extends Component{
                     style={styles.input}
                     placeholder="Digite seu e-mail"
                     value={this.state.email}
-                    onChangeText={email=>this.setState({ email })}
+                    onChangeText={(val) => this.setState({email: val})}
                 />
                 <TextInput
                     style={styles.input}
                     placeholder="Digite sua senha"
-                    value={this.state.senha}
-                    onChangeText={senha=>this.setState({ senha })}
+                    value={this.state.password}
+                    onChangeText={(val) => this.setState({password: val})}
+                    secureTextEntry={true}
                 />
-                <TouchableOpacity style={styles.button} onPress={() => {}}>
+                <TouchableOpacity style={styles.button} onPress={this.onLoginPress.bind(this)}>
                     <Text style={styles.buttonText}>Logar</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.button} onPress={() => navigate('Cadastro')}>
@@ -42,7 +74,6 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#b7b7b7',
         padding: 20
     },
     title: {
