@@ -1,20 +1,37 @@
 import React, { Component } from 'react';
 
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, AsyncStorage } from 'react-native';
 
 export default class Cadastro extends Component{
     constructor(){
         super();
         this.state = {
+            nome:""
         }
+    }
+    componentDidMount(){
+        this.pegaNome();
+    }
+    async pegaNome() {
+      try {
+        const value = await AsyncStorage.getItem('NAME');
+        if (value !== null) {
+          // We have data!!
+          console.log(value);
+          this.setState({nome: value});
+        }
+       } catch (error) {
+         // Error retrieving data
+       }
     }
     static navigationOptions = {
         title: 'Perfil'
     }
     render(){
         return(
+            const { navigate } = this.props.navigation;
             <View style={styles.container}>
-
+                    <Text>Seja bem vindo(a) {this.state.nome}</Text>
             </View>
         );
     }

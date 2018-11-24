@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import api from '../services/api'
 
-import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, AsyncStorage } from 'react-native';
 
 export default class Login extends Component{
     constructor(){
@@ -38,6 +38,11 @@ export default class Login extends Component{
             return;
         }
         if(res.data[0].senha == this.state.password){
+            try {
+              await AsyncStorage.setItem('NAME', res.data[0].nome);
+            } catch (error) {
+              console.log(error);
+            }
             return navigate("Perfil");
         }
     }
