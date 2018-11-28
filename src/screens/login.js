@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import api from '../services/api'
+import api from '../services/api';
 
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, AsyncStorage } from 'react-native';
 
@@ -27,7 +27,7 @@ export default class Login extends Component{
         var res;
         const response = await api.get('/usuarios/' + this.state.email)
         .then(function (response){
-            console.log(response);
+            //console.log(response);
             res = response;
         })
         .catch(function (error){
@@ -37,9 +37,14 @@ export default class Login extends Component{
             alert("Credenciais invalidas!");
             return;
         }
-        if(res.data[0].senha == this.state.password){
+        else if (res.data[0].senha != this.state.password) {
+          alert("Credenciais invalidas!");
+          return;
+        }
+        else if(res.data[0].senha == this.state.password){
             try {
               await AsyncStorage.setItem('NAME', res.data[0].nome);
+              await AsyncStorage.setItem('EMAIL', res.data[0].email);
             } catch (error) {
               console.log(error);
             }

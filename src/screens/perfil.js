@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import { StyleSheet, View, Text, AsyncStorage } from 'react-native';
+import { StyleSheet, View, Text, AsyncStorage, TouchableOpacity } from 'react-native';
 
 export default class Cadastro extends Component{
     constructor(){
@@ -16,22 +16,24 @@ export default class Cadastro extends Component{
       try {
         const value = await AsyncStorage.getItem('NAME');
         if (value !== null) {
-          // We have data!!
-          console.log(value);
+          //console.log(value);
           this.setState({nome: value});
         }
        } catch (error) {
-         // Error retrieving data
+         console.log(error);
        }
     }
     static navigationOptions = {
         title: 'Perfil'
     }
     render(){
+        const {navigate} = this.props.navigation;
         return(
-            const { navigate } = this.props.navigation;
             <View style={styles.container}>
-                    <Text>Seja bem vindo(a) {this.state.nome}</Text>
+              <Text>Seja bem vindo(a) {this.state.nome}!</Text>
+              <TouchableOpacity style={styles.button} onPress={() => navigate('EditarPerfil')}>
+                  <Text style={styles.buttonText}>Editar Perfil</Text>
+              </TouchableOpacity>
             </View>
         );
     }
