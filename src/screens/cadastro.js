@@ -42,6 +42,25 @@ export default class Cadastro extends Component{
         .catch(function (error){
             console.log(error);
         });
+
+        var temp;
+        const res = await api.get('/usuarios/' + this.state.email)
+        .then(function (res){
+            //console.log(response);
+            temp = res;
+        })
+        .catch(function (error){
+            console.log(error);
+        });
+        const send = await api.post('/financeira',{
+            id: temp.data[0].id
+        })
+        .then(function (temp){
+            console.log(temp);
+        })
+        .catch(function (error){
+            console.log(error);
+        });
     }
     render(){
         return(

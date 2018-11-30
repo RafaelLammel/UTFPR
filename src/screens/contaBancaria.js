@@ -1,23 +1,18 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import { View, Text, StyleSheet, } from 'react-native';
 
-export default class ContaFinanceira extends Component{
+export default class ContaBancaria extends Component{
     constructor(){
         super();
     }
     static navigationOptions = {
-        title: 'Contas Financeiras'
+        title: 'Conta Bancária'
     }
     render(){
         const { navigate } = this.props.navigation;
         return(
             <View style={styles.container}>
-              <TouchableOpacity style={styles.button} onPress={() => navigate('CartaoCredito')}>
-                  <Text style={styles.buttonText}>Cartão de Crédito</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.button} onPress={() => navigate('ContaBancaria')}>
-                <Text style={styles.buttonText}>Conta Bancária</Text>
-              </TouchableOpacity>
+
             </View>
         );
     }
