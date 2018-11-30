@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import api from '../services/api';
 import { StyleSheet, View, Text, TextInput, AsyncStorage, TouchableOpacity } from 'react-native';
 
-export default class Cadastro extends Component{
+export default class EditarPerfil extends Component{
     constructor(){
         super();
         this.state = {

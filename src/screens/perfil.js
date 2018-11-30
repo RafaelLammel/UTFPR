@@ -1,28 +1,71 @@
 import React, { Component } from 'react';
+import api from '../services/api';
 
 import { StyleSheet, View, Text, AsyncStorage, TouchableOpacity } from 'react-native';
 
-export default class Cadastro extends Component{
+export default class Perfil extends Component{
+
     constructor(){
         super();
         this.state = {
-            nome:""
+            nome:'',
+            id:'',
+            email:''
         }
     }
+
     componentDidMount(){
         this.pegaNome();
     }
+
     async pegaNome() {
       try {
-        const value = await AsyncStorage.getItem('NAME');
+        var value = await AsyncStorage.getItem('NAME');
         if (value !== null) {
           //console.log(value);
           this.setState({nome: value});
+        }
+        value = await AsyncStorage.getItem('ID');
+        if (value !== null) {
+          //console.log(value);
+          this.setState({id: value});
+        }
+        value = await AsyncStorage.getItem('EMAIL');
+        if (value !== null) {
+          //console.log(value);
+          this.setState({email: value});
         }
        } catch (error) {
          console.log(error);
        }
     }
+
+    async viraMusico(){
+      var temp;
+      const res = await api.get('/usuarios/' + this.state.email)
+      .then(function (res){
+          //console.log(response);
+          temp = res;
+      })
+      .catch(function (error){
+          console.log(error);
+      });
+      if (temp.data[0].musico == 1){
+        alert("Você já é músico!!");
+        return;
+      }
+      const response = await api.put('/usuarios/' + this.state.id,{
+          musico: 1,
+      })
+      .then(function (response){
+          console.log(response);
+          alert("Agora você é musico!");
+      })
+      .catch(function (error){
+          console.log(error);
+      });
+    }
+
     static navigationOptions = {
         title: 'Perfil'
     }
@@ -33,6 +76,12 @@ export default class Cadastro extends Component{
               <Text>Seja bem vindo(a) {this.state.nome}!</Text>
               <TouchableOpacity style={styles.button} onPress={() => navigate('EditarPerfil')}>
                   <Text style={styles.buttonText}>Editar Perfil</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.button} onPress={() => navigate('ContaFinanceira')}>
+                  <Text style={styles.buttonText}>Cadastrar Conta Financeira</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.button} onPress={this.viraMusico.bind(this)}>
+                <Text style={styles.buttonText}>Virar Musico</Text>
               </TouchableOpacity>
             </View>
         );

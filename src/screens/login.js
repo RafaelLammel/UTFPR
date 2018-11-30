@@ -45,6 +45,7 @@ export default class Login extends Component{
             try {
               await AsyncStorage.setItem('NAME', res.data[0].nome);
               await AsyncStorage.setItem('EMAIL', res.data[0].email);
+              await AsyncStorage.setItem('ID', res.data[0].id.toString());
             } catch (error) {
               console.log(error);
             }
