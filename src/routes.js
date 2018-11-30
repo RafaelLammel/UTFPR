@@ -2,12 +2,20 @@ const express = require('express');
 const routes = express.Router();
 
 //Rotas para usuarios;
-const usuariosController = require('./controllers/UsersController');
-//Retorna todos os usuarios;
-routes.get('/usuarios',usuariosController.index);
-routes.post('/usuarios',usuariosController.store);
-routes.get('/usuarios/:email',usuariosController.login);
-routes.put('/usuarios/:id',usuariosController.update);
+const usersController = require('./controllers/UsersController');
+routes.get('/usuarios',usersController.index);
+routes.post('/usuarios',usersController.store);
+routes.get('/usuarios/:email',usersController.login);
+routes.put('/usuarios/:id',usersController.update);
+
+//Rotas para conta financeira
+const financialsController = require('./controllers/FinancialsController');
+routes.post('/financeira',financialsController.store);
+routes.get('/financeira/:id',financialsController.getFinancial);
+
+//Rotas para usuarios;
+const creditCardController = require('./controllers/CreditCardController');
+routes.post('/cartaocredito',creditCardController.store);
 
 
 module.exports = routes;

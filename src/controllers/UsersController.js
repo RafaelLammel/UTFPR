@@ -17,13 +17,13 @@ module.exports = {
     },
 
     async store(req, res){
-        conn.query('INSERT INTO usuario (nome, email, senha) VALUES (?,?,?)',
-        [req.body.nome, req.body.email, req.body.senha]
+        conn.query('INSERT INTO usuario (nome, email, senha, musico) VALUES (?,?,?,?)',
+        [req.body.nome, req.body.email, req.body.senha, req.body.musico]
         , function (error, results, fields) {
           if (error) throw error;
           return res.json(results);
       });
-    },
+  },
 
     async update(req, res){
         conn.query('UPDATE usuario SET ? WHERE id=?',[req.body,req.params.id],function (error, results, fields) {
