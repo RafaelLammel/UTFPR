@@ -13,9 +13,13 @@ const financialsController = require('./controllers/FinancialsController');
 routes.post('/financeira',financialsController.store);
 routes.get('/financeira/:id',financialsController.getFinancial);
 
-//Rotas para usuarios;
+//Rotas para conta bancária;
 const creditCardController = require('./controllers/CreditCardController');
 routes.post('/cartaocredito',creditCardController.store);
+
+//Rotas para cartão de crédito;
+const bankAccountController = require('./controllers/bankAccountController');
+routes.post('/contabancaria',bankAccountController.store);
 
 
 module.exports = routes;
