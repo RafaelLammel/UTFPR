@@ -1,22 +1,86 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, } from 'react-native';
+import api from '../services/api'
+
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, AsyncStorage } from 'react-native';
 
 export default class ContaBancaria extends Component{
-    constructor(){
-        super();
+  constructor(){
+      super();
+      this.state={
+        conta:'',
+        agencia:''
+      }
+  }
+  static navigationOptions = {
+      title: 'Conta Bancária'
+  }
+  async cadastraConta(){
+    if (this.state.conta == ""){
+        alert("Conta é obrigatório.");
+        return;
     }
-    static navigationOptions = {
-        title: 'Conta Bancária'
+    else if (this.state.agencia == ""){
+        alert("Agencia é obrigatório.");
+        return;
     }
-    render(){
-        const { navigate } = this.props.navigation;
-        return(
-            <View style={styles.container}>
+    var value;
+      try{
+      value = await AsyncStorage.getItem('ID');
+      if (value !== null) {
+        //console.log(value);
+      }
+     } catch (error) {
+       console.log(error);
+    }
+    console.log(value);
+    var temp;
 
-            </View>
-        );
-    }
-}
+    const res = await api.get('/financeira/' + value)
+    .then(function (res){
+        //console.log(response);
+        temp = res;
+    })
+    .catch(function (error){
+        console.log(error);
+    });
+    console.log(temp.data[0].ID);
+    const response = await api.post('/contabancaria',{
+        conta: this.state.conta,
+        agencia: this.state.agencia,
+        ID: temp.data[0].ID
+    })
+    .then(function (response){
+        console.log(response);
+        alert("Conta Bancária cadastrada com sucesso!");
+    })
+    .catch(function (error){
+        console.log(error);
+    });
+  }
+  render(){
+      const { navigate } = this.props.navigation;
+      return(
+          <View style={styles.container}>
+            <Text style={styles.title}>Cadastro</Text>
+            <TextInput
+                style={styles.input}
+                placeholder="Digite o numero da conta"
+                value={this.state.conta}
+                onChangeText={(val) => this.setState({conta: val})}
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="Digite o numero do agência"
+                value={this.state.agencia}
+                onChangeText={(val) => this.setState({agencia: val})}
+            />
+            <TouchableOpacity style={styles.button} onPress={this.cadastraConta.bind(this)}>
+                <Text style={styles.buttonText}>Cadastrar</Text>
+            </TouchableOpacity>
+          </View>
+      );
+  }
+  }
 const styles = StyleSheet.create({
     container: {
         flex: 1,
