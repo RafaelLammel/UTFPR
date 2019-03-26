@@ -66,30 +66,17 @@ public class Problema implements PontosCardeais {
     public Estado suc(Estado est, int acao) {
         int lin = est.getLin();
         int col = est.getCol();
-        
-        // define incrementos para cada ação
-        int incrLin[] = {-1,-1,0,1,1,1,0,-1};
-        int incrCol[] = {0,1,1,1,0,-1,-1,-1};
-        
-        lin += incrLin[acao];
-        col += incrCol[acao];
-        
-        // verifica limites do tabuleiro
-        if (lin < 0)
-            lin = 0;
-        if (col < 0)
-            col = 0;
-        if (lin == crencaLabir.getMaxLin())
-            lin = (crencaLabir.getMaxLin()-1);
-        if (col == crencaLabir.getMaxCol())
-            col = (crencaLabir.getMaxCol()-1);
-        
-        //verifica parede: caso tenha, fica na posicao original
-        if (crencaLabir.parede[lin][col] == 1) {
-            lin = est.getLin();
-            col = est.getCol();
-        }
-            
+        // define as ações possíveis
+        int[] acoesPos = acoesPossiveis(est);
+        // verifica se ação passada é possível, se sim modifica o estado
+        if(acoesPos[acao] != -1)
+        {
+            // define incrementos para cada ação
+            int incrLin[] = {-1,-1,0,1,1,1,0,-1};
+            int incrCol[] = {0,1,1,1,0,-1,-1,-1};
+            lin += incrLin[acao];
+            col += incrCol[acao];
+        }  
         return new Estado(lin, col);
     }
 
