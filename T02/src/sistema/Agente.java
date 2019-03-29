@@ -29,6 +29,19 @@ public class Agente implements PontosCardeais {
         
         //@todo T2: crencas do agente a respeito do labirinto
         prob.criarLabirinto(9, 9);
+        prob.crencaLabir.porParedeVertical(0, 1, 0);
+        prob.crencaLabir.porParedeVertical(0, 0, 1);
+        prob.crencaLabir.porParedeVertical(5, 8, 1);
+        prob.crencaLabir.porParedeVertical(5, 5, 2);
+        prob.crencaLabir.porParedeVertical(8, 8, 2);
+        prob.crencaLabir.porParedeHorizontal(4, 7, 0);
+        prob.crencaLabir.porParedeHorizontal(7, 7, 1);
+        prob.crencaLabir.porParedeHorizontal(3, 5, 2);
+        prob.crencaLabir.porParedeHorizontal(3, 5, 3);
+        prob.crencaLabir.porParedeHorizontal(7, 7, 3);
+        prob.crencaLabir.porParedeVertical(6, 7, 4);
+        prob.crencaLabir.porParedeVertical(5, 6, 5);
+        prob.crencaLabir.porParedeVertical(5, 7, 7);
                
         //@todo T2: crencas do agente: Estado inicial, objetivo e atual
         // utilizar atributos da classe Problema
@@ -46,23 +59,23 @@ public class Agente implements PontosCardeais {
         //@todo T2: executar o plano de acoes: SOMENTE UMA ACAO POR CHAMADA DESTE METODO
         // Ao final do plano, verifique se o agente atingiu o estado objetivo verificando
         // com o teste de objetivo
-        if(prob.testeObjetivo(estAtu)){
-            return -1;
-        }
-        System.out.println("Estado atual: " + estAtu.getString());
-        System.out.print("Ações possiveis: {");
+        System.out.println("estado atual: " + estAtu.getString());
+        System.out.print("açoes possiveis: {");
         int[] acoes = prob.acoesPossiveis(estAtu);
         for (int i = 0; i < 8; i++)
             if(acoes[i] != -1)
                 System.out.print(acao[i]+" ");
         System.out.println("}");
-        System.out.println("Ação escolhida: " + acao[plan[ct]]);
+        System.out.print("ct: " + (ct+1) + " de " + plan.length);
+        System.out.println(" ação escolhida: " + acao[plan[ct]]);
         executarIr(plan[ct]);
         Estado novoEstado = prob.suc(estAtu, plan[ct]);
         custo+=prob.obterCustoAcao(estAtu, plan[ct], novoEstado);
-        System.out.println("Custo até o momento: " + custo);
+        System.out.println("custo ate o momento: " + custo);
         estAtu = novoEstado;
-        
+        if(prob.testeObjetivo(estAtu)){
+            return -1;
+        }
         //@todo T2: imprimir o que foi pedido
         
         
