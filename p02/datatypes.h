@@ -4,13 +4,17 @@
 //
 // Estruturas de dados internas do sistema operacional
 
+#include <ucontext.h>
+
 #ifndef __DATATYPES__
 #define __DATATYPES__
 
 // Estrutura que define uma tarefa
 typedef struct task_t
 {
-  // preencher quando necessário
+  struct task_t *prev, *next;
+  int tid;
+  ucontext_t context;
 } task_t ;
 
 // estrutura que define um semáforo
