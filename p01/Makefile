@@ -4,7 +4,7 @@
 	@echo " "
 
 saida: contexts.o
-	gcc -o saida contexts.o
+	gcc -Wall -o saida contexts.o
 
 contexts.o: contexts.c
 	gcc -o contexts.o -c contexts.c

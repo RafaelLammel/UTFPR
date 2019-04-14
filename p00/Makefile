@@ -4,7 +4,7 @@
 	@echo " "
 
 saida: queue.o testafila.o
-	gcc -o saida queue.o testafila.o
+	gcc -Wall -o saida queue.o testafila.o
 
 queue.o: queue.c queue.h
 	gcc -o queue.o -c queue.c
