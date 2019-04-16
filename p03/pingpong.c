@@ -4,54 +4,23 @@
 #include "pingpong.h"
 #include "queue.h"
 #define STACKSIZE 32768		/* tamanho de pilha das threads */
-#define N 100
-
-typedef struct filatasks_t
-{
-   struct filatasks_t *prev;
-   struct filatasks_t *next;
-   task_t *t;
-} filatasks_t ;
 
 int taskid, userTasks;
-task_t contextMain, *current, *dispatcher;
-filatasks_t item;
-filatasks_t *filaProntas;
+task_t contextMain, dispatcher, *current, *filaProntas;
+
+task_t *scheduler();
+void dispatcher_body ();
 
 // funções gerais ==============================================================
-
-task_t *scheduler()
-{
-    filatasks_t *aux;
-    aux = (filatasks_t*) queue_remove((queue_t**)&filaProntas,(queue_t*)filaProntas);
-    return aux->t;
-}
-
-void dispatcher_body ()
-{
-    task_t* next;
-    while ( userTasks > 0 )
-    {
-        next = scheduler();
-        if (next)
-        {
-            task_switch (next);
-        }
-        userTasks--;
-    }
-    task_exit(0);
-}
-
 
 void pingpong_init()
 {
     /* desativa o buffer da saida padrao (stdout), usado pela função printf */
     setvbuf (stdout, 0, _IONBF, 0);
-    taskid = 0;
-    userTasks = 0;
+    taskid = 0, userTasks = 0;
     contextMain.tid = taskid;
+    task_create(&dispatcher,dispatcher_body,NULL);
     current = &contextMain;
-    task_create(dispatcher,(void *)dispatcher_body,NULL);
 }
 
 // gerência de tarefas =========================================================
@@ -77,10 +46,14 @@ int task_create (task_t *task, void (*start_func)(void *), void *arg)
         exit (1);
     }
     makecontext(&(task->context),(void*)(*start_func),1,arg);
+    if(task != &dispatcher) // Dispatcher não pode estar na fila;
+    {
+        queue_append((queue_t**) &filaProntas, (queue_t*) task);
+        userTasks++;
+    }
 #ifdef DEBUG
     printf("task_create: criou a tarefa: %d\n", task->tid);
 #endif
-    userTasks++;
     return task->tid;
 }
 
@@ -89,7 +62,10 @@ void task_exit (int exitCode)
 #ifdef DEBUG
     printf("task_exit: tarefa %d sendo encerrada\n", current->tid);
 #endif
-    task_switch(&contextMain);
+    if(current == &dispatcher)
+        task_switch(&contextMain);
+    else
+        task_switch(&dispatcher);
 }
 
 int task_switch (task_t *task)
@@ -109,15 +85,70 @@ int task_id ()
     return current->tid;
 }
 
+void task_suspend (task_t *task, task_t **queue)
+{
+    if (queue != NULL)
+    {
+        if(task == NULL)
+        {
+            task->status = suspensa;
+            queue_remove((queue_t**) &filaProntas,(queue_t*)task);
+            queue_append((queue_t**)queue,(queue_t*)task);
+        }
+        else
+        {
+            current->status = suspensa;
+            queue_remove((queue_t**) &filaProntas,(queue_t*)current);
+            queue_append((queue_t**)queue,(queue_t*)current);
+        }
+    }
+}
+
+void task_resume (task_t *task)
+{
+    if(task->next != NULL && task->prev != NULL)
+    {
+        task->next->prev = task->prev;
+        task->prev->next = task->next;
+    }
+    task->status = pronta;
+    queue_append((queue_t**)&filaProntas, (queue_t*)task);
+}
+
 // operações de escalonamento ==================================================
 
 void task_yield ()
 {
-    item.next = NULL;
-    item.prev = NULL;
-    item.t = current;
-    queue_append((queue_t**) &filaProntas,(queue_t*) &item);
-    task_switch(dispatcher);
+    if(current->tid != 0) // o contexto Main não pode estar na fila de prontas, se não o programa encerra antes do esperado;
+    {
+        queue_append((queue_t**) &filaProntas, (queue_t*) current);
+        userTasks++;
+    }
+    task_switch(&dispatcher);
 }
 
-// =============================================================================
+// Funções que não estão no Header ===========================================
+
+task_t *scheduler()
+{
+    task_t *next, *aux;
+    aux = filaProntas;
+    next = (task_t *) queue_remove((queue_t**) &filaProntas,(queue_t*)aux);
+    return next;
+}
+
+void dispatcher_body () // dispatcher é uma tarefa
+{
+    task_t *next;
+    while ( userTasks > 0 )
+    {
+        next = scheduler() ; // scheduler é uma função
+        if (next)
+        {
+            // ações antes de lançar a tarefa "next", se houverem
+            task_switch (next) ; // transfere controle para a tarefa "next"
+            userTasks--;
+        }
+    }
+    task_exit(0) ; // encerra a tarefa dispatcher
+}

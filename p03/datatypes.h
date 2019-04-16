@@ -9,11 +9,14 @@
 #ifndef __DATATYPES__
 #define __DATATYPES__
 
+enum stat{pronta, suspensa};
+
 // Estrutura que define uma tarefa
 typedef struct task_t
 {
   struct task_t *prev, *next;
   int tid;
+  int status;
   ucontext_t context;
 } task_t ;
 
