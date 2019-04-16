@@ -89,7 +89,7 @@ void task_suspend (task_t *task, task_t **queue)
 {
     if (queue != NULL)
     {
-        if(task == NULL)
+        if(task != NULL)
         {
             task->status = suspensa;
             queue_remove((queue_t**) &filaProntas,(queue_t*)task);
@@ -112,6 +112,8 @@ void task_resume (task_t *task)
         task->prev->next = task->next;
     }
     task->status = pronta;
+    task->next = NULL;
+    task->prev = NULL;
     queue_append((queue_t**)&filaProntas, (queue_t*)task);
 }
 
