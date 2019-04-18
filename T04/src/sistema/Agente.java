@@ -2,12 +2,10 @@ package sistema;
 
 import ambiente.*;
 import arvore.TreeNode;
+import arvore.fnComparator;
 import problema.*;
 import comuns.*;
-import static comuns.PontosCardeais.*;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -109,10 +107,10 @@ public class Agente implements PontosCardeais {
         node.setGn(0);
         node.setState(estAtu);
         // Inciando a fronteira (fila de prioridades)
-        PriorityQueue<TreeNode> fronteira = new PriorityQueue<>(50, new nodeComparator());
+        Queue<TreeNode> fronteira = new PriorityQueue<>(50, new fnComparator());
         fronteira.add(node);
         // Iniciando o Set de explorados
-        HashSet<TreeNode> explorados = new HashSet<>();
+        Set<TreeNode> explorados = new HashSet<>();
         do{
             node = fronteira.poll();
             if(prob.testeObjetivo(node.getState())){
@@ -149,32 +147,19 @@ public class Agente implements PontosCardeais {
         return null;
     }
     
-    public TreeNode existeNaFronteira (PriorityQueue<TreeNode> f, TreeNode node){
+    public TreeNode existeNaFronteira (Queue<TreeNode> f, TreeNode node){
         for(TreeNode n : f)
             if(n.getState().igualAo(node.getState()))
                 return n;
         return null;
     }
     
-    public TreeNode jaExplorado(HashSet<TreeNode> e, TreeNode node){
+    public TreeNode jaExplorado(Set<TreeNode> e, TreeNode node){
         for(TreeNode n : e)
             if(n.getState().igualAo(node.getState())){
                 return n;
             }
         return null;
-    }
-    
-}
-
-class nodeComparator implements Comparator<TreeNode>{
-
-    @Override
-    public int compare(TreeNode o1, TreeNode o2) {
-        if(o1.getGn() > o2.getGn())
-            return 1;
-        else if(o1.getGn() < o2.getGn())
-            return -1;
-        return 0;
     }
     
 }
