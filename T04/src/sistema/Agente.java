@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Scanner;
 import java.util.Set;
 
 /**
@@ -63,7 +64,20 @@ public class Agente implements PontosCardeais {
     public int deliberar() {
         ct++;
         if(ct == 0){
-            plan = custoUniforme();
+            System.out.println("Qual busca deseja fazer?"
+                    + "\n1: Busca Custo Uniforme"
+                    + "\n2: Busca A*");
+            Scanner scan = new Scanner (System.in);
+            String escolha = "1";
+            do{
+                escolha = scan.nextLine();
+                if(!(escolha.equals("1") || escolha.equals("2")))
+                    System.out.println("Escolha invalida! Digite novamente.");
+            }while(!(escolha.equals("1") || escolha.equals("2")));
+            if(escolha.equals("1"))
+                plan = custoUniforme();
+            else
+                plan = buscaAEstrela();
             System.out.print("Solucao: " + plan[0]);
             for(int i = 1; i < plan.length; i++){
                 System.out.print(" - " + plan[i]);
@@ -132,8 +146,18 @@ public class Agente implements PontosCardeais {
                     child.setAction(i);
                     child.setState(prob.suc(node.getState(), i));
                     child.setGn(prob.obterCustoAcao(node.getState(), i, child.getState())+node.getGn());
-                    TreeNode f = existeNaFronteira(fronteira,child);
-                    TreeNode e = jaExplorado(explorados,child);
+                    TreeNode f = null;
+                    TreeNode e = null;
+                    for(TreeNode n : fronteira)
+                        if(n.getState().igualAo(child.getState())){
+                            f = n;
+                            break;
+                        }
+                    for(TreeNode m : explorados)
+                        if(m.getState().igualAo(child.getState())){
+                            e = m;
+                            break;
+                        }
                     if(f == null && e == null){
                         fronteira.add(child);
                     }
@@ -147,19 +171,83 @@ public class Agente implements PontosCardeais {
         return null;
     }
     
-    public TreeNode existeNaFronteira (Queue<TreeNode> f, TreeNode node){
-        for(TreeNode n : f)
-            if(n.getState().igualAo(node.getState()))
-                return n;
+    // Busca A*
+    public int[] buscaAEstrela(){
+        //Inicializando a lista aberta e fechada
+        List<TreeNode> aberta = new ArrayList<>();
+        List<TreeNode> fechada = new ArrayList<>();
+        TreeNode atual = new TreeNode(null);
+        atual.setGn(0);
+        atual.setHn(0);
+        atual.setState(estAtu);
+        //Adicionando o nó inicial na lista aberta
+        aberta.add(atual);
+        while(!aberta.isEmpty()){
+            //Pegando o nó com menor F(n) na lista aberta e o colocando na lista fechada;
+            atual = aberta.get(0);
+            for(int i = 0; i < aberta.size(); i++)
+                if(atual.getFn() > aberta.get(i).getFn())
+                    atual = aberta.get(i);
+            aberta.remove(atual);
+            fechada.add(atual);
+            //Verifica se o nó atual é o objetivo
+            if(prob.testeObjetivo(atual.getState())){
+                List<Integer> listaSolucao = new ArrayList<>();
+                while(atual.getParent() != null){
+                    listaSolucao.add(atual.getAction());
+                    atual = atual.getParent();
+                }
+                int[] solucao = new int[listaSolucao.size()];
+                for (int i = 0; i < listaSolucao.size(); i++)
+                    solucao[i] = listaSolucao.get(listaSolucao.size()-i-1);
+                return solucao;
+            }
+            //Gerando os filhos
+            int[] acoes = prob.acoesPossiveis(atual.getState());
+            List<TreeNode> filhos = new ArrayList<>();
+            for(int i = 0; i < 8; i++){
+                if(acoes[i] != -1){
+                    TreeNode child = atual.addChild();
+                    child.setAction(i);
+                    child.setState(prob.suc(atual.getState(), i));
+                    filhos.add(child);
+                }
+            }
+            //Passando pelos filhos criados e verificando se eles vão para a lista aberta
+            for(TreeNode f : filhos){
+                for (TreeNode c : fechada)
+                    if (c.getState().igualAo(f.getState()))
+                        continue;
+                f.setGn(prob.obterCustoAcao(atual.getState(), f.getAction(), f.getState())+atual.getGn());
+                f.setHn(h1(f.getState(),prob.estObj));
+                for(TreeNode a : aberta)
+                    if(f.getState().igualAo(a.getState()) && f.getGn() > a.getGn())
+                        continue;
+                aberta.add(f);
+            }
+        }
         return null;
     }
     
-    public TreeNode jaExplorado(Set<TreeNode> e, TreeNode node){
-        for(TreeNode n : e)
-            if(n.getState().igualAo(node.getState())){
-                return n;
-            }
-        return null;
+    //Manhattan Distance
+    public float h1(Estado no, Estado objetivo){
+        float dx = Math.abs(no.getCol()-objetivo.getCol());
+        float dy = Math.abs(no.getLin()-objetivo.getLin());
+        float D = 1;
+        return D*(dx+dy);
+    }
+    
+    //Diagnoal
+    public float h2(Estado no, Estado objetivo){
+        float dx = Math.abs(no.getCol()-objetivo.getCol());
+        float dy = Math.abs(no.getLin()-objetivo.getLin());
+        float D1 = 1, D2 = 1.5f;
+        float menor;
+        if(dx>dy)
+            menor = dy;
+        else
+            menor = dx;
+        return D1 *(dx+dy) + (D2-2*D1) * menor;
     }
     
 }
