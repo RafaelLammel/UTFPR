@@ -20,23 +20,7 @@ task_t contextMain, dispatcher, *current, *filaProntas;
 
 task_t *scheduler();
 void dispatcher_body ();
-
-unsigned int systime(){
-  return clock;
-}
-
-void tratador (int signum)
-{
-    clock++;
-    if(current != &dispatcher && current != &contextMain)
-    {
-        current->quantum--;
-        if(current->quantum == 0)
-        {
-            task_yield();
-        }
-    }
-}
+void tratador (int signum);
 
 // funções gerais ==============================================================
 
@@ -86,6 +70,8 @@ int task_create (task_t *task, void (*start_func)(void *), void *arg)
         task->context.uc_stack.ss_flags = 0;
         task->context.uc_link = 0;
         task->tid = ++taskid;
+        task->createTime = clock;
+        task->processTime = 0;
     }
     else
     {
@@ -103,22 +89,24 @@ int task_create (task_t *task, void (*start_func)(void *), void *arg)
 #ifdef DEBUG
     printf("task_create: criou a tarefa: %d\n", task->tid);
 #endif
-    task->createTime = clock;
     return task->tid;
 }
 
 void task_exit (int exitCode)
 {
     current->exitTime = clock;
-    printf("Task: %d exit: execution time: %d ms, processor time: 0 ms, activations: %d\n",current->tid,
-    current->exitTime-current->createTime,current->act);
+    printf("Task: %d exit: execution time: %d ms, processor time: %d ms, activations: %d\n",current->tid,
+    current->exitTime-current->createTime,current->processTime,current->act);
 #ifdef DEBUG
     printf("task_exit: tarefa %d sendo encerrada\n", current->tid);
 #endif
     if(current == &dispatcher)
         task_switch(&contextMain);
     else
+    {
+        dispatcher.act++;
         task_switch(&dispatcher);
+    }
 }
 
 int task_switch (task_t *task)
@@ -174,12 +162,12 @@ void task_resume (task_t *task)
 
 void task_yield ()
 {
-    current->act++;
     if(current->tid != 0) // o contexto Main não pode estar na fila de prontas, se não o programa encerra antes do esperado;
     {
         queue_append((queue_t**) &filaProntas, (queue_t*) current);
         userTasks++;
     }
+    dispatcher.act++;
     task_switch(&dispatcher);
 }
 
@@ -210,7 +198,7 @@ task_t *scheduler()
 {
     task_t *next, *aux;
     aux = filaProntas;
-    /*next = aux;
+    next = aux;
     do
     {
         if(aux->dynamicPrio <= next->dynamicPrio)
@@ -227,8 +215,8 @@ task_t *scheduler()
         aux = aux->next;
     }
     while(aux != filaProntas);
-    next->dynamicPrio = next->staticPrio;*/
-    next = (task_t*) queue_remove((queue_t**) &filaProntas,(queue_t*)aux);
+    next->dynamicPrio = next->staticPrio;
+    queue_remove((queue_t**) &filaProntas,(queue_t*)next);
     return next;
 }
 
@@ -241,9 +229,30 @@ void dispatcher_body () // dispatcher é uma tarefa
         if (next)
         {
             next->quantum = 20;
+            next->act++;
             task_switch (next) ; // transfere controle para a tarefa "next"
             userTasks--;
         }
     }
     task_exit(0) ; // encerra a tarefa dispatcher
+}
+
+
+void tratador (int signum)
+{
+    clock++;
+    if(current != &dispatcher && current != &contextMain)
+    {
+        current->quantum--;
+        current->processTime++;
+        if(current->quantum == 0)
+        {
+            task_yield();
+        }
+    }
+}
+
+unsigned int systime()
+{
+  return clock;
 }

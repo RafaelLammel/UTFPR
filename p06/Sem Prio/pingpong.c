@@ -15,6 +15,7 @@ struct sigaction action ;
 struct itimerval timer;
 
 int taskid, userTasks, tick;
+unsigned int clock;
 task_t contextMain, dispatcher, *current, *filaProntas;
 
 task_t *scheduler();
@@ -31,6 +32,7 @@ void pingpong_init()
     contextMain.tid = taskid;
     task_create(&dispatcher,dispatcher_body,NULL);
     current = &contextMain;
+    clock = 0;
     //Iniciando o Signal
     action.sa_handler = tratador ;
     sigemptyset (&action.sa_mask) ;
@@ -68,6 +70,8 @@ int task_create (task_t *task, void (*start_func)(void *), void *arg)
         task->context.uc_stack.ss_flags = 0;
         task->context.uc_link = 0;
         task->tid = ++taskid;
+        task->createTime = clock;
+        task->processTime = 0;
     }
     else
     {
@@ -90,13 +94,19 @@ int task_create (task_t *task, void (*start_func)(void *), void *arg)
 
 void task_exit (int exitCode)
 {
+    current->exitTime = clock;
+    printf("Task: %d exit: execution time: %d ms, processor time: %d ms, activations: %d\n",current->tid,
+    current->exitTime-current->createTime,current->processTime,current->act);
 #ifdef DEBUG
     printf("task_exit: tarefa %d sendo encerrada\n", current->tid);
 #endif
     if(current == &dispatcher)
         task_switch(&contextMain);
     else
+    {
+        dispatcher.act++;
         task_switch(&dispatcher);
+    }
 }
 
 int task_switch (task_t *task)
@@ -157,6 +167,7 @@ void task_yield ()
         queue_append((queue_t**) &filaProntas, (queue_t*) current);
         userTasks++;
     }
+    dispatcher.act++;
     task_switch(&dispatcher);
 }
 
@@ -218,6 +229,7 @@ void dispatcher_body () // dispatcher é uma tarefa
         if (next)
         {
             next->quantum = 20;
+            next->act++;
             task_switch (next) ; // transfere controle para a tarefa "next"
             userTasks--;
         }
@@ -228,13 +240,19 @@ void dispatcher_body () // dispatcher é uma tarefa
 
 void tratador (int signum)
 {
+    clock++;
     if(current != &dispatcher && current != &contextMain)
     {
         current->quantum--;
+        current->processTime++;
         if(current->quantum == 0)
         {
-            //   printf("Acabou o Quantum da Tarefa: %d\n",current->tid);
             task_yield();
         }
     }
+}
+
+unsigned int systime()
+{
+  return clock;
 }
