@@ -28,6 +28,7 @@ public class Agente implements PontosCardeais {
     int plan[];
     double custo;
     static int ct = -1;
+    private int nos = 0, ct_ja_explorados = 0, ct_descartados_front = 0;
            
     public Agente(Model m) {
         this.model = m;
@@ -64,6 +65,7 @@ public class Agente implements PontosCardeais {
     public int deliberar() {
         ct++;
         if(ct == 0){
+            custo = 0;
             System.out.println("Qual busca deseja fazer?"
                     + "\n1: Busca Custo Uniforme"
                     + "\n2: Busca A*");
@@ -86,11 +88,24 @@ public class Agente implements PontosCardeais {
         }
         if(prob.testeObjetivo(estAtu)){
             System.out.println("estado atual: " + estAtu.getString());
-            System.out.println("Chegou no objetivo!");
+            System.out.println("Chegou no objetivo!\n");
+            System.out.println("Complexidade Temporal: " + nos);
+            int maior = nos;
+            if (nos < ct_ja_explorados)
+                maior = ct_ja_explorados;
+            if (ct_descartados_front > maior)
+                maior = ct_descartados_front;
+            System.out.println("Complexidade Espacial: " + maior);
+            System.out.print("Solucao: " + plan[0]);
+            for(int i = 1; i < plan.length; i++){
+                System.out.print(" - " + plan[i]);
+            }
+            System.out.println("\nCusto: " + custo);
             return -1;
         }
         System.out.println("estado atual: " + estAtu.getString());
         System.out.println("proxima acao do plano: " + plan[ct]);
+        custo += prob.obterCustoAcao(estAtu, plan[ct], prob.suc(estAtu, plan[ct]));
         executarIr(plan[ct]);
         Estado novoEstado = prob.suc(estAtu, plan[ct]);
         estAtu = novoEstado;
@@ -118,6 +133,7 @@ public class Agente implements PontosCardeais {
     public int[] custoUniforme(){
         // Iniciando o nó
         TreeNode node = new TreeNode(null);
+        nos++;
         node.setGn(0);
         node.setState(estAtu);
         // Inciando a fronteira (fila de prioridades)
@@ -143,6 +159,7 @@ public class Agente implements PontosCardeais {
             for(int i = 0; i < 8; i++){
                 if(acoes[i] != -1){
                     TreeNode child = node.addChild();
+                    nos++;
                     child.setAction(i);
                     child.setState(prob.suc(node.getState(), i));
                     child.setGn(prob.obterCustoAcao(node.getState(), i, child.getState())+node.getGn());
@@ -158,13 +175,18 @@ public class Agente implements PontosCardeais {
                             e = m;
                             break;
                         }
+                    if(e != null)
+                        ct_ja_explorados++;
                     if(f == null && e == null){
                         fronteira.add(child);
                     }
                     else if (f != null && f.getGn() > child.getGn()){
                         fronteira.remove(f);
                         fronteira.add(child);
+                        ct_descartados_front++;
                     }
+                    else
+                        ct_descartados_front++;
                 }
             }
         }while(!fronteira.isEmpty());
@@ -177,6 +199,7 @@ public class Agente implements PontosCardeais {
         List<TreeNode> aberta = new ArrayList<>();
         List<TreeNode> fechada = new ArrayList<>();
         TreeNode atual = new TreeNode(null);
+        nos++;
         atual.setGn(0);
         atual.setHn(0);
         atual.setState(estAtu);
@@ -208,6 +231,7 @@ public class Agente implements PontosCardeais {
             for(int i = 0; i < 8; i++){
                 if(acoes[i] != -1){
                     TreeNode child = atual.addChild();
+                    nos++;
                     child.setAction(i);
                     child.setState(prob.suc(atual.getState(), i));
                     filhos.add(child);
@@ -216,13 +240,17 @@ public class Agente implements PontosCardeais {
             //Passando pelos filhos criados e verificando se eles vão para a lista aberta
             for(TreeNode f : filhos){
                 for (TreeNode c : fechada)
-                    if (c.getState().igualAo(f.getState()))
+                    if (c.getState().igualAo(f.getState())){
+                        ct_ja_explorados++;
                         continue;
+                    }
                 f.setGn(prob.obterCustoAcao(atual.getState(), f.getAction(), f.getState())+atual.getGn());
                 f.setHn(h1(f.getState(),prob.estObj));
                 for(TreeNode a : aberta)
-                    if(f.getState().igualAo(a.getState()) && f.getGn() > a.getGn())
+                    if(f.getState().igualAo(a.getState()) && f.getGn() > a.getGn()){
+                        ct_descartados_front++;
                         continue;
+                    }
                 aberta.add(f);
             }
         }
