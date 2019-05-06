@@ -4,6 +4,12 @@
 //
 // Estruturas de dados internas do sistema operacional
 
+/*
+Modificações - Autores:
+Kelvin James
+Rafael Lammel Marinheiro
+*/
+
 #include <ucontext.h>
 
 #ifndef __DATATYPES__

@@ -1,3 +1,8 @@
+/*
+Projeto 06 sem Prioridades - Autores:
+Kelvin James
+Rafael Lammel Marinheiro
+*/
 #include <ucontext.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,6 +35,7 @@ void pingpong_init()
     setvbuf (stdout, 0, _IONBF, 0);
     taskid = 0, userTasks = 0;
     contextMain.tid = taskid;
+    //Criamos o dispatcher como uma tarefa;
     task_create(&dispatcher,dispatcher_body,NULL);
     current = &contextMain;
     clock = 0;
@@ -60,6 +66,7 @@ int task_create (task_t *task, void (*start_func)(void *), void *arg)
 {
     char *stack;
 
+    //Salva o atual contexto (que está sendo criado) no ponteiro task;
     getcontext (&(task->context));
 
     stack = malloc (STACKSIZE) ;
@@ -78,8 +85,10 @@ int task_create (task_t *task, void (*start_func)(void *), void *arg)
         perror ("Erro na criação da pilha: ");
         exit (1);
     }
+    //Setando prioridades dinamicas e estáticas
     task->staticPrio = 0;
     task->dynamicPrio = 0;
+    //Colocando a função passada para ser executada ao iniciar task;
     makecontext(&(task->context),(void*)(*start_func),1,arg);
     if(task != &dispatcher) // Dispatcher não pode estar na fila;
     {
@@ -100,8 +109,10 @@ void task_exit (int exitCode)
 #ifdef DEBUG
     printf("task_exit: tarefa %d sendo encerrada\n", current->tid);
 #endif
+    //Verifica se a tarefa é dispatcher, se for retorna para a Main;
     if(current == &dispatcher)
         task_switch(&contextMain);
+    //Computa o numero de vezes que Dispatcher é ativado;
     else
     {
         dispatcher.act++;
@@ -117,6 +128,7 @@ int task_switch (task_t *task)
     task_t *aux;
     aux = current;
     current = task;
+    //Troca o contexto para o passado por parâmetro e salva o atual;
     swapcontext(&(aux->context),&(task->context));
     return 0;
 }
@@ -126,6 +138,7 @@ int task_id ()
     return current->tid;
 }
 
+//Não utilizada nesse projeto;
 void task_suspend (task_t *task, task_t **queue)
 {
     if (queue != NULL)
@@ -145,6 +158,7 @@ void task_suspend (task_t *task, task_t **queue)
     }
 }
 
+//Não utilizada nesse projeto;
 void task_resume (task_t *task)
 {
     if(task->next != NULL && task->prev != NULL)
@@ -167,6 +181,7 @@ void task_yield ()
         queue_append((queue_t**) &filaProntas, (queue_t*) current);
         userTasks++;
     }
+    //Computa quantas vezes Dispatcher foi ativado;
     dispatcher.act++;
     task_switch(&dispatcher);
 }
@@ -198,6 +213,9 @@ task_t *scheduler()
 {
     task_t *next, *aux;
     aux = filaProntas;
+
+    //Código usado com prioridades; Não utilizado nesta versão do projeto;
+
     /*next = aux;
     do
     {
@@ -216,6 +234,9 @@ task_t *scheduler()
     }
     while(aux != filaProntas);
     next->dynamicPrio = next->staticPrio;*/
+
+    //Remove a cabeça da fila de prontas e retorna
+    //ela para o dispatcher (FIFO);
     next = (task_t*) queue_remove((queue_t**) &filaProntas,(queue_t*)aux);
     return next;
 }
@@ -228,7 +249,11 @@ void dispatcher_body () // dispatcher é uma tarefa
         next = scheduler() ; // scheduler é uma função
         if (next)
         {
+            //Enquanto houverem tarefas de usuário, scheduler seleciona
+            //a próxima tarefa de acordo com a política implementada
+            //e retorna para que possa ser executada;
             next->quantum = 20;
+            //Computa quantas vezes a tarefa foi ativada;
             next->act++;
             task_switch (next) ; // transfere controle para a tarefa "next"
             userTasks--;
@@ -240,10 +265,15 @@ void dispatcher_body () // dispatcher é uma tarefa
 
 void tratador (int signum)
 {
+    //Variavel para armazenar o tempo total de execução
+    //do programa;
     clock++;
+    //Verifica se é uma tarefa de usuário, se for retira um quantum
+    //e logo em seguida verifica se o quantum acabou para trocar de tarefa;
     if(current != &dispatcher && current != &contextMain)
     {
         current->quantum--;
+        //Computa o tempo total de processamento da tarefa;
         current->processTime++;
         if(current->quantum == 0)
         {
