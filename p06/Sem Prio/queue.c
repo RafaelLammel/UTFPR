@@ -38,7 +38,6 @@ void queue_append (queue_t **queue, queue_t *elem)
 queue_t *queue_remove (queue_t **queue, queue_t *elem)
 {
     queue_t *aux;
-    queue_t *teste;
     if(queue == NULL)
     {
         printf("ERRO: Fila não existe!\n");

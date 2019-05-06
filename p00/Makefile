@@ -7,10 +7,10 @@ saida: queue.o testafila.o
 	gcc -Wall -o saida queue.o testafila.o
 
 queue.o: queue.c queue.h
-	gcc -o queue.o -c queue.c
+	gcc -Wall -o queue.o -c queue.c
 
 testafila.o: testafila.c queue.h
-	gcc -o testafila.o -c testafila.c
+	gcc -Wall -o testafila.o -c testafila.c
 
 clean:
 	rm -f *.o

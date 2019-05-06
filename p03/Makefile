@@ -7,13 +7,13 @@ saida: pingpong-dispatcher.o pingpong.o queue.o
 	gcc -Wall -o saida pingpong-dispatcher.o pingpong.o queue.o
 
 pingpong-dispatcher.o: pingpong-dispatcher.c
-	gcc -o pingpong-dispatcher.o -c pingpong-dispatcher.c
+	gcc -Wall -o pingpong-dispatcher.o -c pingpong-dispatcher.c
 
 pingpong.o: pingpong.c
-	gcc -o pingpong.o -c pingpong.c
+	gcc -Wall -o pingpong.o -c pingpong.c
 
 queue.o: queue.c
-	gcc -o queue.o -c queue.c
+	gcc -Wall -o queue.o -c queue.c
 
 clean:
 	rm -f *.o

@@ -13,16 +13,16 @@ tasks3: pingpong-tasks3.o pingpong.o
 	gcc -Wall -o tasks3 pingpong-tasks3.o pingpong.o
 
 pingpong-tasks1.o: pingpong-tasks1.c datatypes.h pingpong.h
-	gcc -o pingpong-tasks1.o -c pingpong-tasks1.c
+	gcc -Wall -o pingpong-tasks1.o -c pingpong-tasks1.c
 
 pingpong-tasks2.o: pingpong-tasks2.c datatypes.h pingpong.h
-	gcc -o pingpong-tasks2.o -c pingpong-tasks2.c
+	gcc -Wall -o pingpong-tasks2.o -c pingpong-tasks2.c
 
 pingpong-tasks3.o: pingpong-tasks3.c datatypes.h pingpong.h
-	gcc -o pingpong-tasks3.o -c pingpong-tasks3.c
+	gcc -Wall -o pingpong-tasks3.o -c pingpong-tasks3.c
 
 pingpong.o: pingpong.c datatypes.h pingpong.h
-	gcc -o pingpong.o -c pingpong.c
+	gcc -Wall -o pingpong.o -c pingpong.c
 
 clean:
 	rm -f *.o
