@@ -135,25 +135,24 @@ public class Mochila {
      */
     private void calcularFitnessPenalizacao() {
         // Penalizar indivíduos que violam a capacidade da MOCHILA
+        // @to do 
         if(CAPACIDADE_KG_MOCHILA < this.peso)
             this.valor = 0;
-        // @to do 
-
     }
     /**
      * Este método repara a mochila fazendo-a respeitar a capacidade máxima de peso.
      */
     private void calcularFitnessReparacao() {
         //@to do
-        int i = 0;
+        int i;
         while(CAPACIDADE_KG_MOCHILA < this.peso){
+            i = s.nextInt(QTD_ITENS_DISPON);
             if (colocado.get(i) == true) {
                 this.peso -= pesoItem[i];
                 this.valor -= vlrItem[i];
                 this.qtdItens--;
                 
             }
-            i++;
         }
     }
 
