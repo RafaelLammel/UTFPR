@@ -24,19 +24,19 @@ public class AGMochila {
      * tamanho da população = quantidade de indivíduos ou cromossomos
      * OBRIGATORIAMENTE UM NÚMERO PAR >= 2
      */
-    private static final int TAM_POP = 500;
+    private static final int TAM_POP = 700;
     /**
      * critério de parada: máximo de gerações a serem criadas
      */
-    private static final int MAX_GERACOES = 10;
+    private static final int MAX_GERACOES = 500;
     /**
      * probabilidade de crossover entre 2 individuos [0, 1]
      */
-    private static final float PROB_CROSSOVER = (float) 0.8;
+    private static final float PROB_CROSSOVER = (float) 0.7;
     /**
      * probabilidade de mutação de um alelo: [0 ,1]
      */
-    private static final float PROB_MUTACAO = (float) 0.05;
+    private static final float PROB_MUTACAO = (float) 0.1;
 
     // ESTRUTURAS PARA EXECUÇÃO DO AG
     /**
@@ -58,6 +58,9 @@ public class AGMochila {
      * false, escolhe fitness+reparação
      */
     private static final boolean penalizacao = false;
+    
+    private static int[] melhorFitness = new int[MAX_GERACOES];
+    private static int ct;
 
     /**
      * Cria uma população inicial contendo TAM_POP mochilas preenchidas com
@@ -192,13 +195,14 @@ public class AGMochila {
             geracao++;
             //System.out.printf("ger. %03d: melhor fit = %02d\n", geracao, melhorFit);
             System.out.println(geracao + "," + melhorFit);
+            melhorFitness[ct] = melhorFit;
         } while (geracao < MAX_GERACOES);
         return melhorMochila;
     }
 
     public static void main(String[] args) {
         Mochila best;
-        int ct = 0;
+        ct = 0;
         do {
             AGMochila ag = new AGMochila();
             best = ag.executarAG();
@@ -209,5 +213,11 @@ public class AGMochila {
             ct++;
             System.out.println("Total de execucoes = " + ct);
         } while (ct < MAX_EXECUCOES);
+        float m = 0;
+        for (int i = 0; i < 10; i++){
+            System.out.println("Execução: " + (i+1) + " Best fitness: " + melhorFitness[i]);
+            m += melhorFitness[i];
+        }
+        System.out.println("Média: " + (m/10));
     }
 }

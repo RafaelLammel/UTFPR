@@ -136,7 +136,7 @@ public class Mochila {
     private void calcularFitnessPenalizacao() {
         // Penalizar indivíduos que violam a capacidade da MOCHILA
         // @to do 
-        if(CAPACIDADE_KG_MOCHILA < this.peso)
+        if(CAPACIDADE_KG_MOCHILA <= this.peso)
             this.valor = 0;
     }
     /**
@@ -145,7 +145,7 @@ public class Mochila {
     private void calcularFitnessReparacao() {
         //@to do
         int i;
-        while(CAPACIDADE_KG_MOCHILA < this.peso){
+        while(CAPACIDADE_KG_MOCHILA <= this.peso){
             i = s.nextInt(QTD_ITENS_DISPON);
             if (colocado.get(i) == true) {
                 this.peso -= pesoItem[i];
