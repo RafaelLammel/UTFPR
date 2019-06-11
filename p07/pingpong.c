@@ -1,5 +1,5 @@
 /*
-Projeto 06 sem Prioridades - Autores:
+Projeto 07 - Autores:
 Kelvin James
 Rafael Lammel Marinheiro
 */
