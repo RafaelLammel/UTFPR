@@ -113,7 +113,7 @@ void task_exit (int exitCode)
     printf("task_exit: tarefa %d sendo encerrada\n", current->tid);
 #endif
     current->exitCode = exitCode;
-    if(aux != NULL){
+    if(filaSuspensas!=NULL){
       do{
         if(aux->tarefab == current->tid)
         {
@@ -121,6 +121,8 @@ void task_exit (int exitCode)
           aux = aux->next;
           task_resume(acorda);
         }
+        if(filaSuspensas == NULL)
+          break;
         else
           aux = aux->next;
       }while(aux != filaSuspensas);

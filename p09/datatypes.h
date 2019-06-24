@@ -9,7 +9,7 @@
 #ifndef __DATATYPES__
 #define __DATATYPES__
 
-enum stat{pronta, suspensa, adormecida, terminada};
+enum stat{pronta, suspensa, terminada, adormecida};
 
 // Estrutura que define uma tarefa
 typedef struct task_t
@@ -21,6 +21,7 @@ typedef struct task_t
   int dynamicPrio;
   int quantum;
   int exitCode;
+  int tarefab;
   int acordaEm;
   unsigned int createTime;
   unsigned int exitTime;

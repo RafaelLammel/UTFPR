@@ -1,5 +1,5 @@
 /*
-Projeto 09 - Autores:
+Projeto 07 - Autores:
 Kelvin James
 Rafael Lammel Marinheiro
 */
@@ -21,7 +21,8 @@ struct itimerval timer;
 
 int taskid, userTasks, tick;
 unsigned int clock;
-task_t contextMain, dispatcher, *current, *filaProntas, *filaSuspensas, *filaAdormecidas;
+task_t contextMain, dispatcher, *current, *filaProntas, *filaSuspensas,
+*filaAdormecidas;
 
 task_t *scheduler();
 void dispatcher_body ();
@@ -38,7 +39,6 @@ void pingpong_init()
     //Criamos o dispatcher como uma tarefa;
     task_create(&dispatcher,dispatcher_body,NULL);
     current = &contextMain;
-    current->status = pronta;
     clock = 0;
     //Iniciando o Signal
     action.sa_handler = tratador ;
@@ -96,8 +96,8 @@ int task_create (task_t *task, void (*start_func)(void *), void *arg)
     {
         queue_append((queue_t**) &filaProntas, (queue_t*) task);
         userTasks++;
-        task->status = pronta;
     }
+    task->tarefab = -1;
 #ifdef DEBUG
     printf("task_create: criou a tarefa: %d\n", task->tid);
 #endif
@@ -106,6 +106,7 @@ int task_create (task_t *task, void (*start_func)(void *), void *arg)
 
 void task_exit (int exitCode)
 {
+    task_t *aux = filaSuspensas;
     current->exitTime = clock;
     printf("Task: %d exit: execution time: %d ms, processor time: %d ms, activations: %d\n",current->tid,
     current->exitTime-current->createTime,current->processTime,current->act);
@@ -113,9 +114,20 @@ void task_exit (int exitCode)
     printf("task_exit: tarefa %d sendo encerrada\n", current->tid);
 #endif
     current->exitCode = exitCode;
-    current->status = terminada;
-    if(exitCode != 0)
-        task_resume(&contextMain);
+    if(filaSuspensas!=NULL){
+      do{
+        if(aux->tarefab == current->tid)
+        {
+          task_t *acorda = aux;
+          aux = aux->next;
+          task_resume(acorda);
+        }
+        if(filaSuspensas == NULL)
+          break;
+        else
+          aux = aux->next;
+      }while(aux != filaSuspensas);
+    }
     //Verifica se a tarefa é dispatcher, se for retorna para a Main;
     if(current == &dispatcher)
         task_switch(&contextMain);
@@ -166,10 +178,11 @@ void task_suspend (task_t *task, task_t **queue)
 
 void task_resume (task_t *task)
 {
-    queue_remove((queue_t**) &filaSuspensas,(queue_t*)task);
-    task->status = pronta;
-    queue_append((queue_t**)&filaProntas, (queue_t*)task);
-    userTasks++;
+  queue_remove((queue_t**)&filaSuspensas,(queue_t*)task);
+  task->status = pronta;
+  task->tarefab = -1;
+  queue_append((queue_t**)&filaProntas, (queue_t*)task);
+  userTasks++;
 }
 
 // operações de escalonamento ==================================================
@@ -210,12 +223,13 @@ int task_getprio (task_t *task)
 // a tarefa corrente aguarda o encerramento de outra task
 int task_join (task_t *task)
 {
-    if(task != NULL && task->status != terminada)
-    {
-        task_suspend(NULL,&filaSuspensas);
-        return task->exitCode;
-    }
-    return -1;
+  if(task != NULL && task->status != terminada)
+  {
+    current->tarefab = task->tid;
+    task_suspend(NULL,&filaSuspensas);
+    return task->exitCode;
+  }
+  return -1;
 }
 
 // operações de gestão do tempo ================================================
@@ -223,10 +237,10 @@ int task_join (task_t *task)
 // suspende a tarefa corrente por t segundos
 void task_sleep (int t)
 {
-    queue_append((queue_t**)&filaAdormecidas, (queue_t*)current);
-    current->acordaEm = (t*1000)+clock;
-    current->status = adormecida;
-    task_switch(&dispatcher);
+  current->status = adormecida;
+  current->acordaEm = clock+t;
+  queue_append((queue_t**)&filaAdormecidas,(queue_t*)current);
+  task_switch(&dispatcher);
 }
 
 unsigned int systime()
@@ -270,13 +284,28 @@ task_t *scheduler()
 
 void dispatcher_body () // dispatcher é uma tarefa
 {
-    task_t *next, *aux;
-    aux = filaAdormecidas;
-    while ( userTasks > 0)
+    task_t *next, *aux = filaAdormecidas, *aux2;
+    while ( userTasks > 0 )
     {
-        next = scheduler() ; // scheduler é uma função
-        if (next)
-        {
+      if(filaAdormecidas != NULL){
+        do{
+          if(aux->acordaEm <= clock){
+              aux2 = aux;
+              queue_remove((queue_t**)&filaAdormecidas, (queue_t*)aux2);
+              queue_append((queue_t**)&filaProntas, (queue_t*)aux2);
+              aux2->status = pronta;
+              aux = aux->next;
+          }
+          if(filaAdormecidas == NULL){
+            break;
+          }
+          else
+            aux = aux->next;
+        }while(aux != filaAdormecidas);
+      }
+      next = scheduler() ; // scheduler é uma função
+      if (next)
+      {
             //Enquanto houverem tarefas de usuário, scheduler seleciona
             //a próxima tarefa de acordo com a política implementada
             //e retorna para que possa ser executada;
@@ -287,7 +316,6 @@ void dispatcher_body () // dispatcher é uma tarefa
             userTasks--;
         }
     }
-
     task_exit(0) ; // encerra a tarefa dispatcher
 }
 
