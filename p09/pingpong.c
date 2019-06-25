@@ -1,5 +1,5 @@
 /*
-Projeto 08 - Autores:
+Projeto 09 - Autores:
 Kelvin James
 Rafael Lammel Marinheiro
 */
@@ -21,7 +21,7 @@ struct itimerval timer;
 
 int taskid, userTasks, tick;
 unsigned int clock;
-task_t contextMain, dispatcher, *current, *filaProntas, *filaSuspensas;
+task_t contextMain, dispatcher, *current, *filaProntas, *filaSuspensas, *filaAdormecidas;
 
 task_t *scheduler();
 void dispatcher_body ();
@@ -218,6 +218,22 @@ int task_join (task_t *task)
     return -1;
 }
 
+// operações de gestão do tempo ================================================
+
+// suspende a tarefa corrente por t segundos
+void task_sleep (int t)
+{
+    queue_append((queue_t**)&filaAdormecidas, (queue_t*)current);
+    current->acordaEm = (t*1000)+clock;
+    current->status = adormecida;
+    task_switch(&dispatcher);
+}
+
+unsigned int systime()
+{
+  return clock;
+}
+
 // Funções que não estão no Header ===========================================
 
 task_t *scheduler()
@@ -254,8 +270,9 @@ task_t *scheduler()
 
 void dispatcher_body () // dispatcher é uma tarefa
 {
-    task_t *next;
-    while ( userTasks > 0 )
+    task_t *next, *aux;
+    aux = filaAdormecidas;
+    while ( userTasks > 0)
     {
         next = scheduler() ; // scheduler é uma função
         if (next)
@@ -270,6 +287,7 @@ void dispatcher_body () // dispatcher é uma tarefa
             userTasks--;
         }
     }
+
     task_exit(0) ; // encerra a tarefa dispatcher
 }
 
@@ -291,9 +309,4 @@ void tratador (int signum)
             task_yield();
         }
     }
-}
-
-unsigned int systime()
-{
-  return clock;
 }
