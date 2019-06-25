@@ -21,6 +21,7 @@ typedef struct task_t
   int dynamicPrio;
   int quantum;
   int exitCode;
+  int tarefab;
   int acordaEm;
   unsigned int createTime;
   unsigned int exitTime;

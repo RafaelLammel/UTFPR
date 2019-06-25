@@ -38,7 +38,6 @@ void pingpong_init()
     //Criamos o dispatcher como uma tarefa;
     task_create(&dispatcher,dispatcher_body,NULL);
     current = &contextMain;
-    current->status = pronta;
     clock = 0;
     //Iniciando o Signal
     action.sa_handler = tratador ;
@@ -96,8 +95,8 @@ int task_create (task_t *task, void (*start_func)(void *), void *arg)
     {
         queue_append((queue_t**) &filaProntas, (queue_t*) task);
         userTasks++;
-        task->status = pronta;
     }
+    task->tarefab = -1;
 #ifdef DEBUG
     printf("task_create: criou a tarefa: %d\n", task->tid);
 #endif
@@ -106,16 +105,25 @@ int task_create (task_t *task, void (*start_func)(void *), void *arg)
 
 void task_exit (int exitCode)
 {
+    task_t *aux = filaSuspensas;
     current->exitTime = clock;
     printf("Task: %d exit: execution time: %d ms, processor time: %d ms, activations: %d\n",current->tid,
     current->exitTime-current->createTime,current->processTime,current->act);
 #ifdef DEBUG
     printf("task_exit: tarefa %d sendo encerrada\n", current->tid);
 #endif
+    //Verifica se a tarefa é dispatcher, se for retorna para a Main;
     current->exitCode = exitCode;
     current->status = terminada;
-    if(exitCode != 0)
-        task_resume(&contextMain);
+    if(filaSuspensas != NULL)
+    {
+        do{
+            task_t *remove = aux;
+            aux = aux->next;
+            if(remove->tarefab == current->tid)
+                task_resume(remove);
+        }while(aux!=filaSuspensas && filaSuspensas != NULL);
+    }
     //Verifica se a tarefa é dispatcher, se for retorna para a Main;
     if(current == &dispatcher)
         task_switch(&contextMain);
@@ -166,8 +174,7 @@ void task_suspend (task_t *task, task_t **queue)
 
 void task_resume (task_t *task)
 {
-    queue_remove((queue_t**) &filaSuspensas,(queue_t*)task);
-    task->status = pronta;
+    queue_remove((queue_t**)&filaSuspensas, (queue_t*)task);
     queue_append((queue_t**)&filaProntas, (queue_t*)task);
     userTasks++;
 }
@@ -210,8 +217,9 @@ int task_getprio (task_t *task)
 // a tarefa corrente aguarda o encerramento de outra task
 int task_join (task_t *task)
 {
-    if(task != NULL && task->status != terminada)
+    if(task->status != terminada && task != NULL)
     {
+        current->tarefab = task->tid;
         task_suspend(NULL,&filaSuspensas);
         return task->exitCode;
     }
