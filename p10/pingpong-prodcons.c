@@ -31,8 +31,7 @@ void produtor(void * arg)
     aux->valor = item;
     sem_down(&s_vaga);
     sem_down(&s_buffer);
-    if(queue_size((queue_t*)b) < 5)
-      queue_append((queue_t**)&b, (queue_t*)aux);
+    queue_append((queue_t**)&b, (queue_t*)aux);
     sem_up(&s_buffer);
     sem_up(&s_item);
     printf("%s produziu %d\n", (char*)arg, item);
@@ -47,8 +46,7 @@ void consumidor(void * arg)
     buffer *i;
     sem_down(&s_item);
     sem_down(&s_buffer);
-    if(queue_size((queue_t*)b) > 0)
-      i = (buffer*) queue_remove((queue_t**)&b,(queue_t*)b);
+    i = (buffer*) queue_remove((queue_t**)&b,(queue_t*)b);
     sem_up(&s_buffer);
     sem_up(&s_vaga);
     printf("                              %s consumiu %d\n", (char*)arg, i->valor);
@@ -61,13 +59,16 @@ int main()
 {
   pingpong_init();
 
-  sem_create(&s_buffer,2);
+  //Apenas um por vez tem acesso ao Buffer;
+  sem_create(&s_buffer,1);
+  //Inicia com 0 items no Buffer
   sem_create(&s_item,0);
+  //5 vagas no Buffer
   sem_create(&s_vaga,5);
 
-  task_create(&p1,produtor,"p1");
-  task_create(&p2,produtor,"p2");
   task_create(&p3,produtor,"p3");
+  task_create(&p2,produtor,"p2");
+  task_create(&p1,produtor,"p1");
   task_create(&c1,consumidor,"c1");
   task_create(&c2,consumidor,"c2");
 

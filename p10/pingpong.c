@@ -233,7 +233,7 @@ int task_join (task_t *task)
 void task_sleep (int t)
 {
     queue_append((queue_t**)&filaAdormecidas,(queue_t*)current);
-    current->acordaEm = t+clock;
+    current->acordaEm = t*1000+clock;
     task_switch(&dispatcher);
 }
 
@@ -279,7 +279,7 @@ int sem_up (semaphore_t *s)
   if(s != NULL && s->status != destruido)
   {
     s->value = s->value + 1;
-    if(s->value < 0)
+    if(s->value <= 0)
     {
       task_t *aux = s->fila;
       task_t *u = (task_t*) queue_remove((queue_t**)&(s->fila),(queue_t*)aux);

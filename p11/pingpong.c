@@ -1,5 +1,5 @@
 /*
-Projeto 09 - Autores:
+Projeto 10 - Autores:
 Kelvin James
 Rafael Lammel Marinheiro
 */
@@ -107,8 +107,8 @@ void task_exit (int exitCode)
 {
     task_t *aux = filaSuspensas;
     current->exitTime = clock;
-    printf("Task: %d exit: execution time: %d ms, processor time: %d ms, activations: %d\n",current->tid,
-    current->exitTime-current->createTime,current->processTime,current->act);
+    /*printf("Task: %d exit: execution time: %d ms, processor time: %d ms, activations: %d\n",current->tid,*/
+    //current->exitTime-current->createTime,current->processTime,current->act);
 #ifdef DEBUG
     printf("task_exit: tarefa %d sendo encerrada\n", current->tid);
 #endif
@@ -120,8 +120,9 @@ void task_exit (int exitCode)
         do{
             task_t *remove = aux;
             aux = aux->next;
-            if(remove->tarefab == current->tid)
+            if(remove->tarefab == current->tid){
                 task_resume(remove);
+            }
         }while(aux!=filaSuspensas && filaSuspensas != NULL);
     }
     //Verifica se a tarefa é dispatcher, se for retorna para a Main;
@@ -239,6 +240,136 @@ void task_sleep (int t)
 unsigned int systime()
 {
   return clock;
+}
+
+// operações de IPC ============================================================
+
+// semáforos
+
+// cria um semáforo com valor inicial "value"
+int sem_create (semaphore_t *s, int value)
+{
+  s->status = ativo;
+  s->fila = NULL;
+  s->value = value;
+  return 0;
+}
+
+// requisita o semáforo
+int sem_down (semaphore_t *s)
+{
+  if(s != NULL && s->status != destruido)
+  {
+    s->value = s->value - 1;
+    if(s->value < 0)
+    {
+      current->status = suspensa;
+      task_suspend(NULL,&(s->fila));
+      if(s->status == destruido)
+        return -1;
+    }
+    return 0;
+  }
+  return -1;
+}
+
+// libera o semáforo
+int sem_up (semaphore_t *s)
+{
+  if(s != NULL && s->status != destruido)
+  {
+    s->value = s->value + 1;
+    if(s->value <= 0)
+    {
+      task_t *aux = s->fila;
+      task_t *u = (task_t*) queue_remove((queue_t**)&(s->fila),(queue_t*)aux);
+      queue_append((queue_t**)&filaProntas,(queue_t*)u);
+      u->status = pronta;
+      userTasks++;
+    }
+    return 0;
+  }
+  return -1;
+}
+
+// destroi o semáforo, liberando as tarefas bloqueadas
+int sem_destroy (semaphore_t *s)
+{
+  s->status = destruido;
+  while(queue_size((queue_t*)s->fila) > 0)
+  {
+    task_t *aux = s->fila;
+    task_t *u = (task_t*) queue_remove((queue_t**)&(s->fila),(queue_t*)aux);
+    u->status = pronta;
+    queue_append((queue_t**)&filaProntas,(queue_t*)u);
+    userTasks++;
+  }
+  return 0;
+}
+
+// barreiras
+
+// Inicializa uma barreira
+int barrier_create (barrier_t *b, int N)
+{
+  if(N > 0)
+  {
+    b->fila = NULL;
+    b->N = N;
+    b->n = 0;
+    b->status = ativo;
+    return 0;
+  }
+  return -1;
+}
+
+// Chega a uma barreira
+int barrier_join (barrier_t *b)
+{
+  if(b != NULL && b->status != destruido)
+  {
+    b->n = (b->n)+1;
+    if(b->N == b->n)
+    {
+      while(queue_size((queue_t*)b->fila) > 0)
+      {
+        task_t *aux = b->fila;
+        if(aux->tid == 0 || queue_size((queue_t*)b->fila) > 1)
+          aux = aux->next;
+        task_t *u = (task_t*) queue_remove((queue_t**)&(b->fila),(queue_t*)aux);
+        u->status = pronta;
+        queue_append((queue_t**)&filaProntas,(queue_t*)u);
+        userTasks++;
+
+      }
+      b->n = 0;
+    }
+    else
+    {
+      current->status = suspensa;
+      queue_append((queue_t**)&(b->fila),(queue_t*)current);
+      task_switch(&dispatcher);
+      if(b->status == destruido)
+        return -1;
+    }
+    return 0;
+  }
+  return -1;
+}
+
+// Destrói uma barreira
+int barrier_destroy (barrier_t *b)
+{
+  b->status = destruido;
+  while(queue_size((queue_t*)b->fila) > 0)
+  {
+    task_t *aux = b->fila;
+    task_t *u = (task_t*) queue_remove((queue_t**)&(b->fila),(queue_t*)aux);
+    u->status = pronta;
+    queue_append((queue_t**)&filaProntas,(queue_t*)u);
+    userTasks++;
+  }
+  return 0;
 }
 
 // Funções que não estão no Header ===========================================
