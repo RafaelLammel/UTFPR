@@ -1,0 +1,18 @@
+@relation marciano.symbolic
+
+@attribute verde={S,N}  %sim ou nao
+@attribute pernas Numeric  %numero de pernas
+@attribute altura={B,A}    %Baixo ou Alto
+@attribute fedido={S,N}    %fedido ou nao
+@attribute especie={H,M}   %Humano ou Marciano
+@data
+N,3,B,S,M
+S,2,A,N,M
+S,3,A,N,M
+N,2,B,S,M
+S,3,A,N,M
+N,2,A,S,H
+N,2,B,N,H
+N,2,A,N,H
+S,1,B,N,H
+N,2,A,S,H
