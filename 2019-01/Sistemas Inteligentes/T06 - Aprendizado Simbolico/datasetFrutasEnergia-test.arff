@@ -1,0 +1,59 @@
+@relation frutaEnergia.symbolic
+
+@attribute c0={K,W}
+@attribute c1={R,G,B}
+@attribute c2={R,G,B}
+@attribute c3={R,G,B}
+@attribute c4={K,W}
+@attribute e={0,2,4}
+@data
+W,R,R,R,K,4
+W,B,G,B,K,2
+W,R,R,B,K,2
+K,G,G,G,K,2
+W,R,B,G,K,0
+W,G,B,G,K,2
+W,G,G,G,W,0
+W,B,R,R,K,2
+W,B,B,G,K,2
+W,B,B,B,W,4
+K,R,G,R,K,2
+K,R,B,B,K,2
+W,G,G,B,K,2
+K,G,B,B,W,2
+W,R,B,B,W,2
+K,G,G,B,K,2
+W,G,G,R,K,0
+K,R,B,R,K,2
+W,R,R,G,W,2
+W,R,B,B,K,2
+W,G,B,B,W,0
+K,R,B,G,K,0
+W,B,G,R,K,0
+K,B,R,B,W,2
+K,B,B,G,K,2
+W,R,G,B,W,4
+W,R,B,B,K,4
+K,G,G,G,W,0
+K,G,B,R,K,2
+W,B,G,B,K,2
+W,G,R,R,W,0
+W,B,G,B,K,2
+W,G,R,B,K,0
+W,B,B,R,W,2
+K,G,B,G,W,2
+W,G,G,B,W,0
+W,R,R,B,W,2
+W,R,B,R,W,2
+W,R,R,R,W,2
+K,B,B,B,K,0
+W,B,B,R,W,2
+W,R,R,B,W,2
+K,G,G,G,K,2
+W,G,R,R,K,0
+K,B,G,R,K,0
+W,R,B,G,W,0
+W,R,R,B,W,2
+K,B,B,R,K,2
+K,B,R,B,K,2
+K,B,G,R,W,0
