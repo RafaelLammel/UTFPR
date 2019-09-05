@@ -143,7 +143,7 @@ final class HttpRequest implements Runnable{
         if(fileName.endsWith(".gif")){
             return "image/gif";
         }
-        if(fileName.endsWith(".jpeg")){
+        if(fileName.endsWith(".jpeg") || fileName.endsWith(".jpg"){
             return "image/jpeg";
         }
         return "application/octet-stream";
