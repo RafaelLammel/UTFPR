@@ -2,10 +2,12 @@ package edu.utfpr.servidor.ultrassom.controller;
 
 import edu.utfpr.servidor.ultrassom.model.Usuario;
 import edu.utfpr.servidor.ultrassom.repository.UsuarioRepository;
+import edu.utfpr.servidor.ultrassom.request.LoginRequest;
 import edu.utfpr.servidor.ultrassom.response.LoginResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -16,13 +18,12 @@ public class UsuarioController {
     
     @PostMapping("/cadastroUsuario")
     public Usuario cadastro(@RequestBody Usuario usuario){
-        System.out.println("Hello There");
         return usuarioRepository.save(usuario);
     }
     
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody Usuario usuario){
-        Usuario u = usuarioRepository.findByLogin(usuario.getLogin(), usuario.getSenha());
+    public LoginResponse login(@RequestBody LoginRequest loginRequest){
+        Usuario u = usuarioRepository.findByLoginAndSenha(loginRequest.getLogin(), loginRequest.getSenha());
         if(u == null)
             return new LoginResponse(-1,false);
         return new LoginResponse(u.getId(),true);

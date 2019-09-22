@@ -7,17 +7,16 @@ package edu.utfpr.cliente.ultrassom.view;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static javax.swing.JOptionPane.showMessageDialog;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -56,17 +55,17 @@ public class LoginScreen extends javax.swing.JFrame {
         textFieldLoginCadastro = new javax.swing.JTextField();
         textFieldNome = new javax.swing.JTextField();
         textFieldEmail = new javax.swing.JTextField();
-        textFieldSenha = new javax.swing.JTextField();
         buttonCadastra = new javax.swing.JButton();
+        passwordFieldCadastro = new javax.swing.JPasswordField();
         panelTitle = new javax.swing.JPanel();
         labelTitle = new javax.swing.JLabel();
         panelLoginForm = new javax.swing.JPanel();
         labelLogin = new javax.swing.JLabel();
         labelPassword = new javax.swing.JLabel();
         textFieldLogin = new javax.swing.JTextField();
-        textFieldPassword = new javax.swing.JTextField();
         buttonLogin = new javax.swing.JButton();
         buttonCadastrar = new javax.swing.JButton();
+        passwordFieldLogin = new javax.swing.JPasswordField();
 
         frameCadastroUsuario.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         frameCadastroUsuario.getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -120,8 +119,6 @@ public class LoginScreen extends javax.swing.JFrame {
 
         textFieldEmail.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
 
-        textFieldSenha.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
-
         buttonCadastra.setFont(new java.awt.Font("Roboto", 1, 24)); // NOI18N
         buttonCadastra.setText("CADASTRAR");
         buttonCadastra.addActionListener(new java.awt.event.ActionListener() {
@@ -142,7 +139,7 @@ public class LoginScreen extends javax.swing.JFrame {
                         .addGroup(panelCadastroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(labelNome)
                             .addComponent(labelLogin1))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
                         .addGroup(panelCadastroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(textFieldNome, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(textFieldLoginCadastro, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -151,9 +148,9 @@ public class LoginScreen extends javax.swing.JFrame {
                             .addComponent(labelEmail)
                             .addComponent(labelSenha))
                         .addGap(18, 18, 18)
-                        .addGroup(panelCadastroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(textFieldSenha, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(textFieldEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGroup(panelCadastroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(textFieldEmail, javax.swing.GroupLayout.DEFAULT_SIZE, 221, Short.MAX_VALUE)
+                            .addComponent(passwordFieldCadastro))))
                 .addContainerGap(37, Short.MAX_VALUE))
         );
         panelCadastroLayout.setVerticalGroup(
@@ -171,11 +168,14 @@ public class LoginScreen extends javax.swing.JFrame {
                 .addGroup(panelCadastroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(labelEmail)
                     .addComponent(textFieldEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(7, 7, 7)
-                .addGroup(panelCadastroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(labelSenha)
-                    .addComponent(textFieldSenha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addGroup(panelCadastroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelCadastroLayout.createSequentialGroup()
+                        .addGap(11, 11, 11)
+                        .addComponent(labelSenha))
+                    .addGroup(panelCadastroLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(passwordFieldCadastro, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(18, 18, Short.MAX_VALUE)
                 .addComponent(buttonCadastra, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(41, Short.MAX_VALUE))
         );
@@ -214,9 +214,6 @@ public class LoginScreen extends javax.swing.JFrame {
         textFieldLogin.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
         panelLoginForm.add(textFieldLogin, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 20, 250, 30));
 
-        textFieldPassword.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
-        panelLoginForm.add(textFieldPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 60, 250, 30));
-
         buttonLogin.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
         buttonLogin.setText("LOGIN");
         buttonLogin.addActionListener(new java.awt.event.ActionListener() {
@@ -234,6 +231,7 @@ public class LoginScreen extends javax.swing.JFrame {
             }
         });
         panelLoginForm.add(buttonCadastrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 120, 140, 40));
+        panelLoginForm.add(passwordFieldLogin, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 60, 250, 30));
 
         getContentPane().add(panelLoginForm, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 70, 400, 220));
 
@@ -242,7 +240,43 @@ public class LoginScreen extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttonLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonLoginActionPerformed
-        
+        URL url;
+        try {
+            url = new URL("http://localhost:8080/login");
+            HttpURLConnection con = (HttpURLConnection)url.openConnection();
+            //Declaranco método e tipo do conteúdo
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Content-Type", "application/json");
+            con.setRequestProperty("Accept", "application/json");
+            //Falando que vamos enviar algo
+            con.setDoOutput(true);
+            con.setDoInput(true);
+            //Montando o Body do JSON
+            JSONObject body = new JSONObject();
+            body.put("login", textFieldLogin.getText());
+            body.put("senha", passwordFieldLogin.getText());
+            //Enviando o JSON no Body
+            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+            wr.writeBytes(body.toString());
+            wr.flush();
+            wr.close();
+            //Lendo resposta
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            String response = "";
+            while((inputLine = in.readLine()) != null){
+                response += inputLine;
+            }
+            in.close();
+            JSONParser parser = new JSONParser();
+            JSONObject json = (JSONObject) parser.parse(response);
+            showMessageDialog(null,"Usuário cadastrado com sucesso!\n"+json.toJSONString());
+            frameCadastroUsuario.dispatchEvent(new WindowEvent(frameCadastroUsuario, WindowEvent.WINDOW_CLOSING));
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(LoginScreen.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException | ParseException ex) {
+            Logger.getLogger(LoginScreen.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_buttonLoginActionPerformed
 
     private void buttonCadastrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCadastrarActionPerformed
@@ -259,45 +293,53 @@ public class LoginScreen extends javax.swing.JFrame {
     }//GEN-LAST:event_buttonCadastrarActionPerformed
 
     private void buttonCadastraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCadastraActionPerformed
-        try {
-            //Abrindo conexão com o servidor
-            URL url = new URL("http://localhost:8080/cadastroUsuario");
-            HttpURLConnection con = (HttpURLConnection)url.openConnection();
-            //Declaranco método e tipo do conteúdo
-            con.setRequestMethod("POST");
-            con.setRequestProperty("Content-Type", "application/json");
-            //Falando que vamos enviar algo
-            con.setDoOutput(true);
-            //Montando um JSON para o Body
-            String jsonInputString = "{"
-                    + "\"login\":\""+textFieldLoginCadastro.getText()+"\","
-                    +"\"nome\":\""+textFieldNome.getText()+"\","
-                    +"\"email\":\""+textFieldEmail.getText()+"\","
-                    +"\"senha\":\""+textFieldSenha.getText()+"\""
-                    + "}";
-            //Enviando o JSON no Body
-            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(jsonInputString);
-            wr.flush();
-            wr.close();
-            //Lendo resposta
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            String inputLine;
-            StringBuffer response = new StringBuffer();
-            while((inputLine = in.readLine()) != null){
-                response.append(inputLine);
+        if("".equals(textFieldLoginCadastro.getText()))
+            showMessageDialog(null,"Login não pode ser vazio!");
+        else if("".equals(textFieldEmail.getText()))
+            showMessageDialog(null,"Email não pode ser vazio!");
+        else if("".equals(passwordFieldCadastro.getText()))
+            showMessageDialog(null,"Senha não pode ser vazio!");
+        else{
+            try {
+                //Abrindo conexão com o servidor
+                URL url = new URL("http://localhost:8080/cadastroUsuario");
+                HttpURLConnection con = (HttpURLConnection)url.openConnection();
+                //Declaranco método e tipo do conteúdo
+                con.setRequestMethod("POST");
+                con.setRequestProperty("Content-Type", "application/json");
+                //Falando que vamos enviar algo
+                con.setDoOutput(true);
+                //Montando um JSON para o Body
+                JSONObject body = new JSONObject();
+                body.put("login", textFieldLoginCadastro.getText());
+                body.put("nome", textFieldNome.getText());
+                body.put("email",textFieldEmail.getText());
+                body.put("senha", passwordFieldCadastro.getText());
+                //Enviando o JSON no Body
+                DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+                wr.writeBytes(body.toString());
+                wr.flush();
+                wr.close();
+                //Lendo resposta
+                BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                String inputLine;
+                String response = "";
+                while((inputLine = in.readLine()) != null){
+                    response += inputLine;
+                }
+                in.close();
+                JSONParser parser = new JSONParser();
+                JSONObject json = (JSONObject) parser.parse(response);
+                showMessageDialog(null,"Usuário cadastrado com sucesso!\n"+json.get("id").toString());
+                frameCadastroUsuario.dispatchEvent(new WindowEvent(frameCadastroUsuario, WindowEvent.WINDOW_CLOSING));
+            } catch (MalformedURLException ex) {
+                Logger.getLogger(LoginScreen.class.getName()).log(Level.SEVERE, null, ex);
+                showMessageDialog(null,"Erro no Servidor");
+            } catch (IOException | ParseException ex) {
+                Logger.getLogger(LoginScreen.class.getName()).log(Level.SEVERE, null, ex);
+                showMessageDialog(null,"Erro ao enviar ou ler os dados");
             }
-            in.close();
-            JSONParser parser = new JSONParser();
-            JSONObject json = (JSONObject) parser.parse(response.toString());
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(LoginScreen.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(LoginScreen.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ParseException ex) {
-            Logger.getLogger(LoginScreen.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
     }//GEN-LAST:event_buttonCadastraActionPerformed
     
     /**
@@ -352,11 +394,11 @@ public class LoginScreen extends javax.swing.JFrame {
     private javax.swing.JPanel panelLoginForm;
     private javax.swing.JPanel panelTitle;
     private javax.swing.JPanel panelTitle1;
+    private javax.swing.JPasswordField passwordFieldCadastro;
+    private javax.swing.JPasswordField passwordFieldLogin;
     private javax.swing.JTextField textFieldEmail;
     private javax.swing.JTextField textFieldLogin;
     private javax.swing.JTextField textFieldLoginCadastro;
     private javax.swing.JTextField textFieldNome;
-    private javax.swing.JTextField textFieldPassword;
-    private javax.swing.JTextField textFieldSenha;
     // End of variables declaration//GEN-END:variables
 }
