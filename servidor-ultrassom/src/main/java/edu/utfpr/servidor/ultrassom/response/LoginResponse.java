@@ -2,28 +2,48 @@ package edu.utfpr.servidor.ultrassom.response;
 
 public class LoginResponse {
     
-    int usuarioId;
-    boolean status;
+    private int id;
+    private String nome;
+    private String login;
+    private String email;
 
-    public LoginResponse(int usuarioId, boolean status) {
-        this.usuarioId = usuarioId;
-        this.status = status;
+    public LoginResponse(int id, String nome, String login, String email) {
+        this.id = id;
+        this.nome = nome;
+        this.login = login;
+        this.email = email;
     }
 
-    public int getUsuarioId() {
-        return usuarioId;
+    public int getId() {
+        return id;
     }
 
-    public void setUsuarioId(int usuarioId) {
-        this.usuarioId = usuarioId;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public boolean isStatus() {
-        return status;
+    public String getNome() {
+        return nome;
     }
 
-    public void setStatus(boolean status) {
-        this.status = status;
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
     
 }

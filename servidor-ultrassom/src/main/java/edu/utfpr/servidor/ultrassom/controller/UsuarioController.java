@@ -7,7 +7,6 @@ import edu.utfpr.servidor.ultrassom.response.LoginResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -25,8 +24,8 @@ public class UsuarioController {
     public LoginResponse login(@RequestBody LoginRequest loginRequest){
         Usuario u = usuarioRepository.findByLoginAndSenha(loginRequest.getLogin(), loginRequest.getSenha());
         if(u == null)
-            return new LoginResponse(-1,false);
-        return new LoginResponse(u.getId(),true);
+            return new LoginResponse(-1, null, null, null);
+        return new LoginResponse(u.getId(),u.getNome(),u.getLogin(),u.getEmail());
     }
     
 }

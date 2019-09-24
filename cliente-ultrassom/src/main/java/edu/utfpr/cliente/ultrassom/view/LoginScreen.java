@@ -1,10 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.utfpr.cliente.ultrassom.view;
 
+import edu.utfpr.cliente.ultrassom.view.session.Session;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
@@ -21,10 +18,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-/**
- *
- * @author Rafael
- */
 public class LoginScreen extends javax.swing.JFrame {
 
     /**
@@ -68,6 +61,11 @@ public class LoginScreen extends javax.swing.JFrame {
         passwordFieldLogin = new javax.swing.JPasswordField();
 
         frameCadastroUsuario.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        frameCadastroUsuario.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                frameCadastroUsuarioKeyPressed(evt);
+            }
+        });
         frameCadastroUsuario.getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         panelTitle1.setBackground(new java.awt.Color(0, 0, 153));
@@ -114,16 +112,37 @@ public class LoginScreen extends javax.swing.JFrame {
         labelEmail.setText("E-mail:");
 
         textFieldLoginCadastro.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
+        textFieldLoginCadastro.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                textFieldLoginCadastroKeyPressed(evt);
+            }
+        });
 
         textFieldNome.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
+        textFieldNome.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                textFieldNomeKeyPressed(evt);
+            }
+        });
 
         textFieldEmail.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
+        textFieldEmail.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                textFieldEmailKeyPressed(evt);
+            }
+        });
 
         buttonCadastra.setFont(new java.awt.Font("Roboto", 1, 24)); // NOI18N
         buttonCadastra.setText("CADASTRAR");
         buttonCadastra.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonCadastraActionPerformed(evt);
+            }
+        });
+
+        passwordFieldCadastro.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                passwordFieldCadastroKeyPressed(evt);
             }
         });
 
@@ -185,6 +204,11 @@ public class LoginScreen extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(393, 287));
         setPreferredSize(new java.awt.Dimension(393, 287));
+        addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                formKeyPressed(evt);
+            }
+        });
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         panelTitle.setBackground(new java.awt.Color(0, 0, 153));
@@ -212,6 +236,11 @@ public class LoginScreen extends javax.swing.JFrame {
 
         textFieldLogin.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
         textFieldLogin.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
+        textFieldLogin.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                textFieldLoginKeyPressed(evt);
+            }
+        });
         panelLoginForm.add(textFieldLogin, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 20, 250, 30));
 
         buttonLogin.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
@@ -231,6 +260,12 @@ public class LoginScreen extends javax.swing.JFrame {
             }
         });
         panelLoginForm.add(buttonCadastrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 120, 140, 40));
+
+        passwordFieldLogin.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                passwordFieldLoginKeyPressed(evt);
+            }
+        });
         panelLoginForm.add(passwordFieldLogin, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 60, 250, 30));
 
         getContentPane().add(panelLoginForm, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 70, 400, 220));
@@ -240,43 +275,7 @@ public class LoginScreen extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttonLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonLoginActionPerformed
-        URL url;
-        try {
-            url = new URL("http://localhost:8080/login");
-            HttpURLConnection con = (HttpURLConnection)url.openConnection();
-            //Declaranco método e tipo do conteúdo
-            con.setRequestMethod("POST");
-            con.setRequestProperty("Content-Type", "application/json");
-            con.setRequestProperty("Accept", "application/json");
-            //Falando que vamos enviar algo
-            con.setDoOutput(true);
-            con.setDoInput(true);
-            //Montando o Body do JSON
-            JSONObject body = new JSONObject();
-            body.put("login", textFieldLogin.getText());
-            body.put("senha", passwordFieldLogin.getText());
-            //Enviando o JSON no Body
-            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(body.toString());
-            wr.flush();
-            wr.close();
-            //Lendo resposta
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            String inputLine;
-            String response = "";
-            while((inputLine = in.readLine()) != null){
-                response += inputLine;
-            }
-            in.close();
-            JSONParser parser = new JSONParser();
-            JSONObject json = (JSONObject) parser.parse(response);
-            showMessageDialog(null,"Usuário cadastrado com sucesso!\n"+json.toJSONString());
-            frameCadastroUsuario.dispatchEvent(new WindowEvent(frameCadastroUsuario, WindowEvent.WINDOW_CLOSING));
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(LoginScreen.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException | ParseException ex) {
-            Logger.getLogger(LoginScreen.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        login();
     }//GEN-LAST:event_buttonLoginActionPerformed
 
     private void buttonCadastrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCadastrarActionPerformed
@@ -293,6 +292,103 @@ public class LoginScreen extends javax.swing.JFrame {
     }//GEN-LAST:event_buttonCadastrarActionPerformed
 
     private void buttonCadastraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCadastraActionPerformed
+        cadastra();
+    }//GEN-LAST:event_buttonCadastraActionPerformed
+
+    private void formKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER)
+            login();
+    }//GEN-LAST:event_formKeyPressed
+
+    private void frameCadastroUsuarioKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_frameCadastroUsuarioKeyPressed
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER)
+            cadastra();
+    }//GEN-LAST:event_frameCadastroUsuarioKeyPressed
+
+    private void passwordFieldLoginKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_passwordFieldLoginKeyPressed
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER)
+            login();
+    }//GEN-LAST:event_passwordFieldLoginKeyPressed
+
+    private void textFieldLoginKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textFieldLoginKeyPressed
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER)
+            login();
+    }//GEN-LAST:event_textFieldLoginKeyPressed
+
+    private void textFieldLoginCadastroKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textFieldLoginCadastroKeyPressed
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER)
+            cadastra();
+    }//GEN-LAST:event_textFieldLoginCadastroKeyPressed
+
+    private void textFieldNomeKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textFieldNomeKeyPressed
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER)
+            cadastra();
+    }//GEN-LAST:event_textFieldNomeKeyPressed
+
+    private void textFieldEmailKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textFieldEmailKeyPressed
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER)
+            cadastra();
+    }//GEN-LAST:event_textFieldEmailKeyPressed
+
+    private void passwordFieldCadastroKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_passwordFieldCadastroKeyPressed
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER)
+            cadastra();
+    }//GEN-LAST:event_passwordFieldCadastroKeyPressed
+    
+    private void login(){
+        if(textFieldLogin.getText().equals("") || passwordFieldLogin.getText().equals(""))
+            showMessageDialog(null,"Por favor preencha os dois campos!");
+        else{
+            try {
+                URL url = new URL("http://localhost:8080/login");
+                HttpURLConnection con = (HttpURLConnection)url.openConnection();
+                //Declaranco método e tipo do conteúdo
+                con.setRequestMethod("POST");
+                con.setRequestProperty("Content-Type", "application/json");
+                con.setRequestProperty("Accept", "application/json");
+                //Falando que vamos enviar algo
+                con.setDoOutput(true);
+                con.setDoInput(true);
+                //Montando o Body do JSON
+                JSONObject body = new JSONObject();
+                body.put("login", textFieldLogin.getText());
+                body.put("senha", passwordFieldLogin.getText());
+                //Enviando o JSON no Body
+                DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+                wr.writeBytes(body.toString());
+                wr.flush();
+                wr.close();
+                //Lendo resposta
+                BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                String inputLine;
+                String response = "";
+                while((inputLine = in.readLine()) != null){
+                    response += inputLine;
+                }
+                in.close();
+                JSONParser parser = new JSONParser();
+                JSONObject json = (JSONObject) parser.parse(response);
+                if(Integer.parseInt(json.get("id").toString()) > 0){
+                    Session.setId(Integer.parseInt(json.get("id").toString()));
+                    Session.setLogin(json.get("login").toString());
+                    Session.setNome(json.get("nome").toString());
+                    Session.setEmail(json.get("email").toString());
+                    MainScreen mainScreen = new MainScreen();
+                    this.setVisible(false);
+                    mainScreen.setVisible(true);
+                }
+                else
+                    showMessageDialog(null,"Credenciais inválidas!");
+                //frameCadastroUsuario.dispatchEvent(new WindowEvent(frameCadastroUsuario, WindowEvent.WINDOW_CLOSING));
+            } catch (MalformedURLException ex) {
+                Logger.getLogger(LoginScreen.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException | ParseException ex) {
+                Logger.getLogger(LoginScreen.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
+    private void cadastra(){
         if("".equals(textFieldLoginCadastro.getText()))
             showMessageDialog(null,"Login não pode ser vazio!");
         else if("".equals(textFieldEmail.getText()))
@@ -340,7 +436,7 @@ public class LoginScreen extends javax.swing.JFrame {
                 showMessageDialog(null,"Erro ao enviar ou ler os dados");
             }
         }
-    }//GEN-LAST:event_buttonCadastraActionPerformed
+    }
     
     /**
      * @param args the command line arguments

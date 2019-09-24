@@ -6,6 +6,9 @@
       <Properties>
         <Property name="defaultCloseOperation" type="int" value="2"/>
       </Properties>
+      <Events>
+        <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="frameCadastroUsuarioKeyPressed"/>
+      </Events>
       <AuxValues>
         <AuxValue name="designerSize" type="java.awt.Dimension" value="-84,-19,0,5,115,114,0,18,106,97,118,97,46,97,119,116,46,68,105,109,101,110,115,105,111,110,65,-114,-39,-41,-84,95,68,20,2,0,2,73,0,6,104,101,105,103,104,116,73,0,5,119,105,100,116,104,120,112,0,0,1,40,0,0,1,102"/>
       </AuxValues>
@@ -192,6 +195,9 @@
                   <Font name="Roboto" size="18" style="1"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="textFieldLoginCadastroKeyPressed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JTextField" name="textFieldNome">
               <Properties>
@@ -199,6 +205,9 @@
                   <Font name="Roboto" size="18" style="1"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="textFieldNomeKeyPressed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JTextField" name="textFieldEmail">
               <Properties>
@@ -206,6 +215,9 @@
                   <Font name="Roboto" size="18" style="1"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="textFieldEmailKeyPressed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="buttonCadastra">
               <Properties>
@@ -219,6 +231,9 @@
               </Events>
             </Component>
             <Component class="javax.swing.JPasswordField" name="passwordFieldCadastro">
+              <Events>
+                <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="passwordFieldCadastroKeyPressed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>
@@ -238,6 +253,9 @@
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
     <SyntheticProperty name="generateCenter" type="boolean" value="true"/>
   </SyntheticProperties>
+  <Events>
+    <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="formKeyPressed"/>
+  </Events>
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
@@ -346,6 +364,9 @@
               <Color id="Cursor de Texto"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="textFieldLoginKeyPressed"/>
+          </Events>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
               <AbsoluteConstraints x="110" y="20" width="250" height="30"/>
@@ -385,6 +406,9 @@
           </Constraints>
         </Component>
         <Component class="javax.swing.JPasswordField" name="passwordFieldLogin">
+          <Events>
+            <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="passwordFieldLoginKeyPressed"/>
+          </Events>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
               <AbsoluteConstraints x="110" y="60" width="250" height="30"/>
