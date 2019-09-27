@@ -192,8 +192,20 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="labelUploadTitle" pref="640" max="32767" attributes="0"/>
+                  <Component id="labelUploadTitle" pref="636" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
+              </Group>
+              <Group type="102" alignment="1" attributes="0">
+                  <EmptySpace max="32767" attributes="0"/>
+                  <Component id="textFieldUploadFile" min="-2" pref="292" max="-2" attributes="0"/>
+                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                  <Component id="buttonFileChoose" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="128" max="-2" attributes="0"/>
+              </Group>
+              <Group type="102" alignment="0" attributes="0">
+                  <EmptySpace min="-2" pref="275" max="-2" attributes="0"/>
+                  <Component id="buttonSendFile" min="-2" pref="163" max="-2" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -202,7 +214,14 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace min="-2" pref="23" max="-2" attributes="0"/>
                   <Component id="labelUploadTitle" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="309" max="32767" attributes="0"/>
+                  <EmptySpace min="-2" pref="80" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                      <Component id="buttonFileChoose" max="32767" attributes="0"/>
+                      <Component id="textFieldUploadFile" max="32767" attributes="0"/>
+                  </Group>
+                  <EmptySpace pref="141" max="32767" attributes="0"/>
+                  <Component id="buttonSendFile" min="-2" pref="37" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="51" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -214,8 +233,29 @@
               <Font name="Roboto" size="24" style="1"/>
             </Property>
             <Property name="horizontalAlignment" type="int" value="0"/>
-            <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;p style=&quot;text-align:center&quot;&gt;Arraste um arquivo TXT para a area abaixo&lt;br&gt; ou clique para selecionar o arquivo!&lt;/p&gt;&lt;/html&gt;"/>
+            <Property name="text" type="java.lang.String" value="Escolha um arquivo de texto para enviar para o servidor"/>
           </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="buttonFileChoose">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Escolher arquivo..."/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonFileChooseActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JTextField" name="textFieldUploadFile">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Escolha um arquivo..."/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="buttonSendFile">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="ENVIAR"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonSendFileActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

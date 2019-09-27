@@ -1,6 +1,25 @@
 package edu.utfpr.cliente.ultrassom.view;
 
+import java.util.ArrayList;
 import edu.utfpr.cliente.ultrassom.view.session.Session;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFileChooser;
+import static javax.swing.JOptionPane.showMessageDialog;
+import javax.swing.filechooser.FileSystemView;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class MainScreen extends javax.swing.JFrame {
 
@@ -11,6 +30,7 @@ public class MainScreen extends javax.swing.JFrame {
         this.setSize(805,455);
         this.setResizable(false);
         this.setLocationRelativeTo(null);
+        textFieldUploadFile.setEnabled(false);
     }
 
     /** This method is called from within the constructor to
@@ -31,6 +51,9 @@ public class MainScreen extends javax.swing.JFrame {
         labelHeader = new javax.swing.JLabel();
         panelUpload = new javax.swing.JPanel();
         labelUploadTitle = new javax.swing.JLabel();
+        buttonFileChoose = new javax.swing.JButton();
+        textFieldUploadFile = new javax.swing.JTextField();
+        buttonSendFile = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -127,7 +150,23 @@ public class MainScreen extends javax.swing.JFrame {
 
         labelUploadTitle.setFont(new java.awt.Font("Roboto", 1, 24)); // NOI18N
         labelUploadTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        labelUploadTitle.setText("<html><p style=\"text-align:center\">Arraste um arquivo TXT para a area abaixo<br> ou clique para selecionar o arquivo!</p></html>");
+        labelUploadTitle.setText("Escolha um arquivo de texto para enviar para o servidor");
+
+        buttonFileChoose.setText("Escolher arquivo...");
+        buttonFileChoose.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonFileChooseActionPerformed(evt);
+            }
+        });
+
+        textFieldUploadFile.setText("Escolha um arquivo...");
+
+        buttonSendFile.setText("ENVIAR");
+        buttonSendFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonSendFileActionPerformed(evt);
+            }
+        });
 
         org.jdesktop.layout.GroupLayout panelUploadLayout = new org.jdesktop.layout.GroupLayout(panelUpload);
         panelUpload.setLayout(panelUploadLayout);
@@ -135,21 +174,106 @@ public class MainScreen extends javax.swing.JFrame {
             panelUploadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(panelUploadLayout.createSequentialGroup()
                 .addContainerGap()
-                .add(labelUploadTitle, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 640, Short.MAX_VALUE)
+                .add(labelUploadTitle, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 636, Short.MAX_VALUE)
                 .addContainerGap())
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, panelUploadLayout.createSequentialGroup()
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(textFieldUploadFile, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 292, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(18, 18, 18)
+                .add(buttonFileChoose)
+                .add(128, 128, 128))
+            .add(panelUploadLayout.createSequentialGroup()
+                .add(275, 275, 275)
+                .add(buttonSendFile, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 163, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panelUploadLayout.setVerticalGroup(
             panelUploadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(panelUploadLayout.createSequentialGroup()
                 .add(23, 23, 23)
-                .add(labelUploadTitle, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(309, Short.MAX_VALUE))
+                .add(labelUploadTitle)
+                .add(80, 80, 80)
+                .add(panelUploadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                    .add(buttonFileChoose, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(textFieldUploadFile))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 141, Short.MAX_VALUE)
+                .add(buttonSendFile, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 37, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(51, 51, 51))
         );
 
         getContentPane().add(panelUpload, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 60, 660, 390));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void buttonFileChooseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonFileChooseActionPerformed
+        JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+
+        int returnValue = jfc.showOpenDialog(null);
+
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = jfc.getSelectedFile();
+                textFieldUploadFile.setText(selectedFile.getAbsolutePath());
+        }
+    }//GEN-LAST:event_buttonFileChooseActionPerformed
+
+    private void buttonSendFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSendFileActionPerformed
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(textFieldUploadFile.getText()));
+            JSONArray data = new JSONArray();
+            String linha = "";
+            String aux = "";
+            while(br.ready()){
+                linha = br.readLine();
+                for(int i = 0; i < linha.length(); i++){
+                    if(linha.charAt(i) == ','){
+                        data.add(Double.parseDouble(aux));
+                        aux = "";
+                    }
+                    else{
+                        aux += linha.charAt(i);
+                    }
+                }
+                data.add(Double.parseDouble(aux));
+                aux = "";
+            }
+                data.add(Double.parseDouble(br.readLine()));
+            br.close();
+            URL url = new URL("http://localhost:8080/process");
+            HttpURLConnection con = (HttpURLConnection)url.openConnection();
+            //Declaranco método e tipo do conteúdo
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Content-Type", "application/json");
+            con.setRequestProperty("Accept", "application/json");
+            //Falando que vamos enviar algo
+            con.setDoOutput(true);
+            con.setDoInput(true);
+            
+            JSONObject body = new JSONObject();
+            body.put("data", data);
+            
+            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+            wr.writeBytes(body.toString());
+            wr.flush();
+            wr.close();
+            
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            String response = "";
+            while((inputLine = in.readLine()) != null)
+                response += inputLine;
+            in.close();
+            JSONParser parser = new JSONParser();
+            JSONObject json = (JSONObject) parser.parse(response);
+            showMessageDialog(null,"Enviado com sucesso!");
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MainScreen.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(MainScreen.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException ex) {
+            Logger.getLogger(MainScreen.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_buttonSendFileActionPerformed
 
     /**
      * @param args the command line arguments
@@ -187,6 +311,8 @@ public class MainScreen extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton buttonFileChoose;
+    private javax.swing.JButton buttonSendFile;
     private javax.swing.JLabel labelDownload;
     private javax.swing.JLabel labelHeader;
     private javax.swing.JLabel labelUpload;
@@ -196,6 +322,7 @@ public class MainScreen extends javax.swing.JFrame {
     private javax.swing.JPanel panelDashboard;
     private javax.swing.JPanel panelHeader;
     private javax.swing.JPanel panelUpload;
+    private javax.swing.JTextField textFieldUploadFile;
     // End of variables declaration//GEN-END:variables
 
 }
