@@ -1,6 +1,5 @@
 package edu.utfpr.cliente.ultrassom.view;
 
-import java.util.ArrayList;
 import edu.utfpr.cliente.ultrassom.view.session.Session;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -42,6 +41,7 @@ public class MainScreen extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        buttonGroupAlgorithm = new javax.swing.ButtonGroup();
         panelDashboard = new javax.swing.JPanel();
         panelBackgroundUpload = new javax.swing.JPanel();
         labelUpload = new javax.swing.JLabel();
@@ -54,6 +54,9 @@ public class MainScreen extends javax.swing.JFrame {
         buttonFileChoose = new javax.swing.JButton();
         textFieldUploadFile = new javax.swing.JTextField();
         buttonSendFile = new javax.swing.JButton();
+        radioCGNE = new javax.swing.JRadioButton();
+        radioFISTA = new javax.swing.JRadioButton();
+        labelAlgoritmo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -168,22 +171,45 @@ public class MainScreen extends javax.swing.JFrame {
             }
         });
 
+        buttonGroupAlgorithm.add(radioCGNE);
+        radioCGNE.setFont(new java.awt.Font("Roboto", 0, 11)); // NOI18N
+        radioCGNE.setSelected(true);
+        radioCGNE.setText("CGNE");
+
+        buttonGroupAlgorithm.add(radioFISTA);
+        radioFISTA.setFont(new java.awt.Font("Roboto", 0, 11)); // NOI18N
+        radioFISTA.setText("Fast Iterative Shrinkage-Thresholding Algorithm");
+
+        labelAlgoritmo.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
+        labelAlgoritmo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        labelAlgoritmo.setText("Qual algoritmo quer usar?");
+
         org.jdesktop.layout.GroupLayout panelUploadLayout = new org.jdesktop.layout.GroupLayout(panelUpload);
         panelUpload.setLayout(panelUploadLayout);
         panelUploadLayout.setHorizontalGroup(
             panelUploadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(panelUploadLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(labelUploadTitle, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 636, Short.MAX_VALUE)
+                .add(panelUploadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, panelUploadLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .add(labelUploadTitle, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 640, Short.MAX_VALUE))
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, panelUploadLayout.createSequentialGroup()
+                        .add(panelUploadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                            .add(org.jdesktop.layout.GroupLayout.LEADING, panelUploadLayout.createSequentialGroup()
+                                .add(192, 192, 192)
+                                .add(radioCGNE)
+                                .add(18, 18, 18)
+                                .add(radioFISTA))
+                            .add(org.jdesktop.layout.GroupLayout.LEADING, panelUploadLayout.createSequentialGroup()
+                                .add(113, 113, 113)
+                                .add(textFieldUploadFile, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 292, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .add(18, 18, 18)
+                                .add(buttonFileChoose)))
+                        .add(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, panelUploadLayout.createSequentialGroup()
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .add(textFieldUploadFile, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 292, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(18, 18, 18)
-                .add(buttonFileChoose)
-                .add(128, 128, 128))
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, labelAlgoritmo, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .add(panelUploadLayout.createSequentialGroup()
-                .add(275, 275, 275)
+                .add(241, 241, 241)
                 .add(buttonSendFile, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 163, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -192,13 +218,19 @@ public class MainScreen extends javax.swing.JFrame {
             .add(panelUploadLayout.createSequentialGroup()
                 .add(23, 23, 23)
                 .add(labelUploadTitle)
-                .add(80, 80, 80)
-                .add(panelUploadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                    .add(buttonFileChoose, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(textFieldUploadFile))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 141, Short.MAX_VALUE)
+                .add(43, 43, 43)
+                .add(panelUploadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(buttonFileChoose)
+                    .add(textFieldUploadFile, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 23, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(28, 28, 28)
+                .add(labelAlgoritmo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 23, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(18, 18, 18)
+                .add(panelUploadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(radioCGNE)
+                    .add(radioFISTA))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 108, Short.MAX_VALUE)
                 .add(buttonSendFile, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 37, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(51, 51, 51))
+                .add(35, 35, 35))
         );
 
         getContentPane().add(panelUpload, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 60, 660, 390));
@@ -221,23 +253,9 @@ public class MainScreen extends javax.swing.JFrame {
         try {
             BufferedReader br = new BufferedReader(new FileReader(textFieldUploadFile.getText()));
             JSONArray data = new JSONArray();
-            String linha = "";
-            String aux = "";
-            while(br.ready()){
-                linha = br.readLine();
-                for(int i = 0; i < linha.length(); i++){
-                    if(linha.charAt(i) == ','){
-                        data.add(Double.parseDouble(aux));
-                        aux = "";
-                    }
-                    else{
-                        aux += linha.charAt(i);
-                    }
-                }
-                data.add(Double.parseDouble(aux));
-                aux = "";
-            }
+            while(br.ready())
                 data.add(Double.parseDouble(br.readLine()));
+            
             br.close();
             URL url = new URL("http://localhost:8080/process");
             HttpURLConnection con = (HttpURLConnection)url.openConnection();
@@ -251,6 +269,8 @@ public class MainScreen extends javax.swing.JFrame {
             
             JSONObject body = new JSONObject();
             body.put("data", data);
+            body.put("usuario_id", Session.getId());
+            body.put("algoritmo", radioFISTA.getText());
             
             DataOutputStream wr = new DataOutputStream(con.getOutputStream());
             wr.writeBytes(body.toString());
@@ -312,7 +332,9 @@ public class MainScreen extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonFileChoose;
+    private javax.swing.ButtonGroup buttonGroupAlgorithm;
     private javax.swing.JButton buttonSendFile;
+    private javax.swing.JLabel labelAlgoritmo;
     private javax.swing.JLabel labelDownload;
     private javax.swing.JLabel labelHeader;
     private javax.swing.JLabel labelUpload;
@@ -322,6 +344,8 @@ public class MainScreen extends javax.swing.JFrame {
     private javax.swing.JPanel panelDashboard;
     private javax.swing.JPanel panelHeader;
     private javax.swing.JPanel panelUpload;
+    private javax.swing.JRadioButton radioCGNE;
+    private javax.swing.JRadioButton radioFISTA;
     private javax.swing.JTextField textFieldUploadFile;
     // End of variables declaration//GEN-END:variables
 
