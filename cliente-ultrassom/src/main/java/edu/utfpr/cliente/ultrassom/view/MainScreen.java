@@ -253,9 +253,14 @@ public class MainScreen extends javax.swing.JFrame {
         try {
             BufferedReader br = new BufferedReader(new FileReader(textFieldUploadFile.getText()));
             JSONArray data = new JSONArray();
-            while(br.ready())
-                data.add(Double.parseDouble(br.readLine()));
-            
+            for(int j = 0; j < 64; j++){
+                for(int i = 0; i < 794; i++){
+                    double g = Double.parseDouble(br.readLine());
+                    double gama = 100+(1/20*i*Math.sqrt(i));
+                    g = g*gama;
+                    data.add(g);
+                }
+            }
             br.close();
             URL url = new URL("http://localhost:8080/process");
             HttpURLConnection con = (HttpURLConnection)url.openConnection();
@@ -270,7 +275,7 @@ public class MainScreen extends javax.swing.JFrame {
             JSONObject body = new JSONObject();
             body.put("data", data);
             body.put("usuario_id", Session.getId());
-            body.put("algoritmo", radioFISTA.getText());
+            body.put("algoritmo", radioCGNE.isSelected() ? radioCGNE.getText() : radioFISTA.getText());
             
             DataOutputStream wr = new DataOutputStream(con.getOutputStream());
             wr.writeBytes(body.toString());

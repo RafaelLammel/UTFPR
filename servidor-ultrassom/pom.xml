@@ -44,6 +44,11 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+                <dependency>
+                    <groupId>com.googlecode.matrix-toolkits-java</groupId>
+                    <artifactId>mtj</artifactId>
+                    <version>1.0.2</version>
+                </dependency>
 	</dependencies>
 
 	<build>
