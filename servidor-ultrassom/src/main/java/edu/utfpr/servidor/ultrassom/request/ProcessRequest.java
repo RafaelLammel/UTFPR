@@ -2,15 +2,15 @@ package edu.utfpr.servidor.ultrassom.request;
 
 public class ProcessRequest {
     
-    private Double[] data;
+    private double[] data;
     private int usuario_id;
     private String algoritmo;
 
-    public Double[] getData() {
+    public double[] getData() {
         return data;
     }
 
-    public void setData(Double[] data) {
+    public void setData(double[] data) {
         this.data = data;
     }
 

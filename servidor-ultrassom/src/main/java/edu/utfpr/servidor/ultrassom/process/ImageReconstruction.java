@@ -8,16 +8,19 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import no.uib.cipr.matrix.DenseMatrix;
+import no.uib.cipr.matrix.DenseVector;
+import no.uib.cipr.matrix.Matrix;
+import no.uib.cipr.matrix.Vector;
 
 public class ImageReconstruction implements Runnable {
    
     private Imagem imagem;
-    private Double[] g;
-    private DenseMatrix H;
+    private Vector g;
+    private Matrix H;
     
-    public ImageReconstruction(Imagem imagem, Double[] g){
+    public ImageReconstruction(Imagem imagem, double[] g){
         this.imagem = imagem;
-        this.g = g;
+        this.g = new DenseVector(g);
         this.H = new DenseMatrix(50816,3600);
     }
     
@@ -31,6 +34,8 @@ public class ImageReconstruction implements Runnable {
     
     private void processCGNE(){
         try {
+            
+            //Lendo a Matriz Modelo e guardando em uma matriz
             BufferedReader br = new BufferedReader(new FileReader("./H-1.txt"));
             StringBuffer s = new StringBuffer();
             int i = 0, j = 0;
@@ -52,7 +57,42 @@ public class ImageReconstruction implements Runnable {
                 i++;
                 j = 0;
             }
-            System.out.println("Items na matriz!");
+            
+            //Iniciando o cálculo de reconstrução
+            //r0 = g - Hf*0
+            Vector f = new DenseVector(3600);
+            f.zero();
+            Vector fH = null;
+            H.mult(f,fH);
+            Vector r = null;
+            g.add(-1.0,fH);
+            //(g virou r) p0 = Ht*r
+            Matrix Ht = null;
+            H.transpose(Ht);
+            Vector p = null;
+            Ht.mult(g,p);
+            double e = 0;
+            do{
+                //alpha = (rit*ri)/(pit*pi)
+                double alpha = g.dot(g)/p.dot(p);
+                //f = f + alpha*p
+                f.add(alpha,p);
+                //r = r - alpha*H*p (g = g - alpha*H*p)
+                Vector Hp = null;
+                Vector gAnterior = g.copy();
+                H.mult(p, Hp);
+                g.add(-alpha, Hp);
+                //beta = rt*r/ri-1t*ri-1 (beta = gt*g/gi-1t*gi-1)
+                double beta = g.dot(g)/gAnterior.dot(gAnterior);
+                //p = Ht*r + beta*p (p = Ht*g + beta*p)
+                Vector Htg = null;
+                Ht.mult(g, Htg);
+                p.add(beta,Htg);
+                
+                //Calculo de erro
+                e = g.norm(Vector.Norm.Two)-gAnterior.norm(Vector.Norm.Two);
+            }while(e < Math.pow(10,-4));
+            System.out.println("FOI MEU DEUS");
         } catch (FileNotFoundException ex) {
             Logger.getLogger(ImageReconstruction.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
