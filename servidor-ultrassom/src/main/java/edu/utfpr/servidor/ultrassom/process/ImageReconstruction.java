@@ -37,6 +37,41 @@ public class ImageReconstruction implements Runnable {
             this.processCGNE();
         else
             this.processFISTA();
+        
+        double[] normalized = new double[3600];
+        double max = img.get(0);
+        double min = img.get(0);
+        
+        for(int i = 1; i < 3600; i++){
+            if(max < img.get(i))
+                max = img.get(i);
+            if(min > img.get(i))
+                min = img.get(i);
+        }
+        
+        for (int i = 0; i < 3600; i++)
+            normalized[i] = ((img.get(i)-min)*255)/max-min;
+        
+        BufferedImage bf = new BufferedImage(60,60,BufferedImage.TYPE_BYTE_GRAY);
+        
+        int k = 0;
+        
+        for(int i = 0; i < 60; i++){
+            for(int j = 0; j < 60; j++){
+                bf.setRGB(i, j, (int)normalized[k]);
+                k++;
+            }
+        }
+        
+        File file = new File("./saida.png");
+        try {
+            ImageIO.write(bf, "png", file);
+        } catch (IOException ex) {
+            Logger.getLogger(ImageReconstruction.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        System.out.println("FINISH");
+        
     }
     
     private void processCGNE(){
