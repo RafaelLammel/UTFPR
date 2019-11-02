@@ -2,6 +2,8 @@ package edu.utfpr.servidor.ultrassom.process;
 
 import edu.utfpr.servidor.ultrassom.model.Imagem;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
+import java.awt.image.WritableRaster;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -50,22 +52,47 @@ public class ImageReconstruction implements Runnable {
         }
         
         for (int i = 0; i < 3600; i++)
-            normalized[i] = ((img.get(i)-min)*255)/max-min;
+            normalized[i] = ((img.get(i)-min)/(max-min))*255;
         
         BufferedImage bf = new BufferedImage(60,60,BufferedImage.TYPE_BYTE_GRAY);
+        WritableRaster raster = bf.getRaster();
         
+        //byte[] newData = ((DataBufferByte) bf.getRaster().getDataBuffer()).getData(); 
         int k = 0;
         
         for(int i = 0; i < 60; i++){
             for(int j = 0; j < 60; j++){
-                bf.setRGB(i, j, (int)normalized[k]);
+                if(normalized[k] < 70)
+                    raster.setSample(i, j, 0, 0.0);
+                else
+                    raster.setSample(i, j, 0, normalized[k]);
                 k++;
             }
         }
         
-        File file = new File("./saida.png");
+        File file = new File("./saida.bmp");
+        
+        String content = "";
+        for(int i = 1; i <= 60; i++){
+            for(int j = 1; j <= 60; j++){
+                content += normalized[(i*j)-1] + " - ";
+            }
+            content+="\n";
+        }
+
+        // If the file doesn't exists, create and write to it
+		// If the file exists, truncate (remove all content) and write to it
+        try (FileWriter writer = new FileWriter("app.txt");
+             BufferedWriter bw = new BufferedWriter(writer)) {
+
+            bw.write(content);
+
+        } catch (IOException e) {
+            System.err.format("IOException: %s%n", e);
+        }
+        
         try {
-            ImageIO.write(bf, "png", file);
+            ImageIO.write(bf, "bmp", file);
         } catch (IOException ex) {
             Logger.getLogger(ImageReconstruction.class.getName()).log(Level.SEVERE, null, ex);
         }
