@@ -1,16 +1,15 @@
 package edu.utfpr.servidor.ultrassom.process;
 
 import edu.utfpr.servidor.ultrassom.model.Imagem;
+import edu.utfpr.servidor.ultrassom.repository.ImagemRepository;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -18,7 +17,10 @@ import no.uib.cipr.matrix.DenseMatrix;
 import no.uib.cipr.matrix.DenseVector;
 import no.uib.cipr.matrix.Matrix;
 import no.uib.cipr.matrix.Vector;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ImageReconstruction implements Runnable {
    
     private Imagem imagem;
@@ -27,19 +29,82 @@ public class ImageReconstruction implements Runnable {
     private Vector img;
     private int iteracoes;
     
-    public ImageReconstruction(Imagem imagem, double[] g){
-        this.imagem = imagem;
+    @Autowired
+    ImagemRepository imagemRepository;
+    
+    public void setImagem(Imagem i){
+        this.imagem = i;
+    }
+
+    public void setData(double[] g){
         this.g = new DenseVector(g);
-        this.H = new DenseMatrix(50816,3600);
     }
     
     @Override
     public void run() {
+        
+        this.imagem.setDataInicio(new Date());
+        this.imagem.setStatus(1);
+        imagemRepository.save(this.imagem);
+      
+        this.H = new DenseMatrix(50816,3600);
+        
         if (this.imagem.getAlgoritmo().equals("CGNE"))
             this.processCGNE();
         else
             this.processFISTA();
         
+        this.buildImage();
+        
+    }
+    
+    private void buildImage(){
+        double[] normalized = normalize();
+        
+        BufferedImage bf = new BufferedImage(60,60,BufferedImage.TYPE_BYTE_GRAY);
+        WritableRaster raster = bf.getRaster();
+
+        int k = 0;
+        
+        for(int i = 0; i < 60; i++){
+            for(int j = 0; j < 60; j++){
+                if(normalized[k] < 70)
+                    raster.setSample(i, j, 0, 0.0);
+                else
+                    raster.setSample(i, j, 0, normalized[k]);
+                k++;
+            }
+        }
+        
+        String path = "./imagens/";
+        String diretorio = path+imagem.getUsuario_id();
+        String fileName = imagem.getId()+".bmp";
+        
+        File directory = new File(diretorio);
+        
+        if(!directory.exists()){
+            directory.mkdir();
+        }
+        
+        File file = new File(diretorio+"/"+fileName);
+        
+        try {
+            ImageIO.write(bf, "bmp", file);
+        } catch (IOException ex) {
+            Logger.getLogger(ImageReconstruction.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        this.imagem.setIteracoes(iteracoes);
+        this.imagem.setTamanho("60x60");
+        this.imagem.setStatus(2);
+        this.imagem.setCaminho_imagem(diretorio+"/"+fileName);
+        this.imagem.setDataTermino(new Date());
+        
+        imagemRepository.save(this.imagem);
+        
+    }
+    
+    private double[] normalize(){
         double[] normalized = new double[3600];
         double max = img.get(0);
         double min = img.get(0);
@@ -54,51 +119,7 @@ public class ImageReconstruction implements Runnable {
         for (int i = 0; i < 3600; i++)
             normalized[i] = ((img.get(i)-min)/(max-min))*255;
         
-        BufferedImage bf = new BufferedImage(60,60,BufferedImage.TYPE_BYTE_GRAY);
-        WritableRaster raster = bf.getRaster();
-        
-        //byte[] newData = ((DataBufferByte) bf.getRaster().getDataBuffer()).getData(); 
-        int k = 0;
-        
-        for(int i = 0; i < 60; i++){
-            for(int j = 0; j < 60; j++){
-                if(normalized[k] < 70)
-                    raster.setSample(i, j, 0, 0.0);
-                else
-                    raster.setSample(i, j, 0, normalized[k]);
-                k++;
-            }
-        }
-        
-        File file = new File("./saida.bmp");
-        
-        String content = "";
-        for(int i = 1; i <= 60; i++){
-            for(int j = 1; j <= 60; j++){
-                content += normalized[(i*j)-1] + " - ";
-            }
-            content+="\n";
-        }
-
-        // If the file doesn't exists, create and write to it
-		// If the file exists, truncate (remove all content) and write to it
-        try (FileWriter writer = new FileWriter("app.txt");
-             BufferedWriter bw = new BufferedWriter(writer)) {
-
-            bw.write(content);
-
-        } catch (IOException e) {
-            System.err.format("IOException: %s%n", e);
-        }
-        
-        try {
-            ImageIO.write(bf, "bmp", file);
-        } catch (IOException ex) {
-            Logger.getLogger(ImageReconstruction.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        System.out.println("FINISH");
-        
+        return normalized;
     }
     
     private void processCGNE(){

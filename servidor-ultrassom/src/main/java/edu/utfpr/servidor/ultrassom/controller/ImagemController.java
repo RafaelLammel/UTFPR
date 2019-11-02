@@ -5,7 +5,6 @@ import edu.utfpr.servidor.ultrassom.process.ImageReconstruction;
 import edu.utfpr.servidor.ultrassom.repository.ImagemRepository;
 import edu.utfpr.servidor.ultrassom.request.ProcessRequest;
 import edu.utfpr.servidor.ultrassom.response.ProcessResponse;
-import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,17 +16,21 @@ public class ImagemController {
     @Autowired
     ImagemRepository imagemRepository;
     
+    @Autowired
+    ImageReconstruction ir;
+    
     @PostMapping("/process")
     public ProcessResponse recebeDados(@RequestBody ProcessRequest pr){
         Imagem i = new Imagem();
         i.setUsuario_id(pr.getUsuario_id());
         i.setAlgoritmo(pr.getAlgoritmo());
         i.setStatus(0);
-        ImageReconstruction ir = new ImageReconstruction(imagemRepository.save(i), pr.getData());
+        this.ir.setImagem(imagemRepository.save(i));
+        this.ir.setData(pr.getData());
         Thread t = new Thread(ir);
         t.start();
         ProcessResponse prs = new ProcessResponse();
-        prs.setMensagem("Deu boa!");
+        prs.setMensagem("Processando");
         return prs;
     }
     

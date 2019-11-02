@@ -24,7 +24,7 @@ public class Imagem {
     private String tamanho;
     private int iteracoes;
     private int status;
-    private String linkImagem;
+    private String caminho_imagem;
     private int usuario_id;
 
     public int getId() {
@@ -83,12 +83,12 @@ public class Imagem {
         this.status = status;
     }
 
-    public String getLinkImagem() {
-        return linkImagem;
+    public String getCaminho_imagem() {
+        return caminho_imagem;
     }
 
-    public void setLinkImagem(String linkImagem) {
-        this.linkImagem = linkImagem;
+    public void setCaminho_imagem(String caminho_imagem) {
+        this.caminho_imagem = caminho_imagem;
     }
     
     

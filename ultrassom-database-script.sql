@@ -16,5 +16,7 @@ CREATE TABLE IF NOT EXISTS imagem(
     data_termino DATETIME,
     tamanho VARCHAR(10),
     iteracoes INT,
-    FOREIGN KEY (usuario_id) REFERENCES usuario
+    status int,
+    caminho_imagem varchar(20),
+    FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 );
