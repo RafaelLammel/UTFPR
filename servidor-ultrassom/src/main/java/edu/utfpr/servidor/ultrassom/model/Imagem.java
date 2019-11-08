@@ -26,6 +26,7 @@ public class Imagem {
     private int status;
     private String caminho_imagem;
     private int usuario_id;
+    //private String usuario_email;//arrumar tabela
 
     public int getId() {
         return id;
@@ -101,6 +102,5 @@ public class Imagem {
         this.usuario_id = usuario_id;
     }
     
-    
-    
+
 }

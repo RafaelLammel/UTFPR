@@ -20,6 +20,7 @@ import no.uib.cipr.matrix.Vector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
 @Service
 public class ImageReconstruction implements Runnable {
    
@@ -28,10 +29,9 @@ public class ImageReconstruction implements Runnable {
     private Matrix H;
     private Vector img;
     private int iteracoes;
-    
+    private JavaMailApp mail = new JavaMailApp();
     @Autowired
     ImagemRepository imagemRepository;
-    
     public void setImagem(Imagem i){
         this.imagem = i;
     }
@@ -56,6 +56,7 @@ public class ImageReconstruction implements Runnable {
         
         this.buildImage();
         
+        //mandar email aqui
     }
     
     private void buildImage(){
@@ -101,7 +102,7 @@ public class ImageReconstruction implements Runnable {
         this.imagem.setDataTermino(new Date());
         
         imagemRepository.save(this.imagem);
-        
+        mail.sendEmail("coleradodragao19@gmail.com"/*colar email do usuario aqui*/, "Seu sinal está pronto, agora é só fazer upload amiguinho!\n\nDollynho seu amiguinho"); //enviar email
     }
     
     private double[] normalize(){

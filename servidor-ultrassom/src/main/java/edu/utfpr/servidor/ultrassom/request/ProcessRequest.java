@@ -29,6 +29,7 @@ public class ProcessRequest {
     public void setAlgoritmo(String algoritmo) {
         this.algoritmo = algoritmo;
     }
+    
 
     
     
