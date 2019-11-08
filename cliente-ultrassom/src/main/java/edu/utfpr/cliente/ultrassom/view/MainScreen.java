@@ -9,12 +9,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import static javax.swing.JOptionPane.showMessageDialog;
 import javax.swing.filechooser.FileSystemView;
+import javax.swing.table.DefaultTableModel;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
@@ -30,6 +32,7 @@ public class MainScreen extends javax.swing.JFrame {
         this.setResizable(false);
         this.setLocationRelativeTo(null);
         textFieldUploadFile.setEnabled(false);
+        panelDownload.setVisible(false);
     }
 
     /** This method is called from within the constructor to
@@ -49,6 +52,9 @@ public class MainScreen extends javax.swing.JFrame {
         labelDownload = new javax.swing.JLabel();
         panelHeader = new javax.swing.JPanel();
         labelHeader = new javax.swing.JLabel();
+        panelDownload = new javax.swing.JPanel();
+        jScrollPane = new javax.swing.JScrollPane();
+        table = new javax.swing.JTable();
         panelUpload = new javax.swing.JPanel();
         labelUploadTitle = new javax.swing.JLabel();
         buttonFileChoose = new javax.swing.JButton();
@@ -63,6 +69,12 @@ public class MainScreen extends javax.swing.JFrame {
 
         panelDashboard.setBackground(new java.awt.Color(0, 51, 153));
         panelDashboard.setForeground(new java.awt.Color(0, 102, 204));
+
+        panelBackgroundUpload.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                panelBackgroundUploadMouseClicked(evt);
+            }
+        });
 
         labelUpload.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
         labelUpload.setText("Upload");
@@ -83,6 +95,12 @@ public class MainScreen extends javax.swing.JFrame {
                 .add(labelUpload)
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        panelBackgroundDownload.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                panelBackgroundDownloadMouseClicked(evt);
+            }
+        });
 
         labelDownload.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
         labelDownload.setText("Download");
@@ -135,8 +153,8 @@ public class MainScreen extends javax.swing.JFrame {
         panelHeaderLayout.setHorizontalGroup(
             panelHeaderLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(panelHeaderLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(labelHeader, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 640, Short.MAX_VALUE)
+                .add(479, 479, 479)
+                .add(labelHeader, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         panelHeaderLayout.setVerticalGroup(
@@ -148,6 +166,49 @@ public class MainScreen extends javax.swing.JFrame {
         );
 
         getContentPane().add(panelHeader, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 0, 660, 60));
+
+        panelDownload.setBackground(new java.awt.Color(204, 204, 204));
+
+        table.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
+            },
+            new String [] {
+                "Usuário", "Algoritmo", "Inicio", "Término", "Tamanho", "Iterações"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane.setViewportView(table);
+
+        org.jdesktop.layout.GroupLayout panelDownloadLayout = new org.jdesktop.layout.GroupLayout(panelDownload);
+        panelDownload.setLayout(panelDownloadLayout);
+        panelDownloadLayout.setHorizontalGroup(
+            panelDownloadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 660, Short.MAX_VALUE)
+        );
+        panelDownloadLayout.setVerticalGroup(
+            panelDownloadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(panelDownloadLayout.createSequentialGroup()
+                .add(jScrollPane, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 390, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(0, 0, Short.MAX_VALUE))
+        );
+
+        getContentPane().add(panelDownload, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 60, 660, 390));
 
         panelUpload.setBackground(new java.awt.Color(204, 204, 204));
 
@@ -173,7 +234,6 @@ public class MainScreen extends javax.swing.JFrame {
 
         buttonGroupAlgorithm.add(radioCGNE);
         radioCGNE.setFont(new java.awt.Font("Roboto", 0, 11)); // NOI18N
-        radioCGNE.setSelected(true);
         radioCGNE.setText("CGNE");
 
         buttonGroupAlgorithm.add(radioFISTA);
@@ -300,6 +360,47 @@ public class MainScreen extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_buttonSendFileActionPerformed
 
+    private void panelBackgroundDownloadMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_panelBackgroundDownloadMouseClicked
+        try {
+            panelUpload.setVisible(false);
+            panelDownload.setVisible(true);
+            URL url = new URL("http://localhost:8080/imagem/"+Session.getId());
+            HttpURLConnection con = (HttpURLConnection)url.openConnection();
+            //Declaranco método e tipo do conteúdo
+            con.setRequestMethod("GET");
+            con.setRequestProperty("Accept", "application/json");
+            //Falando que vamos enviar algo
+            con.setDoOutput(true);
+            con.setDoInput(true);
+            //Lendo resposta
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            String response = "";
+            while((inputLine = in.readLine()) != null){
+                response += inputLine;
+            }
+            in.close();
+            JSONParser parser = new JSONParser();
+            JSONArray json = (JSONArray) parser.parse(response);
+            
+            DefaultTableModel model = (DefaultTableModel) table.getModel();
+            for(int i = 0; i < json.size(); i++){
+                JSONObject imagem = (JSONObject) json.get(i);
+                model.addRow(new Object[]{imagem.get("usuarioId"),imagem.get("algoritmo"),imagem.get("dataInicio"),imagem.get("dataTermino"),imagem.get("tamanho"),imagem.get("iteracoes")});
+            }
+            
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(MainScreen.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException | ParseException ex) {
+            Logger.getLogger(MainScreen.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_panelBackgroundDownloadMouseClicked
+
+    private void panelBackgroundUploadMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_panelBackgroundUploadMouseClicked
+        panelDownload.setVisible(false);
+        panelUpload.setVisible(true);
+    }//GEN-LAST:event_panelBackgroundUploadMouseClicked
+
     /**
      * @param args the command line arguments
      */
@@ -339,6 +440,7 @@ public class MainScreen extends javax.swing.JFrame {
     private javax.swing.JButton buttonFileChoose;
     private javax.swing.ButtonGroup buttonGroupAlgorithm;
     private javax.swing.JButton buttonSendFile;
+    private javax.swing.JScrollPane jScrollPane;
     private javax.swing.JLabel labelAlgoritmo;
     private javax.swing.JLabel labelDownload;
     private javax.swing.JLabel labelHeader;
@@ -347,10 +449,12 @@ public class MainScreen extends javax.swing.JFrame {
     private javax.swing.JPanel panelBackgroundDownload;
     private javax.swing.JPanel panelBackgroundUpload;
     private javax.swing.JPanel panelDashboard;
+    private javax.swing.JPanel panelDownload;
     private javax.swing.JPanel panelHeader;
     private javax.swing.JPanel panelUpload;
     private javax.swing.JRadioButton radioCGNE;
     private javax.swing.JRadioButton radioFISTA;
+    private javax.swing.JTable table;
     private javax.swing.JTextField textFieldUploadFile;
     // End of variables declaration//GEN-END:variables
 

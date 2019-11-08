@@ -1,6 +1,7 @@
 package edu.utfpr.servidor.ultrassom.model;
 
 import java.util.Date;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -25,7 +26,8 @@ public class Imagem {
     private int iteracoes;
     private int status;
     private String caminho_imagem;
-    private int usuario_id;
+    @Column(name="usuario_id")
+    private int usuarioId;
     //private String usuario_email;//arrumar tabela
 
     public int getId() {
@@ -94,12 +96,12 @@ public class Imagem {
     
     
     
-    public int getUsuario_id() {
-        return usuario_id;
+    public int getUsuarioId() {
+        return usuarioId;
     }
 
-    public void setUsuario_id(int usuario_id) {
-        this.usuario_id = usuario_id;
+    public void setUsuarioId(int usuario_id) {
+        this.usuarioId = usuario_id;
     }
     
 

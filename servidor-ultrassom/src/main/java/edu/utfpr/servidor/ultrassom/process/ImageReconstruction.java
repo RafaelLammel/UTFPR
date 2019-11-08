@@ -78,7 +78,7 @@ public class ImageReconstruction implements Runnable {
         }
         
         String path = "./imagens/";
-        String diretorio = path+imagem.getUsuario_id();
+        String diretorio = path+imagem.getUsuarioId();
         String fileName = imagem.getId()+".bmp";
         
         File directory = new File(diretorio);
