@@ -79,7 +79,7 @@ public class ImageReconstruction implements Runnable {
         
         String path = "./imagens/";
         String diretorio = path+imagem.getUsuarioId();
-        String fileName = imagem.getId()+".bmp";
+        String fileName = imagem.getId()+".png";
         
         File directory = new File(diretorio);
         
@@ -90,7 +90,7 @@ public class ImageReconstruction implements Runnable {
         File file = new File(diretorio+"/"+fileName);
         
         try {
-            ImageIO.write(bf, "bmp", file);
+            ImageIO.write(bf, "png", file);
         } catch (IOException ex) {
             Logger.getLogger(ImageReconstruction.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -102,7 +102,7 @@ public class ImageReconstruction implements Runnable {
         this.imagem.setDataTermino(new Date());
         
         imagemRepository.save(this.imagem);
-        mail.sendEmail("coleradodragao19@gmail.com"/*colar email do usuario aqui*/, "Seu sinal está pronto, agora é só fazer upload amiguinho!\n\nDollynho seu amiguinho"); //enviar email
+        //mail.sendEmail("coleradodragao19@gmail.com"/*colar email do usuario aqui*/, "Seu sinal está pronto, agora é só fazer upload amiguinho!\n\nDollynho seu amiguinho"); //enviar email
     }
     
     private double[] normalize(){
@@ -126,7 +126,7 @@ public class ImageReconstruction implements Runnable {
     private void processCGNE(){
         try {
             //Lendo a Matriz Modelo e guardando em uma matriz
-            BufferedReader br = new BufferedReader(new FileReader("./H-1.txt"));
+            BufferedReader br = new BufferedReader(new FileReader("./modelos/H-1.txt"));
             StringBuffer s = new StringBuffer();
             int i = 0, j = 0;
             while(br.ready()){

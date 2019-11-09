@@ -5,12 +5,19 @@ import edu.utfpr.servidor.ultrassom.process.ImageReconstruction;
 import edu.utfpr.servidor.ultrassom.repository.ImagemRepository;
 import edu.utfpr.servidor.ultrassom.request.ProcessRequest;
 import edu.utfpr.servidor.ultrassom.response.ProcessResponse;
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -38,8 +45,31 @@ public class ImagemController {
     }
     
     @GetMapping("/imagem/{usuario_id}")
-    public List<Imagem> getImagem(@PathVariable(value="usuario_id") int usuarioId){
+    public List<Imagem> listImagem(@PathVariable(value="usuario_id") int usuarioId){
         return imagemRepository.findByUsuarioId(usuarioId);
+    }
+    
+    @GetMapping("/imagem/{usuario_id}/{imagem_id}")
+    @ResponseBody
+    public void getImagem(@PathVariable("usuario_id") int usuarioId, 
+                          @PathVariable("imagem_id") int imagemId,
+                          HttpServletResponse response){
+       response.setContentType("application/png");
+       
+        try {
+            BufferedOutputStream bos = new BufferedOutputStream(response.getOutputStream());
+            FileInputStream fis = new FileInputStream("./imagens/"+usuarioId+"/"+imagemId+".png");
+            int len;
+            byte[] buf = new byte[1024];
+            while((len = fis.read(buf)) > 0){
+                bos.write(buf,0,len);
+            }
+            bos.close();
+            response.flushBuffer();
+        } catch (IOException ex) {
+            Logger.getLogger(ImagemController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+       
     }
     
 }

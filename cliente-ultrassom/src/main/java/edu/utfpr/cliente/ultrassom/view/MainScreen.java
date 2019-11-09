@@ -1,6 +1,8 @@
 package edu.utfpr.cliente.ultrassom.view;
 
 import edu.utfpr.cliente.ultrassom.view.session.Session;
+import java.awt.Image;
+import java.awt.image.RenderedImage;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -13,6 +15,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import static javax.swing.JOptionPane.showMessageDialog;
 import javax.swing.filechooser.FileSystemView;
@@ -52,9 +55,6 @@ public class MainScreen extends javax.swing.JFrame {
         labelDownload = new javax.swing.JLabel();
         panelHeader = new javax.swing.JPanel();
         labelHeader = new javax.swing.JLabel();
-        panelDownload = new javax.swing.JPanel();
-        jScrollPane = new javax.swing.JScrollPane();
-        table = new javax.swing.JTable();
         panelUpload = new javax.swing.JPanel();
         labelUploadTitle = new javax.swing.JLabel();
         buttonFileChoose = new javax.swing.JButton();
@@ -63,6 +63,9 @@ public class MainScreen extends javax.swing.JFrame {
         radioCGNE = new javax.swing.JRadioButton();
         radioFISTA = new javax.swing.JRadioButton();
         labelAlgoritmo = new javax.swing.JLabel();
+        panelDownload = new javax.swing.JPanel();
+        jScrollPane = new javax.swing.JScrollPane();
+        table = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -153,9 +156,9 @@ public class MainScreen extends javax.swing.JFrame {
         panelHeaderLayout.setHorizontalGroup(
             panelHeaderLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(panelHeaderLayout.createSequentialGroup()
-                .add(479, 479, 479)
+                .add(457, 457, 457)
                 .add(labelHeader, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .add(32, 32, 32))
         );
         panelHeaderLayout.setVerticalGroup(
             panelHeaderLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -166,49 +169,6 @@ public class MainScreen extends javax.swing.JFrame {
         );
 
         getContentPane().add(panelHeader, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 0, 660, 60));
-
-        panelDownload.setBackground(new java.awt.Color(204, 204, 204));
-
-        table.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null}
-            },
-            new String [] {
-                "Usuário", "Algoritmo", "Inicio", "Término", "Tamanho", "Iterações"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
-            };
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        jScrollPane.setViewportView(table);
-
-        org.jdesktop.layout.GroupLayout panelDownloadLayout = new org.jdesktop.layout.GroupLayout(panelDownload);
-        panelDownload.setLayout(panelDownloadLayout);
-        panelDownloadLayout.setHorizontalGroup(
-            panelDownloadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 660, Short.MAX_VALUE)
-        );
-        panelDownloadLayout.setVerticalGroup(
-            panelDownloadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(panelDownloadLayout.createSequentialGroup()
-                .add(jScrollPane, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 390, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(0, 0, Short.MAX_VALUE))
-        );
-
-        getContentPane().add(panelDownload, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 60, 660, 390));
 
         panelUpload.setBackground(new java.awt.Color(204, 204, 204));
 
@@ -295,6 +255,64 @@ public class MainScreen extends javax.swing.JFrame {
 
         getContentPane().add(panelUpload, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 60, 660, 390));
 
+        panelDownload.setBackground(new java.awt.Color(204, 204, 204));
+
+        table.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Imagem", "Usuário", "Algoritmo", "Inicio", "Término", "Tamanho", "Iterações", "Download/Status"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tableMouseClicked(evt);
+            }
+        });
+        jScrollPane.setViewportView(table);
+        if (table.getColumnModel().getColumnCount() > 0) {
+            table.getColumnModel().getColumn(0).setMinWidth(0);
+            table.getColumnModel().getColumn(0).setMaxWidth(0);
+            table.getColumnModel().getColumn(1).setResizable(false);
+            table.getColumnModel().getColumn(2).setResizable(false);
+            table.getColumnModel().getColumn(3).setResizable(false);
+            table.getColumnModel().getColumn(4).setResizable(false);
+            table.getColumnModel().getColumn(5).setResizable(false);
+            table.getColumnModel().getColumn(6).setResizable(false);
+            table.getColumnModel().getColumn(7).setResizable(false);
+        }
+
+        org.jdesktop.layout.GroupLayout panelDownloadLayout = new org.jdesktop.layout.GroupLayout(panelDownload);
+        panelDownload.setLayout(panelDownloadLayout);
+        panelDownloadLayout.setHorizontalGroup(
+            panelDownloadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 660, Short.MAX_VALUE)
+        );
+        panelDownloadLayout.setVerticalGroup(
+            panelDownloadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(panelDownloadLayout.createSequentialGroup()
+                .add(jScrollPane, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 390, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(0, 0, Short.MAX_VALUE))
+        );
+
+        getContentPane().add(panelDownload, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 60, 660, 390));
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
@@ -315,7 +333,7 @@ public class MainScreen extends javax.swing.JFrame {
             JSONArray data = new JSONArray();
             for(int j = 0; j < 64; j++){
                 for(int i = 0; i < 794; i++){
-                    double g = Double.parseDouble(br.readLine());
+                    double g = Double.parseDouble(br.readLine().replace(",", "."));
                     double gama = 100+(1/20*i*Math.sqrt(i));
                     g = g*gama;
                     data.add(g);
@@ -384,9 +402,30 @@ public class MainScreen extends javax.swing.JFrame {
             JSONArray json = (JSONArray) parser.parse(response);
             
             DefaultTableModel model = (DefaultTableModel) table.getModel();
+            model.setRowCount(0);
             for(int i = 0; i < json.size(); i++){
                 JSONObject imagem = (JSONObject) json.get(i);
-                model.addRow(new Object[]{imagem.get("usuarioId"),imagem.get("algoritmo"),imagem.get("dataInicio"),imagem.get("dataTermino"),imagem.get("tamanho"),imagem.get("iteracoes")});
+                String status = "";
+                int stat = ((Long)imagem.get("status")).intValue();
+                switch (stat) {
+                    case 0:
+                        status = "Na fila";
+                        break;
+                    case 1:
+                        status = "Processando";
+                        break;
+                    default:
+                        status = "Clique para baixar";
+                        break;
+                }
+                model.addRow(new Object[]{imagem.get("id"),
+                                          imagem.get("usuarioId"),
+                                          imagem.get("algoritmo"),
+                                          imagem.get("dataInicio"),
+                                          imagem.get("dataTermino"),
+                                          imagem.get("tamanho"),
+                                          imagem.get("iteracoes"),
+                                          status});
             }
             
         } catch (MalformedURLException ex) {
@@ -400,6 +439,36 @@ public class MainScreen extends javax.swing.JFrame {
         panelDownload.setVisible(false);
         panelUpload.setVisible(true);
     }//GEN-LAST:event_panelBackgroundUploadMouseClicked
+
+    private void tableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMouseClicked
+        int row = table.rowAtPoint(evt.getPoint());
+        int col = table.columnAtPoint(evt.getPoint());
+        if(col == 7){
+            try {
+                URL url = new URL("http://localhost:8080/imagem/"+Session.getId()+"/"+table.getValueAt(row,0));
+                Image image = ImageIO.read(url);
+                
+                JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+                
+                int returnValue = jfc.showSaveDialog(null);
+
+                if (returnValue == JFileChooser.APPROVE_OPTION) {
+                        File selectedFile = jfc.getSelectedFile();
+                        String path = selectedFile.getAbsolutePath();
+                        if(!path.endsWith(".png")){
+                            path+=".png";
+                        }
+                        File file = new File(path);
+                        ImageIO.write((RenderedImage) image, "png", file);
+                }
+                
+            } catch (MalformedURLException ex) {
+                Logger.getLogger(MainScreen.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(MainScreen.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_tableMouseClicked
 
     /**
      * @param args the command line arguments
