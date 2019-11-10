@@ -3,6 +3,7 @@ package edu.utfpr.servidor.ultrassom.controller;
 import edu.utfpr.servidor.ultrassom.model.Imagem;
 import edu.utfpr.servidor.ultrassom.process.ImageReconstruction;
 import edu.utfpr.servidor.ultrassom.repository.ImagemRepository;
+import edu.utfpr.servidor.ultrassom.repository.UsuarioRepository;
 import edu.utfpr.servidor.ultrassom.request.ProcessRequest;
 import edu.utfpr.servidor.ultrassom.response.ProcessResponse;
 import java.io.BufferedOutputStream;
@@ -25,6 +26,9 @@ public class ImagemController {
     
     @Autowired
     ImagemRepository imagemRepository;
+    
+    @Autowired
+    UsuarioRepository usuarioRepository;
     
     @Autowired
     ImageReconstruction ir;

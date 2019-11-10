@@ -2,6 +2,7 @@ package edu.utfpr.servidor.ultrassom.process;
 
 import edu.utfpr.servidor.ultrassom.model.Imagem;
 import edu.utfpr.servidor.ultrassom.repository.ImagemRepository;
+import edu.utfpr.servidor.ultrassom.repository.UsuarioRepository;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.io.BufferedReader;
@@ -32,6 +33,8 @@ public class ImageReconstruction implements Runnable {
     private JavaMailApp mail = new JavaMailApp();
     @Autowired
     ImagemRepository imagemRepository;
+    @Autowired
+    UsuarioRepository usuarioRepository;
     public void setImagem(Imagem i){
         this.imagem = i;
     }
@@ -101,7 +104,7 @@ public class ImageReconstruction implements Runnable {
         this.imagem.setCaminho_imagem(diretorio+"/"+fileName);
         this.imagem.setDataTermino(new Date());
         imagemRepository.save(this.imagem);
-        mail.sendEmail("coleradodragao19@gmail.com"/*colar email do usuario aqui*/); //enviar email
+        mail.sendEmail(usuarioRepository.getEmailById(this.imagem.getUsuarioId())/*colar email do usuario aqui*/); //enviar email
     }
     
     private double[] normalize(){
