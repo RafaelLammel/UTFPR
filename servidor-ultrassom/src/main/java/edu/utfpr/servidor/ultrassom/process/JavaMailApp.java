@@ -22,7 +22,7 @@ public class JavaMailApp {
     String emailSrc = "coleradodragao19@gmail.com";
     String senha = "seiyadepegasus";
    
-    public void sendEmail(String emailDest, String msg){
+    public void sendEmail(String emailDest){
         Properties props = new Properties();
         /** Parâmetros de conexão com servidor Gmail */
         props.put("mail.smtp.host", "smtp.gmail.com");
@@ -69,7 +69,7 @@ public class JavaMailApp {
             mpContent.addBodyPart(mbpTextPlain);
             // Adicionando texto html à raiz
             MimeBodyPart mbpTextHtml = new MimeBodyPart();
-            mbpTextHtml.setText("Seu sinal está pronto, agora é só fazer upload amiguinho!<br><br>Um abração!!<br>Dollynho seu amiguinho<img src=\"cid:img1\">", "iso-8859-1", "html");
+            mbpTextHtml.setText("Seu sinal está pronto, agora é só fazer upload amiguinho!<br><br>Um abração!!<br>Dollynho seu amiguinho<br><img src=\"cid:img1\">", "iso-8859-1", "html");
             mpContent.addBodyPart(mbpTextHtml);
             
             // Obtém a referência ao arquivo de imagem

@@ -100,9 +100,8 @@ public class ImageReconstruction implements Runnable {
         this.imagem.setStatus(2);
         this.imagem.setCaminho_imagem(diretorio+"/"+fileName);
         this.imagem.setDataTermino(new Date());
-        
         imagemRepository.save(this.imagem);
-        //mail.sendEmail("coleradodragao19@gmail.com"/*colar email do usuario aqui*/, "Seu sinal está pronto, agora é só fazer upload amiguinho!\n\nDollynho seu amiguinho"); //enviar email
+        mail.sendEmail("coleradodragao19@gmail.com"/*colar email do usuario aqui*/); //enviar email
     }
     
     private double[] normalize(){
