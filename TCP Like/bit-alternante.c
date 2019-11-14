@@ -38,8 +38,9 @@ struct pkt {
 
 int seq = 0;
 int aEspera = 0;
+int nmrPkt = 1;
 struct pkt sendPacket;
-int time = 2;
+float timer = 20;
 
 /* called from layer 5, passed the data to be sent to other side */
 A_output(message)
@@ -59,7 +60,10 @@ A_output(message)
 
   /*Envia para a camada 3, inicia o Timer e coloca o status como esperando*/
   tolayer3(0,sendPacket);
-  starttimer(0,time);
+  printf("\nA enviou o pacote com Seq = %d\n",sendPacket.seqnum);
+  printf("Pacote de numero: %d\n", nmrPkt);
+  nmrPkt++;
+  starttimer(0,timer);
   aEspera = 1;
 }
 
@@ -77,14 +81,24 @@ A_input(packet)
   if(seq == packet.acknum){
     aEspera = 0;
     seq = (seq == 0) ? 1 : 0;
+    stoptimer(0);
+    printf("\nA recebeu o ACK correto\n");
+  }
+  //Se recebeu um ACK incorreto (NACK), reenvia o pacote
+  else{
+    stoptimer(0);
+    tolayer3(0,sendPacket);
+    starttimer(0,timer);
+    printf("\nA recebeu um ACK incorreto ou um NACK. Reenviando pacote de seq = %d\n",sendPacket.seqnum);
   }
 }
 
 /* called when A's timer goes off */
 A_timerinterrupt()
 {
-  tolayer3(0,packet);
-  starttimer(0,time);
+  printf("\nA estourou o tempo de espera, reenviando pacote de seq: %d\n", seq);
+  tolayer3(0,sendPacket);
+  starttimer(0,timer);
 }
 
 /* the following routine will be called once (only) before any other */
@@ -100,6 +114,7 @@ A_init()
 B_input(packet)
   struct pkt packet;
 {
+  printf("\nB recebeu um pacote! seq: %d\n",packet.seqnum);
   int sum = 0;
   struct pkt res;
   /*Verifica se o checksum está correto*/
@@ -109,11 +124,13 @@ B_input(packet)
   }
   /*Se não está, envia um NACK*/
   if(sum != packet.checksum){
+    printf("\nB recebeu dados corrompidos! Enviando NACK para A\n");
     res.acknum = -1;
     tolayer3(1,res);
     return;
   }
   /*Se está, envia a mensagem para a camada 5 e um ACK de volta para A*/
+  printf("\nB recebeu tudo certo, enviando um ACK para A: %d\n", packet.seqnum);
   struct msg message;
   memcpy(message.data,packet.payload,sizeof(message.data));
   tolayer5(1,message);
