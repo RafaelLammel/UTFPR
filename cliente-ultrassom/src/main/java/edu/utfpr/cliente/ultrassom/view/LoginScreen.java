@@ -1,6 +1,7 @@
 package edu.utfpr.cliente.ultrassom.view;
 
 import edu.utfpr.cliente.ultrassom.view.session.Session;
+import edu.utfpr.edu.br.cliente.ultrassom.Config;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -340,7 +341,7 @@ public class LoginScreen extends javax.swing.JFrame {
             showMessageDialog(null,"Por favor preencha os dois campos!");
         else{
             try {
-                URL url = new URL("http://localhost:8080/login");
+                URL url = new URL(Config.getServer_address()+"/login");
                 HttpURLConnection con = (HttpURLConnection)url.openConnection();
                 //Declaranco método e tipo do conteúdo
                 con.setRequestMethod("POST");
@@ -398,7 +399,7 @@ public class LoginScreen extends javax.swing.JFrame {
         else{
             try {
                 //Abrindo conexão com o servidor
-                URL url = new URL("http://localhost:8080/cadastroUsuario");
+                URL url = new URL(Config.getServer_address()+"/cadastroUsuario");
                 HttpURLConnection con = (HttpURLConnection)url.openConnection();
                 //Declaranco método e tipo do conteúdo
                 con.setRequestMethod("POST");

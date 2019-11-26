@@ -1,6 +1,7 @@
 package edu.utfpr.cliente.ultrassom.view;
 
 import edu.utfpr.cliente.ultrassom.view.session.Session;
+import edu.utfpr.edu.br.cliente.ultrassom.Config;
 import java.awt.Image;
 import java.awt.image.RenderedImage;
 import java.io.BufferedReader;
@@ -63,6 +64,14 @@ public class MainScreen extends javax.swing.JFrame {
         radioCGNE = new javax.swing.JRadioButton();
         radioFISTA = new javax.swing.JRadioButton();
         labelAlgoritmo = new javax.swing.JLabel();
+        labelAltura = new javax.swing.JLabel();
+        labelAmostras = new javax.swing.JLabel();
+        textFieldLargura = new javax.swing.JTextField();
+        textFieldAltura = new javax.swing.JTextField();
+        labelLargura = new javax.swing.JLabel();
+        textFieldAmostras = new javax.swing.JTextField();
+        labelSensores = new javax.swing.JLabel();
+        textFieldSensores = new javax.swing.JTextField();
         panelDownload = new javax.swing.JPanel();
         jScrollPane = new javax.swing.JScrollPane();
         table = new javax.swing.JTable();
@@ -204,51 +213,102 @@ public class MainScreen extends javax.swing.JFrame {
         labelAlgoritmo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         labelAlgoritmo.setText("Qual algoritmo quer usar?");
 
+        labelAltura.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
+        labelAltura.setText("Altura:");
+
+        labelAmostras.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
+        labelAmostras.setText("Amostras:");
+
+        labelLargura.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
+        labelLargura.setText("Largura:");
+
+        labelSensores.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
+        labelSensores.setText("Sensores:");
+
         org.jdesktop.layout.GroupLayout panelUploadLayout = new org.jdesktop.layout.GroupLayout(panelUpload);
         panelUpload.setLayout(panelUploadLayout);
         panelUploadLayout.setHorizontalGroup(
             panelUploadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, labelAlgoritmo, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .add(panelUploadLayout.createSequentialGroup()
-                .add(panelUploadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, panelUploadLayout.createSequentialGroup()
+                .add(panelUploadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(panelUploadLayout.createSequentialGroup()
                         .addContainerGap()
                         .add(labelUploadTitle, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 640, Short.MAX_VALUE))
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, panelUploadLayout.createSequentialGroup()
-                        .add(panelUploadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                            .add(org.jdesktop.layout.GroupLayout.LEADING, panelUploadLayout.createSequentialGroup()
+                    .add(panelUploadLayout.createSequentialGroup()
+                        .add(panelUploadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(panelUploadLayout.createSequentialGroup()
+                                .add(241, 241, 241)
+                                .add(buttonSendFile, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 163, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                            .add(panelUploadLayout.createSequentialGroup()
                                 .add(192, 192, 192)
                                 .add(radioCGNE)
                                 .add(18, 18, 18)
                                 .add(radioFISTA))
-                            .add(org.jdesktop.layout.GroupLayout.LEADING, panelUploadLayout.createSequentialGroup()
+                            .add(panelUploadLayout.createSequentialGroup()
                                 .add(113, 113, 113)
-                                .add(textFieldUploadFile, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 292, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .add(18, 18, 18)
-                                .add(buttonFileChoose)))
+                                .add(panelUploadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(panelUploadLayout.createSequentialGroup()
+                                        .add(textFieldUploadFile, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 292, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .add(18, 18, 18)
+                                        .add(buttonFileChoose))
+                                    .add(panelUploadLayout.createSequentialGroup()
+                                        .add(panelUploadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                                            .add(org.jdesktop.layout.GroupLayout.LEADING, panelUploadLayout.createSequentialGroup()
+                                                .add(labelLargura)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .add(textFieldLargura, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 71, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                                            .add(org.jdesktop.layout.GroupLayout.LEADING, panelUploadLayout.createSequentialGroup()
+                                                .add(labelAmostras)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                                                .add(textFieldAmostras, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 71, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                                        .add(50, 50, 50)
+                                        .add(panelUploadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                                            .add(panelUploadLayout.createSequentialGroup()
+                                                .add(labelAltura)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .add(textFieldAltura, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 72, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                                            .add(panelUploadLayout.createSequentialGroup()
+                                                .add(labelSensores)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                                                .add(textFieldSensores, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 71, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))))))
                         .add(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, labelAlgoritmo, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .add(panelUploadLayout.createSequentialGroup()
-                .add(241, 241, 241)
-                .add(buttonSendFile, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 163, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panelUploadLayout.setVerticalGroup(
             panelUploadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(panelUploadLayout.createSequentialGroup()
                 .add(23, 23, 23)
                 .add(labelUploadTitle)
-                .add(43, 43, 43)
+                .add(26, 26, 26)
                 .add(panelUploadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(buttonFileChoose)
                     .add(textFieldUploadFile, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 23, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .add(28, 28, 28)
+                .add(panelUploadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(labelAltura)
+                    .add(textFieldLargura, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(textFieldAltura, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 24, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(labelLargura))
+                .add(panelUploadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(panelUploadLayout.createSequentialGroup()
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 22, Short.MAX_VALUE)
+                        .add(panelUploadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(org.jdesktop.layout.GroupLayout.TRAILING, labelAmostras)
+                            .add(org.jdesktop.layout.GroupLayout.TRAILING, panelUploadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                                .add(textFieldAmostras, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .add(labelSensores)))
+                        .add(33, 33, 33))
+                    .add(panelUploadLayout.createSequentialGroup()
+                        .add(18, 18, 18)
+                        .add(textFieldSensores, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .add(labelAlgoritmo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 23, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .add(18, 18, 18)
                 .add(panelUploadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(radioCGNE)
                     .add(radioFISTA))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 108, Short.MAX_VALUE)
+                .add(18, 18, 18)
                 .add(buttonSendFile, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 37, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .add(35, 35, 35))
         );
@@ -262,14 +322,14 @@ public class MainScreen extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Imagem", "Usuário", "Algoritmo", "Inicio", "Término", "Tamanho", "Iterações", "Download/Status"
+                "Imagem", "Algoritmo", "Inicio", "Término", "Tamanho", "Iterações", "Download/Status"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -280,6 +340,7 @@ public class MainScreen extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        table.getTableHeader().setReorderingAllowed(false);
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tableMouseClicked(evt);
@@ -295,7 +356,6 @@ public class MainScreen extends javax.swing.JFrame {
             table.getColumnModel().getColumn(4).setResizable(false);
             table.getColumnModel().getColumn(5).setResizable(false);
             table.getColumnModel().getColumn(6).setResizable(false);
-            table.getColumnModel().getColumn(7).setResizable(false);
         }
 
         org.jdesktop.layout.GroupLayout panelDownloadLayout = new org.jdesktop.layout.GroupLayout(panelDownload);
@@ -340,7 +400,7 @@ public class MainScreen extends javax.swing.JFrame {
                 }
             }
             br.close();
-            URL url = new URL("http://localhost:8080/process");
+            URL url = new URL(Config.getServer_address()+"/process");
             HttpURLConnection con = (HttpURLConnection)url.openConnection();
             //Declaranco método e tipo do conteúdo
             con.setRequestMethod("POST");
@@ -353,6 +413,10 @@ public class MainScreen extends javax.swing.JFrame {
             JSONObject body = new JSONObject();
             body.put("data", data);
             body.put("usuario_id", Session.getId());
+            body.put("altura",textFieldAltura.getText());
+            body.put("largura", textFieldLargura.getText());
+            body.put("amostras", textFieldAmostras.getText());
+            body.put("sensores", textFieldSensores.getText());
             body.put("algoritmo", radioCGNE.isSelected() ? radioCGNE.getText() : radioFISTA.getText());
             
             DataOutputStream wr = new DataOutputStream(con.getOutputStream());
@@ -382,7 +446,7 @@ public class MainScreen extends javax.swing.JFrame {
         try {
             panelUpload.setVisible(false);
             panelDownload.setVisible(true);
-            URL url = new URL("http://localhost:8080/imagem/"+Session.getId());
+            URL url = new URL(Config.getServer_address()+"/imagem/"+Session.getId());
             HttpURLConnection con = (HttpURLConnection)url.openConnection();
             //Declaranco método e tipo do conteúdo
             con.setRequestMethod("GET");
@@ -415,11 +479,10 @@ public class MainScreen extends javax.swing.JFrame {
                         status = "Processando";
                         break;
                     default:
-                        status = "Clique para baixar";
+                        status = "Baixar";
                         break;
                 }
                 model.addRow(new Object[]{imagem.get("id"),
-                                          imagem.get("usuarioId"),
                                           imagem.get("algoritmo"),
                                           imagem.get("dataInicio"),
                                           imagem.get("dataTermino"),
@@ -443,9 +506,9 @@ public class MainScreen extends javax.swing.JFrame {
     private void tableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMouseClicked
         int row = table.rowAtPoint(evt.getPoint());
         int col = table.columnAtPoint(evt.getPoint());
-        if(col == 7){
+        if(col == 6){
             try {
-                URL url = new URL("http://localhost:8080/imagem/"+Session.getId()+"/"+table.getValueAt(row,0));
+                URL url = new URL(Config.getServer_address()+"/imagem/"+Session.getId()+"/"+table.getValueAt(row,0));
                 Image image = ImageIO.read(url);
                 
                 JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
@@ -511,8 +574,12 @@ public class MainScreen extends javax.swing.JFrame {
     private javax.swing.JButton buttonSendFile;
     private javax.swing.JScrollPane jScrollPane;
     private javax.swing.JLabel labelAlgoritmo;
+    private javax.swing.JLabel labelAltura;
+    private javax.swing.JLabel labelAmostras;
     private javax.swing.JLabel labelDownload;
     private javax.swing.JLabel labelHeader;
+    private javax.swing.JLabel labelLargura;
+    private javax.swing.JLabel labelSensores;
     private javax.swing.JLabel labelUpload;
     private javax.swing.JLabel labelUploadTitle;
     private javax.swing.JPanel panelBackgroundDownload;
@@ -524,6 +591,10 @@ public class MainScreen extends javax.swing.JFrame {
     private javax.swing.JRadioButton radioCGNE;
     private javax.swing.JRadioButton radioFISTA;
     private javax.swing.JTable table;
+    private javax.swing.JTextField textFieldAltura;
+    private javax.swing.JTextField textFieldAmostras;
+    private javax.swing.JTextField textFieldLargura;
+    private javax.swing.JTextField textFieldSensores;
     private javax.swing.JTextField textFieldUploadFile;
     // End of variables declaration//GEN-END:variables
 

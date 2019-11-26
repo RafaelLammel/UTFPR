@@ -1,8 +1,7 @@
 package edu.utfpr.servidor.ultrassom.process;
 
+import edu.utfpr.servidor.ultrassom.controller.ImagemController;
 import edu.utfpr.servidor.ultrassom.model.Imagem;
-import edu.utfpr.servidor.ultrassom.repository.ImagemRepository;
-import edu.utfpr.servidor.ultrassom.repository.UsuarioRepository;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.io.BufferedReader;
@@ -18,23 +17,33 @@ import no.uib.cipr.matrix.DenseMatrix;
 import no.uib.cipr.matrix.DenseVector;
 import no.uib.cipr.matrix.Matrix;
 import no.uib.cipr.matrix.Vector;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
 @Service
-public class ImageReconstruction implements Runnable {
+public class ImageReconstruction implements Runnable{
    
     private Imagem imagem;
     private Vector g;
     private Matrix H;
     private Vector img;
     private int iteracoes;
+    private int S;
+    private int N;
+    private int altura;
+    private int largura;
+    private ImagemController ic;
+
+    public void setController(ImagemController ic){
+        this.ic = ic;
+    }
+    
+    public Imagem getImagem() {
+        return imagem;
+    }
+    
     private JavaMailApp mail = new JavaMailApp();
-    @Autowired
-    ImagemRepository imagemRepository;
-    @Autowired
-    UsuarioRepository usuarioRepository;
+    
     public void setImagem(Imagem i){
         this.imagem = i;
     }
@@ -43,14 +52,38 @@ public class ImageReconstruction implements Runnable {
         this.g = new DenseVector(g);
     }
     
+    public void setS(int S) {
+        this.S = S;
+    }
+
+    public void setN(int N) {
+        this.N = N;
+    }
+    
+     public int getAltura() {
+        return altura;
+    }
+
+    public void setAltura(int altura) {
+        this.altura = altura;
+    }
+
+    public int getLargura() {
+        return largura;
+    }
+
+    public void setLargura(int largura) {
+        this.largura = largura;
+    }
+    
     @Override
     public void run() {
         
         this.imagem.setDataInicio(new Date());
         this.imagem.setStatus(1);
-        imagemRepository.save(this.imagem);
+        ic.updateImg(this.imagem);
       
-        this.H = new DenseMatrix(50816,3600);
+        this.H = new DenseMatrix(S*N,altura*largura);
         
         this.readModel();
         
@@ -67,13 +100,13 @@ public class ImageReconstruction implements Runnable {
     private void buildImage(){
         double[] normalized = normalize();
         
-        BufferedImage bf = new BufferedImage(60,60,BufferedImage.TYPE_BYTE_GRAY);
+        BufferedImage bf = new BufferedImage(largura,altura,BufferedImage.TYPE_BYTE_GRAY);
         WritableRaster raster = bf.getRaster();
 
         int k = 0;
         
-        for(int i = 0; i < 60; i++){
-            for(int j = 0; j < 60; j++){
+        for(int i = 0; i < largura; i++){
+            for(int j = 0; j < altura; j++){
                 if(normalized[k] < 70)
                     raster.setSample(i, j, 0, 0.0);
                 else
@@ -101,27 +134,26 @@ public class ImageReconstruction implements Runnable {
         }
         
         this.imagem.setIteracoes(iteracoes);
-        this.imagem.setTamanho("60x60");
         this.imagem.setStatus(2);
         this.imagem.setCaminho_imagem(diretorio+"/"+fileName);
         this.imagem.setDataTermino(new Date());
-        imagemRepository.save(this.imagem);
-        mail.sendEmail(usuarioRepository.getEmailById(this.imagem.getUsuarioId())/*colar email do usuario aqui*/); //enviar email
+        ic.updateImg(this.imagem);
+        //mail.sendEmail(usuarioRepository.getEmailById(this.imagem.getUsuarioId())/*colar email do usuario aqui*/); //enviar email
     }
     
     private double[] normalize(){
-        double[] normalized = new double[3600];
+        double[] normalized = new double[altura*largura];
         double max = img.get(0);
         double min = img.get(0);
         
-        for(int i = 1; i < 3600; i++){
+        for(int i = 1; i < altura*largura; i++){
             if(max < img.get(i))
                 max = img.get(i);
             if(min > img.get(i))
                 min = img.get(i);
         }
         
-        for (int i = 0; i < 3600; i++)
+        for (int i = 0; i < altura*largura; i++)
             normalized[i] = ((img.get(i)-min)/(max-min))*255;
         
         return normalized;
@@ -130,13 +162,13 @@ public class ImageReconstruction implements Runnable {
     private void processCGNE(){
         //Iniciando o cálculo de reconstrução
         //r0 = g - Hf*0
-        Vector f = new DenseVector(3600);
+        Vector f = new DenseVector(altura*largura);
         f.zero();
-        Vector fH = new DenseVector(50816);
+        Vector fH = new DenseVector(S*N);
         H.mult(f,fH);
         g.add(-1.0,fH);
         //(g virou r) p0 = Ht*r
-        Vector p = new DenseVector(3600);
+        Vector p = new DenseVector(altura*largura);
         H.transMult(g,p);
         double e = 0;
         do{
@@ -145,14 +177,14 @@ public class ImageReconstruction implements Runnable {
             //f = f + alpha*p
             f.add(alpha,p);
             //r = r - alpha*H*p (g = g - alpha*H*p)
-            Vector Hp = new DenseVector(50816);
+            Vector Hp = new DenseVector(S*N);
             Vector gAnterior = new DenseVector(g);
             H.mult(p, Hp);
             g.add(-alpha, Hp);
             //beta = rt*r/ri-1t*ri-1 (beta = gt*g/gi-1t*gi-1)
             double beta = g.dot(g)/gAnterior.dot(gAnterior);
             //p = Ht*r + beta*p (p = Ht*g + beta*p)
-            Vector Htg = new DenseVector(3600);
+            Vector Htg = new DenseVector(altura*largura);
             H.transMult(g, Htg);
             p.add(beta,Htg);
 
@@ -165,7 +197,7 @@ public class ImageReconstruction implements Runnable {
     
     private void processFISTA(){
         //Iniciando calculo de reconstrução
-        Vector f = new DenseVector(3600);
+        Vector f = new DenseVector(altura*largura);
         f.zero();
         Vector y = new DenseVector(f);
         double alpha = 1;
@@ -173,13 +205,13 @@ public class ImageReconstruction implements Runnable {
         do{
             
             Vector fAnterior = new DenseVector(f);
-            Vector Hy = new DenseVector(50816);
+            Vector Hy = new DenseVector(S*N);
             //Hy = H*y
             H.mult(y, Hy);
             Vector gSub = new DenseVector(g);
             //gSub = g - Hy
             gSub.add(-1,Hy);
-            Vector transp = new DenseVector(3600);
+            Vector transp = new DenseVector(altura*largura);
             //transp = Ht*gSub
             H.transMult(gSub, transp);
             //c = |Ht*H|2
@@ -190,7 +222,7 @@ public class ImageReconstruction implements Runnable {
             transp.add(y);
             
             //lambda = max(abs(Ht*g)) * 0.10;
-            Vector Htg = new DenseVector(3600);
+            Vector Htg = new DenseVector(altura*largura);
             H.transMult(g, Htg);
             double lambda = Htg.norm(Vector.Norm.Infinity)* 0.1;
             
@@ -217,7 +249,7 @@ public class ImageReconstruction implements Runnable {
     
     private DenseVector S(double a, double x, Vector xVetor){
         if(a >= x)
-            return new DenseVector(3600).zero();
+            return new DenseVector(altura*largura).zero();
         for(int i = 0; i < xVetor.size(); i++){
             double val = 0;
             if(xVetor.get(i) < a)
@@ -233,7 +265,7 @@ public class ImageReconstruction implements Runnable {
         BufferedReader br = null;
         try {
             //Lendo a Matriz Modelo e guardando em uma matriz
-            br = new BufferedReader(new FileReader("./modelos/H-1.txt"));
+            br = new BufferedReader(new FileReader("./modelos/"+largura+"x"+altura+" - S="+S+" - N="+N+".txt"));
             StringBuffer s = new StringBuffer();
             int i = 0, j = 0;
             while(br.ready()){
