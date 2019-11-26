@@ -52,6 +52,8 @@ public class ImageReconstruction implements Runnable {
       
         this.H = new DenseMatrix(50816,3600);
         
+        this.readModel();
+        
         if (this.imagem.getAlgoritmo().equals("CGNE"))
             this.processCGNE();
         else
@@ -126,9 +128,112 @@ public class ImageReconstruction implements Runnable {
     }
     
     private void processCGNE(){
+        //Iniciando o cálculo de reconstrução
+        //r0 = g - Hf*0
+        Vector f = new DenseVector(3600);
+        f.zero();
+        Vector fH = new DenseVector(50816);
+        H.mult(f,fH);
+        g.add(-1.0,fH);
+        //(g virou r) p0 = Ht*r
+        Vector p = new DenseVector(3600);
+        H.transMult(g,p);
+        double e = 0;
+        do{
+            //alpha = (rit*ri)/(pit*pi)
+            double alpha = g.dot(g)/p.dot(p);
+            //f = f + alpha*p
+            f.add(alpha,p);
+            //r = r - alpha*H*p (g = g - alpha*H*p)
+            Vector Hp = new DenseVector(50816);
+            Vector gAnterior = new DenseVector(g);
+            H.mult(p, Hp);
+            g.add(-alpha, Hp);
+            //beta = rt*r/ri-1t*ri-1 (beta = gt*g/gi-1t*gi-1)
+            double beta = g.dot(g)/gAnterior.dot(gAnterior);
+            //p = Ht*r + beta*p (p = Ht*g + beta*p)
+            Vector Htg = new DenseVector(3600);
+            H.transMult(g, Htg);
+            p.add(beta,Htg);
+
+            //Calculo de erro
+            e = g.norm(Vector.Norm.Two)-gAnterior.norm(Vector.Norm.Two);
+            iteracoes++;
+        }while(e < Math.pow(10,-4));
+        img = new DenseVector(f);
+    }
+    
+    private void processFISTA(){
+        //Iniciando calculo de reconstrução
+        Vector f = new DenseVector(3600);
+        f.zero();
+        Vector y = new DenseVector(f);
+        double alpha = 1;
+        double e = 0;
+        do{
+            
+            Vector fAnterior = new DenseVector(f);
+            Vector Hy = new DenseVector(50816);
+            //Hy = H*y
+            H.mult(y, Hy);
+            Vector gSub = new DenseVector(g);
+            //gSub = g - Hy
+            gSub.add(-1,Hy);
+            Vector transp = new DenseVector(3600);
+            //transp = Ht*gSub
+            H.transMult(gSub, transp);
+            //c = |Ht*H|2
+            double c = H.norm(Matrix.Norm.Frobenius);
+            //trasnp = transp * (1/c)
+            transp.scale(1/c);
+            //transp = transp + y
+            transp.add(y);
+            
+            //lambda = max(abs(Ht*g)) * 0.10;
+            Vector Htg = new DenseVector(3600);
+            H.transMult(g, Htg);
+            double lambda = Htg.norm(Vector.Norm.Infinity)* 0.1;
+            
+            f = S(lambda/c,transp.norm(Vector.Norm.Infinity), transp);
+            
+            
+            //alpha = (1+raiz(1+4*alpha^2))/2
+            double alphaAnterior = alpha;
+            alpha = (1+Math.sqrt(1+(4*alpha*alpha)))/2;
+            
+            //y = f + ((alphaAnteior-1)/alpha) * (f-fAnterior)
+            Vector yAnterior = new DenseVector(y);
+            Vector fSub = new DenseVector(f);
+            fSub.add(-1,fAnterior);
+            y = f.copy();
+            y.add(((alphaAnterior-1)/(alpha)),fSub);
+            
+            //Calculo do erro
+            e = y.norm(Vector.Norm.Two)-yAnterior.norm(Vector.Norm.Two);
+            iteracoes++;
+        }while(e < Math.pow(10, -4));
+        img = new DenseVector(f);
+    }
+    
+    private DenseVector S(double a, double x, Vector xVetor){
+        if(a >= x)
+            return new DenseVector(3600).zero();
+        for(int i = 0; i < xVetor.size(); i++){
+            double val = 0;
+            if(xVetor.get(i) < a)
+                val = -1;
+            if(xVetor.get(i) > a)
+                val = 1;
+            xVetor.add(i, val);
+        }
+        return new DenseVector(xVetor);
+    }
+    
+    private void readModel(){
+        BufferedReader br = null;
         try {
             //Lendo a Matriz Modelo e guardando em uma matriz
-            BufferedReader br = new BufferedReader(new FileReader("./modelos/H-1.txt"));
+            br = new BufferedReader(new FileReader("./modelos/H-1.txt"));
             StringBuffer s = new StringBuffer();
             int i = 0, j = 0;
             while(br.ready()){
@@ -149,49 +254,17 @@ public class ImageReconstruction implements Runnable {
                 i++;
                 j = 0;
             }
-            
-            //Iniciando o cálculo de reconstrução
-            //r0 = g - Hf*0
-            Vector f = new DenseVector(3600);
-            f.zero();
-            Vector fH = new DenseVector(50816);
-            H.mult(f,fH);
-            g.add(-1.0,fH);
-            //(g virou r) p0 = Ht*r
-            Vector p = new DenseVector(3600);
-            H.transMult(g,p);
-            double e = 0;
-            do{
-                //alpha = (rit*ri)/(pit*pi)
-                double alpha = g.dot(g)/p.dot(p);
-                //f = f + alpha*p
-                f.add(alpha,p);
-                //r = r - alpha*H*p (g = g - alpha*H*p)
-                Vector Hp = new DenseVector(50816);
-                Vector gAnterior = new DenseVector(g);
-                H.mult(p, Hp);
-                g.add(-alpha, Hp);
-                //beta = rt*r/ri-1t*ri-1 (beta = gt*g/gi-1t*gi-1)
-                double beta = g.dot(g)/gAnterior.dot(gAnterior);
-                //p = Ht*r + beta*p (p = Ht*g + beta*p)
-                Vector Htg = new DenseVector(3600);
-                H.transMult(g, Htg);
-                p.add(beta,Htg);
-                
-                //Calculo de erro
-                e = g.norm(Vector.Norm.Two)-gAnterior.norm(Vector.Norm.Two);
-                iteracoes++;
-            }while(e < Math.pow(10,-4));
-            img = new DenseVector(f);
         } catch (FileNotFoundException ex) {
             Logger.getLogger(ImageReconstruction.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(ImageReconstruction.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                br.close();
+            } catch (IOException ex) {
+                Logger.getLogger(ImageReconstruction.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
-    }
-    
-    private void processFISTA(){
-        System.out.println("Ainda não implementado!");
     }
     
 }
