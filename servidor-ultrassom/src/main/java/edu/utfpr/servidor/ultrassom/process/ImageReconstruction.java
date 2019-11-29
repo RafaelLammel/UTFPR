@@ -94,6 +94,11 @@ public class ImageReconstruction implements Runnable{
         
         this.buildImage();
         
+        H = null;
+        g = null;
+        img = null;
+        
+        ic.getFromQueue();
         //mandar email aqui
     }
     

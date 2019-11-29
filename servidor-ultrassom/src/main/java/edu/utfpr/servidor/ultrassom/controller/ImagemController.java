@@ -7,23 +7,18 @@ import edu.utfpr.servidor.ultrassom.repository.UsuarioRepository;
 import edu.utfpr.servidor.ultrassom.request.ProcessRequest;
 import edu.utfpr.servidor.ultrassom.response.ProcessResponse;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,32 +44,32 @@ public class ImagemController {
         i.setAlgoritmo(pr.getAlgoritmo());
         i.setStatus(0);
         i.setTamanho(pr.getLargura()+"x"+pr.getAltura());
-        ImageReconstruction ir = new ImageReconstruction();
-        ir.setS(pr.getAmostras());
-        ir.setN(pr.getSensores());
-        ir.setAltura(pr.getAltura());
-        ir.setLargura(pr.getLargura());
-        ir.setImagem(imagemRepository.save(i));
-        ir.setData(pr.getData());
-        ir.setController(this);
+        i = imagemRepository.save(i);
         ProcessResponse prs = new ProcessResponse();
         System.out.println(Runtime.getRuntime().freeMemory());
-        if(Runtime.getRuntime().freeMemory() >= 1073741824){
-            System.out.println("Processando...");
+        if(checkRecursos()){
+            ImageReconstruction ir = new ImageReconstruction();
+            ir.setS(pr.getAmostras());
+            ir.setN(pr.getSensores());
+            ir.setAltura(pr.getAltura());
+            ir.setLargura(pr.getLargura());
+            ir.setImagem(i);
+            ir.setData(pr.getData());
+            ir.setController(this);
             Thread tr = new Thread(ir);
             tr.start();
+            System.out.println("Processando...");
             prs.setMensagem("Processando...");
         }
-        else{
-            
+        else{ 
             BufferedWriter writer = null;
             try {
                 File directory = new File("./fila");
-                String fileName = ir.getImagem().getId()+".txt";
+                String fileName = i.getId()+"-"+pr.getLargura()+"-"+pr.getAltura()+"-"+pr.getAmostras()+"-"+pr.getSensores()+".txt";
                 File file = new File(directory, fileName);
                 writer = new BufferedWriter(new FileWriter(file));
                 for(int j = 0; j < pr.getData().length; j++)
-                    writer.write(String.valueOf(pr.getData()[j]));
+                    writer.write(String.valueOf(pr.getData()[j])+'\n');
                 writer.close();
                 System.out.println("Na fila...");
                 prs.setMensagem("Na fila...");
@@ -87,7 +82,6 @@ public class ImagemController {
                     Logger.getLogger(ImagemController.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            
         }
         return prs;
         //mail.sendEmail(usuarioRepository.getEmailById(this.imagem.getUsuarioId())/*colar email do usuario aqui*/); //enviar email
@@ -123,6 +117,79 @@ public class ImagemController {
     
     public void updateImg(Imagem img){
         imagemRepository.save(img);
+    }
+    
+    public boolean checkRecursos(){
+        if(Runtime.getRuntime().freeMemory() >= 1147483647)
+            return true;
+        return false;
+    }
+    
+    public void getFromQueue(){
+        if(checkRecursos()){
+            System.out.println("Pegou da Fila!");
+            File diretorio = new File("./fila");
+            File[] files = diretorio.listFiles();
+            File oldest = null;
+            long oldestDate = Long.MAX_VALUE;
+            if(files != null){
+                for(File f : files){
+                    if(f.lastModified() < oldestDate){
+                        oldestDate = f.lastModified();
+                        oldest = f;
+                    }
+                }
+            }
+            if(oldest != null){
+                try {
+                    
+                    String[] chaves = new String[5];
+                    
+                    for(String c : chaves)
+                        c = "";
+                    
+                    int j = 0;
+                    int i = 0;
+                    while(oldest.getName().charAt(i) != '.'){
+                        if(oldest.getName().charAt(i) != '-')
+                            chaves[j] += oldest.getName().charAt(i);
+                        else{
+                            chaves[j] = chaves[j].replace("null", "");
+                            j++;
+                        }
+                        i++;
+                    }
+                    chaves[j] = chaves[j].replace("null", "");
+                    
+                    BufferedReader br = new BufferedReader(new FileReader("./fila/"+oldest.getName()));
+                    double[] vetor = new double[Integer.parseInt(chaves[3])*Integer.parseInt(chaves[4])];
+                    String line;
+                    int k = 0;
+                    while((line = br.readLine()) != null){
+                        vetor[k] = Double.parseDouble(line.replace(",", "."));
+                        k++;
+                    }
+                    br.close();
+                    
+                    Imagem im = imagemRepository.findById(Integer.parseInt(chaves[0]));
+                    ImageReconstruction ir = new ImageReconstruction();
+                    ir.setS(Integer.parseInt(chaves[3]));
+                    ir.setN(Integer.parseInt(chaves[4]));
+                    ir.setAltura(Integer.parseInt(chaves[2]));
+                    ir.setLargura(Integer.parseInt(chaves[1]));
+                    ir.setImagem(im);
+                    ir.setData(vetor);
+                    ir.setController(this);
+                    Thread tr = new Thread(ir);
+                    tr.start();
+                    oldest.delete();
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(ImagemController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(ImagemController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
     }
     
 }
