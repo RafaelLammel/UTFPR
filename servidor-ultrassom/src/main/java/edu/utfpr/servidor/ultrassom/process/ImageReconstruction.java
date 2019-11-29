@@ -78,7 +78,7 @@ public class ImageReconstruction implements Runnable{
     
     @Override
     public void run() {
-        
+        try{
         this.imagem.setDataInicio(new Date());
         this.imagem.setStatus(1);
         ic.updateImg(this.imagem);
@@ -99,6 +99,15 @@ public class ImageReconstruction implements Runnable{
         img = null;
         
         ic.getFromQueue();
+        }catch(OutOfMemoryError e){
+            //System.out.println("Hello");
+            double[] vetor = new double[g.size()];
+            for(int i = 0; i < vetor.length; i++)
+                vetor[i] = g.get(i);
+            this.imagem.setStatus(0);
+            ic.updateImg(this.imagem);
+            ic.storeOnQueue(imagem, largura, altura, S, N, vetor);
+        }
         //mandar email aqui
     }
     

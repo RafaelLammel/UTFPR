@@ -15,7 +15,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -62,26 +61,9 @@ public class ImagemController {
             prs.setMensagem("Processando...");
         }
         else{ 
-            BufferedWriter writer = null;
-            try {
-                File directory = new File("./fila");
-                String fileName = i.getId()+"-"+pr.getLargura()+"-"+pr.getAltura()+"-"+pr.getAmostras()+"-"+pr.getSensores()+".txt";
-                File file = new File(directory, fileName);
-                writer = new BufferedWriter(new FileWriter(file));
-                for(int j = 0; j < pr.getData().length; j++)
-                    writer.write(String.valueOf(pr.getData()[j])+'\n');
-                writer.close();
-                System.out.println("Na fila...");
-                prs.setMensagem("Na fila...");
-            } catch (IOException ex) {
-                Logger.getLogger(ImagemController.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                try {
-                    writer.close();
-                } catch (IOException ex) {
-                    Logger.getLogger(ImagemController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
+            storeOnQueue(i,pr.getLargura(),pr.getAltura(),pr.getAmostras(),pr.getSensores(),pr.getData());
+            System.out.println("Na fila...");
+            prs.setMensagem("Na fila...");
         }
         return prs;
         //mail.sendEmail(usuarioRepository.getEmailById(this.imagem.getUsuarioId())/*colar email do usuario aqui*/); //enviar email
@@ -120,9 +102,24 @@ public class ImagemController {
     }
     
     public boolean checkRecursos(){
-        if(Runtime.getRuntime().freeMemory() >= 1147483647)
+        //if(Runtime.getRuntime().freeMemory() >= 1147483647)
             return true;
-        return false;
+        //return false;
+    }
+    
+    public void storeOnQueue(Imagem i, int largura, int altura, int amostras, int sensores, double[] data){
+        BufferedWriter writer = null;
+        try {
+            File directory = new File("./fila");
+            String fileName = i.getId()+"-"+largura+"-"+altura+"-"+amostras+"-"+sensores+".txt";
+            File file = new File(directory, fileName);
+            writer = new BufferedWriter(new FileWriter(file));
+            for(int j = 0; j < data.length; j++)
+                writer.write(String.valueOf(data[j])+'\n');
+            writer.close();
+        } catch (IOException ex) {
+            Logger.getLogger(ImagemController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public void getFromQueue(){
