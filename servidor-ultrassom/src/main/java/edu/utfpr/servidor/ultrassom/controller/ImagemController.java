@@ -46,27 +46,21 @@ public class ImagemController {
         i = imagemRepository.save(i);
         ProcessResponse prs = new ProcessResponse();
         System.out.println(Runtime.getRuntime().freeMemory());
-        if(checkRecursos()){
-            ImageReconstruction ir = new ImageReconstruction();
-            ir.setS(pr.getAmostras());
-            ir.setN(pr.getSensores());
-            ir.setAltura(pr.getAltura());
-            ir.setLargura(pr.getLargura());
-            ir.setImagem(i);
-            ir.setData(pr.getData());
-            ir.setController(this);
-            Thread tr = new Thread(ir);
-            tr.start();
-            System.out.println("Processando...");
-            prs.setMensagem("Processando...");
-        }
-        else{ 
-            storeOnQueue(i,pr.getLargura(),pr.getAltura(),pr.getAmostras(),pr.getSensores(),pr.getData());
-            System.out.println("Na fila...");
-            prs.setMensagem("Na fila...");
-        }
+
+        ImageReconstruction ir = new ImageReconstruction();
+        ir.setS(pr.getAmostras());
+        ir.setN(pr.getSensores());
+        ir.setAltura(pr.getAltura());
+        ir.setLargura(pr.getLargura());
+        ir.setImagem(i);
+        ir.setData(pr.getData());
+        ir.setController(this);
+        Thread tr = new Thread(ir);
+        tr.start();
+        System.out.println("Processando...");
+        prs.setMensagem("Processando...");
+
         return prs;
-        //mail.sendEmail(usuarioRepository.getEmailById(this.imagem.getUsuarioId())/*colar email do usuario aqui*/); //enviar email
     }
     
     @GetMapping("/imagem/{usuario_id}")
@@ -101,12 +95,6 @@ public class ImagemController {
         imagemRepository.save(img);
     }
     
-    public boolean checkRecursos(){
-        //if(Runtime.getRuntime().freeMemory() >= 1147483647)
-            return true;
-        //return false;
-    }
-    
     public void storeOnQueue(Imagem i, int largura, int altura, int amostras, int sensores, double[] data){
         BufferedWriter writer = null;
         try {
@@ -123,68 +111,66 @@ public class ImagemController {
     }
     
     public void getFromQueue(){
-        if(checkRecursos()){
-            System.out.println("Pegou da Fila!");
-            File diretorio = new File("./fila");
-            File[] files = diretorio.listFiles();
-            File oldest = null;
-            long oldestDate = Long.MAX_VALUE;
-            if(files != null){
-                for(File f : files){
-                    if(f.lastModified() < oldestDate){
-                        oldestDate = f.lastModified();
-                        oldest = f;
-                    }
+        System.out.println("Pegou da Fila!");
+        File diretorio = new File("./fila");
+        File[] files = diretorio.listFiles();
+        File oldest = null;
+        long oldestDate = Long.MAX_VALUE;
+        if(files != null){
+            for(File f : files){
+                if(f.lastModified() < oldestDate){
+                    oldestDate = f.lastModified();
+                    oldest = f;
                 }
             }
-            if(oldest != null){
-                try {
-                    
-                    String[] chaves = new String[5];
-                    
-                    for(String c : chaves)
-                        c = "";
-                    
-                    int j = 0;
-                    int i = 0;
-                    while(oldest.getName().charAt(i) != '.'){
-                        if(oldest.getName().charAt(i) != '-')
-                            chaves[j] += oldest.getName().charAt(i);
-                        else{
-                            chaves[j] = chaves[j].replace("null", "");
-                            j++;
-                        }
-                        i++;
+        }
+        if(oldest != null){
+            try {
+
+                String[] chaves = new String[5];
+
+                for(String c : chaves)
+                    c = "";
+
+                int j = 0;
+                int i = 0;
+                while(oldest.getName().charAt(i) != '.'){
+                    if(oldest.getName().charAt(i) != '-')
+                        chaves[j] += oldest.getName().charAt(i);
+                    else{
+                        chaves[j] = chaves[j].replace("null", "");
+                        j++;
                     }
-                    chaves[j] = chaves[j].replace("null", "");
-                    
-                    BufferedReader br = new BufferedReader(new FileReader("./fila/"+oldest.getName()));
-                    double[] vetor = new double[Integer.parseInt(chaves[3])*Integer.parseInt(chaves[4])];
-                    String line;
-                    int k = 0;
-                    while((line = br.readLine()) != null){
-                        vetor[k] = Double.parseDouble(line.replace(",", "."));
-                        k++;
-                    }
-                    br.close();
-                    
-                    Imagem im = imagemRepository.findById(Integer.parseInt(chaves[0]));
-                    ImageReconstruction ir = new ImageReconstruction();
-                    ir.setS(Integer.parseInt(chaves[3]));
-                    ir.setN(Integer.parseInt(chaves[4]));
-                    ir.setAltura(Integer.parseInt(chaves[2]));
-                    ir.setLargura(Integer.parseInt(chaves[1]));
-                    ir.setImagem(im);
-                    ir.setData(vetor);
-                    ir.setController(this);
-                    Thread tr = new Thread(ir);
-                    tr.start();
-                    oldest.delete();
-                } catch (FileNotFoundException ex) {
-                    Logger.getLogger(ImagemController.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IOException ex) {
-                    Logger.getLogger(ImagemController.class.getName()).log(Level.SEVERE, null, ex);
+                    i++;
                 }
+                chaves[j] = chaves[j].replace("null", "");
+
+                BufferedReader br = new BufferedReader(new FileReader("./fila/"+oldest.getName()));
+                double[] vetor = new double[Integer.parseInt(chaves[3])*Integer.parseInt(chaves[4])];
+                String line;
+                int k = 0;
+                while((line = br.readLine()) != null){
+                    vetor[k] = Double.parseDouble(line.replace(",", "."));
+                    k++;
+                }
+                br.close();
+
+                Imagem im = imagemRepository.findById(Integer.parseInt(chaves[0]));
+                ImageReconstruction ir = new ImageReconstruction();
+                ir.setS(Integer.parseInt(chaves[3]));
+                ir.setN(Integer.parseInt(chaves[4]));
+                ir.setAltura(Integer.parseInt(chaves[2]));
+                ir.setLargura(Integer.parseInt(chaves[1]));
+                ir.setImagem(im);
+                ir.setData(vetor);
+                ir.setController(this);
+                Thread tr = new Thread(ir);
+                tr.start();
+                oldest.delete();
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(ImagemController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(ImagemController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
