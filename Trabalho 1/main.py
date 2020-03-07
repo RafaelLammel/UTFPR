@@ -17,9 +17,9 @@ INPUT_IMAGE =  'arroz.bmp'
 # TODO: ajuste estes parâmetros!
 NEGATIVO = False
 THRESHOLD = 0.8
-ALTURA_MIN = 1
-LARGURA_MIN = 1
-N_PIXELS_MIN = 1
+ALTURA_MIN = 15
+LARGURA_MIN = 15
+N_PIXELS_MIN = 255 #o menor é 412
 
 #===============================================================================
 
@@ -78,8 +78,10 @@ respectivamente: topo, esquerda, baixo e direita.'''
             else:
                 aux[j][i] = 0
     label = 1
-
-    # Percorrendo a matriz auxiliar e procurando pixels que pertencem ao Foreground (pixel == -1)
+    '''
+    Percorrendo a matriz auxiliar e procurando pixels que pertencem ao 
+    Foreground (pixel == -1)
+    '''
     for x in range(len(aux)):
         for y in range(len(aux[0])):
             if aux[x][y] == -1:
@@ -90,8 +92,10 @@ respectivamente: topo, esquerda, baixo e direita.'''
                 L = x
                 B = y
                 R = x
-
-                # Chamando flood_fill e montando dict de resposta quando termina de inundar
+                '''
+                Chamando flood_fill e montando dict de resposta quando 
+                termina de inunda
+                '''
                 res = flood_fill(label, aux, x, y, n_pixels, T, L, B, R)
                 result.append({
                     'label': label,
@@ -113,7 +117,8 @@ def verifica_vizinho(aux, x, y):
     if aux[x][y] == -1: return True
     else: return False
 
-# Inunda recursivamente o pixel passado e posteriormente todos os seus vizinhos não rotulados
+# Inunda recursivamente o pixel passado e posteriormente todos os seus 
+# vizinhos não rotulados
 def flood_fill(label, aux, x, y, n_pixels, T, L, B, R):
 
     aux[x][y] = label
@@ -124,7 +129,8 @@ def flood_fill(label, aux, x, y, n_pixels, T, L, B, R):
 
     n_pixels += 1
     
-    # Verifica se o pixel atual está fora do retangulo do blob; Se estiver, ele atualiza os valores necessários para aumentar o retangulo
+    # Verifica se o pixel atual está fora do retangulo do blob; 
+    # Se estiver, ele atualiza os valores necessários para aumentar o retangulo
     if y > T:
         T = y
     if x > R:
@@ -137,8 +143,10 @@ def flood_fill(label, aux, x, y, n_pixels, T, L, B, R):
     # Percorre todos os vizinhos e chama o flood_fill para os não rotulados 
     for i in range(len(verifica_y)):
         if verifica_vizinho(aux, x+verifica_x[i], y+verifica_y[i]):
-            res = flood_fill(label, aux, x+verifica_x[i], y+verifica_y[i], n_pixels, T, L, B, R)
-            # Após visitar um vizinho, atualiza os valores do BLOB que podem ter sido alterados pelo vizinho
+            res = flood_fill(label, aux, x+verifica_x[i], y+verifica_y[i],\
+                n_pixels, T, L, B, R)
+            # Após visitar um vizinho, atualiza os valores do BLOB que podem 
+            # ter sido alterados pelo vizinho
             n_pixels += res['n_pixels']
             T = res['T']
             R = res['R']
@@ -153,6 +161,14 @@ def flood_fill(label, aux, x, y, n_pixels, T, L, B, R):
         'aux': aux
     }
 
+def calcula_area(aux, label):
+    quantidade = []
+    for i in range(label):
+        quantidade.append(np.count_nonzero(aux==i))
+    quantidade.sort()
+    del quantidade[len(quantidade)-1]
+    area = np.mean(quantidade)-np.sqrt(np.var(quantidade))
+    medidas= np.sqrt(area)
 #===============================================================================
 
 def main ():
