@@ -65,28 +65,94 @@ respectivamente: topo, esquerda, baixo e direita.'''
 
     # TODO: escreva esta função.
     # Use a abordagem com flood fill recursivo.
-    rotulo = 2
-    for i in range(len(img)):
-        for j in range(len(img[i])):
-            if img[i][j] == 1:
-                img,rotulo = flood_fill(rotulo, img, j, i)
-                print(rotulo) #print temporario
-                rotulo +=1
+    
+    # Instanciando auxiliar e lista de retorno
+    result = []
+    aux = np.empty([len(img[0]),len(img)])
 
-def verifica_vizinho(img, x, y):
-    if y<0 or x<0 or y>len(img) or x>len(img[y]): return False
-    if img[y][x] == 1: return True
+    # Colocando 0 para background e -1 para foreground na matriz auxiliar
+    for i in range(len(img)):
+        for j in range(len(img[0])):
+            if img[i][j][0] == 1:
+                aux[j][i] = -1
+            else:
+                aux[j][i] = 0
+    label = 1
+
+    # Percorrendo a matriz auxiliar e procurando pixels que pertencem ao Foreground (pixel == -1)
+    for x in range(len(aux)):
+        for y in range(len(aux[0])):
+            if aux[x][y] == -1:
+
+                # Inicializando as propriedades do blob
+                n_pixels = 0
+                T = y
+                L = x
+                B = y
+                R = x
+
+                # Chamando flood_fill e montando dict de resposta quando termina de inundar
+                res = flood_fill(label, aux, x, y, n_pixels, T, L, B, R)
+                result.append({
+                    'label': label,
+                    'n_pixels': res['n_pixels'],
+                    'T': res['T'],
+                    'L': res['L'],
+                    'B': res['B'],
+                    'R': res['R']
+                })
+
+                # Modificando label e matriz
+                aux = res['aux']
+                label += 1
+    return result
+
+# Verifica o vizinho determinado para saber se já possui rótulo ou não
+def verifica_vizinho(aux, x, y):
+    if y<0 or x<0 or x>len(aux) or y>len(aux[y]): return False
+    if aux[x][y] == -1: return True
     else: return False
 
-def flood_fill(rotulo, img, x, y):
-    img[y][x] = rotulo
-    # vizinho 8
+# Inunda recursivamente o pixel passado e posteriormente todos os seus vizinhos não rotulados
+def flood_fill(label, aux, x, y, n_pixels, T, L, B, R):
+
+    aux[x][y] = label
+    
+    # Vizinho 8
     verifica_y = [-1,-1,-1,0,0,1,1,1]
     verifica_x = [-1,0,1,-1,1,-1,0,1]
+
+    n_pixels += 1
+    
+    # Verifica se o pixel atual está fora do retangulo do blob; Se estiver, ele atualiza os valores necessários para aumentar o retangulo
+    if y > T:
+        T = y
+    if x > R:
+        R = x
+    if x < L:
+        L = x
+    if y < B:
+        B = y
+
+    # Percorre todos os vizinhos e chama o flood_fill para os não rotulados 
     for i in range(len(verifica_y)):
-        if verifica_vizinho(img, x+verifica_x[i], y+verifica_y[i]): 
-            img, rotulo = flood_fill(rotulo, img, x+verifica_x[i], y+verifica_y[i])
-    return img, rotulo
+        if verifica_vizinho(aux, x+verifica_x[i], y+verifica_y[i]):
+            res = flood_fill(label, aux, x+verifica_x[i], y+verifica_y[i], n_pixels, T, L, B, R)
+            # Após visitar um vizinho, atualiza os valores do BLOB que podem ter sido alterados pelo vizinho
+            n_pixels += res['n_pixels']
+            T = res['T']
+            R = res['R']
+            L = res['L']
+            B = res['B']
+    return {
+        'n_pixels': n_pixels,
+        'T': T,
+        'R': R,
+        'L': L,
+        'B': B,
+        'aux': aux
+    }
+
 #===============================================================================
 
 def main ():
