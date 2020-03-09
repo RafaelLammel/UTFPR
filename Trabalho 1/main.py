@@ -96,16 +96,17 @@ respectivamente: topo, esquerda, baixo e direita.'''
                 Chamando flood_fill e montando dict de resposta quando 
                 termina de inunda
                 '''
-                res = flood_fill(label, aux, x, y, n_pixels, T, L, B, R)
-                result.append({
-                    'label': label,
-                    'n_pixels': res['n_pixels'],
-                    'T': res['T'],
-                    'L': res['L'],
-                    'B': res['B'],
-                    'R': res['R']
-                })
-
+                res = flood_fill(label, aux, x, y, T, L, B, R)
+                if res['n_pixels']>=N_PIXELS_MIN or abs(res['T']-res['B']) >= \
+                    ALTURA_MIN or abs(res['L']-res['R']) >= LARGURA_MIN:
+                    result.append({
+                        'label': label,
+                        'n_pixels': res['n_pixels'],
+                        'T': res['T'],
+                        'L': res['L'],
+                        'B': res['B'],
+                        'R': res['R']
+                    })
                 # Modificando label e matriz
                 aux = res['aux']
                 label += 1
@@ -119,7 +120,7 @@ def verifica_vizinho(aux, x, y):
 
 # Inunda recursivamente o pixel passado e posteriormente todos os seus 
 # vizinhos não rotulados
-def flood_fill(label, aux, x, y, n_pixels, T, L, B, R):
+def flood_fill(label, aux, x, y, T, L, B, R):
 
     aux[x][y] = label
     
@@ -127,7 +128,7 @@ def flood_fill(label, aux, x, y, n_pixels, T, L, B, R):
     verifica_y = [-1,-1,-1,0,0,1,1,1]
     verifica_x = [-1,0,1,-1,1,-1,0,1]
 
-    n_pixels += 1
+    n_pixels = 1
     
     # Verifica se o pixel atual está fora do retangulo do blob; 
     # Se estiver, ele atualiza os valores necessários para aumentar o retangulo
@@ -144,7 +145,7 @@ def flood_fill(label, aux, x, y, n_pixels, T, L, B, R):
     for i in range(len(verifica_y)):
         if verifica_vizinho(aux, x+verifica_x[i], y+verifica_y[i]):
             res = flood_fill(label, aux, x+verifica_x[i], y+verifica_y[i],\
-                n_pixels, T, L, B, R)
+                T, L, B, R)
             # Após visitar um vizinho, atualiza os valores do BLOB que podem 
             # ter sido alterados pelo vizinho
             n_pixels += res['n_pixels']
