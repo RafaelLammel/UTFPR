@@ -87,7 +87,6 @@ respectivamente: topo, esquerda, baixo e direita.'''
             if aux[x][y] == -1:
 
                 # Inicializando as propriedades do blob
-                n_pixels = 0
                 T = y
                 L = x
                 B = y
@@ -162,14 +161,6 @@ def flood_fill(label, aux, x, y, T, L, B, R):
         'aux': aux
     }
 
-def calcula_area(aux, label):
-    quantidade = []
-    for i in range(label):
-        quantidade.append(np.count_nonzero(aux==i))
-    quantidade.sort()
-    del quantidade[len(quantidade)-1]
-    area = np.mean(quantidade)-np.sqrt(np.var(quantidade))
-    medidas= np.sqrt(area)
 #===============================================================================
 
 def main ():
