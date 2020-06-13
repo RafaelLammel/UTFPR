@@ -1,41 +1,54 @@
 import cv2
 import sys
-import timeit
 import numpy as np
 
-INPUT_IMAGEM = 'Imagens/a01 - Original.bmp'
-TAMANHO_JANELA_X = 3
-TAMANHO_JANELA_Y = 3
-TEMPORARIO = 5
+# Caminho da imagem a ser processada
+CAMINHO_IMAGEM = 'Imagens/'
+INPUT_IMAGEM = 'a01 - Original.bmp'
 
-def ingenuo(imagem, x, y):
-    aux = np.empty([len(imagem[0]), len(imagem)])
-    nova_img = np.empty([len(imagem[0]), len(imagem)])
-    
-    for i in range(TEMPORARIO, len(aux)-TEMPORARIO):
-        for j in range(TEMPORARIO , len(aux[0])-TEMPORARIO ):
-            soma = 0
+# Largura e Altura da janela (Escolher sempre tamanhos ímpares para ambos)
+LARGURA_JANELA = 3
+ALTURA_JANELA = 3
 
-          
-            for k in range(int(i-x/2), int(i+x/2)):
-                for l in range(int(j-y/2), int(j+y/2)):
-                    soma += aux[i][j]
-            nova_img[i][j] = soma/(x*y)
+'''
+Algoritmo a ser utilizado:
+0 - "Ingenuo" (WIP)
+1 - Filtros Separáveis (TODO)
+2 - Imagens Integrais (TODO)
+'''
+ALGORITMO = 0
+
+
+def ingenuo(img, w, h):
+    nova_img = np.copy(img)
+
+    for i in range(h, len(img[0])-h):
+        for j in range(w, len(img)-w):
+            soma = [0, 0, 0]
+            for k in range(int(i-h/2), int(i+h/2)):
+                for l in range(int(j-w/2), int(j+w/2)):
+                    soma[0] += img[l][k][0]
+                    soma[1] += img[l][k][1]
+                    soma[2] += img[l][k][2]
+            nova_img[j][i] = [s / (w*h) for s in soma]
 
     return nova_img
 
+
 def main():
-    img = cv2.imread(INPUT_IMAGEM, cv2.IMREAD_GRAYSCALE)
+    img = cv2.imread(f'{CAMINHO_IMAGEM}{INPUT_IMAGEM}', cv2.IMREAD_COLOR)
     if img is None:
-        print("erro ao ler imagem")
+        print("Erro ao ler imagem")
         sys.exit()
 
-    img = img.reshape ((img.shape [0], img.shape [1], 1))
-    img = img.astype (np.float32) / 255
+    if ALGORITMO == 0:
+        img = ingenuo(img, LARGURA_JANELA, ALTURA_JANELA)
+    else:
+        print("Algoritmo inexistente ou não implementado!")
+        sys.exit()
 
-    img = ingenuo(img, TAMANHO_JANELA_X, TAMANHO_JANELA_Y)
-
-    cv2.imwrite(f'Imagens/a01 - Borrada {TAMANHO_JANELA_X}X{TAMANHO_JANELA_Y}.bmp', img)
+    OUTPUT_IMAGEM = INPUT_IMAGEM.split('.', 1)[0]
+    cv2.imwrite(f'Imagens/Processadas/{OUTPUT_IMAGEM} Borrada {LARGURA_JANELA}X{ALTURA_JANELA}.bmp', img)
 
 
 if __name__ == '__main__':
