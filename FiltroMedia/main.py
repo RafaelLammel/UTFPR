@@ -4,19 +4,20 @@ import numpy as np
 
 # Caminho da imagem a ser processada
 CAMINHO_IMAGEM = 'Imagens/'
-INPUT_IMAGEM = 'a01 - Original.bmp'
+INPUT_IMAGEM = 'b01 - Original.bmp'
 
 # Largura e Altura da janela (Escolher sempre tamanhos ímpares para ambos)
-LARGURA_JANELA = 3
-ALTURA_JANELA = 3
+LARGURA_JANELA = 10
+ALTURA_JANELA = 10
 
+
+ALGORITMO = 0
 '''
 Algoritmo a ser utilizado:
 0 - "Ingenuo" (WIP)
 1 - Filtros Separáveis (TODO)
 2 - Imagens Integrais (TODO)
 '''
-ALGORITMO = 0
 
 
 def ingenuo(img, w, h):
@@ -31,8 +32,28 @@ def ingenuo(img, w, h):
                     soma[1] += img[l][k][1]
                     soma[2] += img[l][k][2]
             nova_img[j][i] = [s / (w*h) for s in soma]
-
     return nova_img
+
+
+def integral(img, w, h):
+    pass
+
+
+def separaveis(img, w, h):
+    pass
+
+
+def filtro_media(img, w, h):
+    switch = {
+        0: ingenuo,
+        1: separaveis,
+        2: integral
+    }
+    func = switch.get(ALGORITMO, None)
+    if func is None:
+        print(f"função invalida")
+        sys.exit()
+    return func(img, w, h)
 
 
 def main():
@@ -41,11 +62,7 @@ def main():
         print("Erro ao ler imagem")
         sys.exit()
 
-    if ALGORITMO == 0:
-        img = ingenuo(img, LARGURA_JANELA, ALTURA_JANELA)
-    else:
-        print("Algoritmo inexistente ou não implementado!")
-        sys.exit()
+    img = filtro_media(img, LARGURA_JANELA, ALTURA_JANELA)
 
     OUTPUT_IMAGEM = INPUT_IMAGEM.split('.', 1)[0]
     cv2.imwrite(f'Imagens/Processadas/{OUTPUT_IMAGEM} Borrada {LARGURA_JANELA}X{ALTURA_JANELA}.bmp', img)
