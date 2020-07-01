@@ -7,8 +7,8 @@ CAMINHO_IMAGEM = 'Imagens/'
 INPUT_IMAGEM = 'b01 - Original.bmp'
 
 # Largura e Altura da janela (Escolher sempre tamanhos ímpares para ambos)
-LARGURA_JANELA = 10
-ALTURA_JANELA = 10
+LARGURA_JANELA = 3
+ALTURA_JANELA = 3
 
 
 ALGORITMO = 0
