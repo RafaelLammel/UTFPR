@@ -7,31 +7,31 @@ CAMINHO_IMAGEM = 'Imagens/'
 INPUT_IMAGEM = 'b01 - Original.bmp'
 
 # Largura e Altura da janela (Escolher sempre tamanhos ímpares para ambos)
-LARGURA_JANELA = 21
-ALTURA_JANELA = 24
+LARGURA_JANELA = 7
+ALTURA_JANELA = 7
 
 
-ALGORITMO = 2
+ALGORITMO = 0
 '''
 Algoritmo a ser utilizado:
-0 - "Ingenuo" (WIP)
-1 - Filtros Separáveis (TODO)
-2 - Imagens Integrais (TODO)
+0 - "Ingenuo" (DONE - Ignorando margens)
+1 - Filtros Separáveis (WIP - Ignorando margens)
+2 - Imagens Integrais (WIP)
 '''
 
 
-def ingenuo(img, h, w):
-    nova_img = np.copy(img)
+def ingenuo(img, w, h):
+    nova_img = np.empty((len(img)-(w*2), len(img[0])-(h*2), 3))
 
-    for i in range(h, len(img[0])-h):
-        for j in range(w, len(img)-w):
+    for y in range(h, len(img[0])-h):
+        for x in range(w, len(img)-w):
             soma = [0, 0, 0]
-            for k in range(int(i-h/2), int(i+h/2)):
-                for l in range(int(j-w/2), int(j+w/2)):
-                    soma[0] += img[l][k][0]
-                    soma[1] += img[l][k][1]
-                    soma[2] += img[l][k][2]
-            nova_img[j][i] = [s / (w*h) for s in soma]
+            for j in range(int(y-h/2), int(y+h/2)):
+                for i in range(int(x-w/2), int(x+w/2)):
+                    soma[0] += img[i][j][0]
+                    soma[1] += img[i][j][1]
+                    soma[2] += img[i][j][2]
+            nova_img[x-w][y-h] = [s / (w*h) for s in soma]
     return nova_img
 
 
