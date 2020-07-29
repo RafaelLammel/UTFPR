@@ -21,7 +21,7 @@ Algoritmo a ser utilizado:
 
 
 def ingenuo(img, w, h):
-    nova_img = np.empty((len(img)-(w*2), len(img[0])-(h*2), 3))
+    nova_img = np.copy(img)
 
     for y in range(h, len(img[0])-h):
         for x in range(w, len(img)-w):
@@ -31,7 +31,7 @@ def ingenuo(img, w, h):
                     soma[0] += img[i][j][0]
                     soma[1] += img[i][j][1]
                     soma[2] += img[i][j][2]
-            nova_img[x-w][y-h] = [s / (w*h) for s in soma]
+            nova_img[x][y] = [s / (w*h) for s in soma]
     return nova_img
 
 
