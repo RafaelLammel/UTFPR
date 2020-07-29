@@ -11,11 +11,11 @@ LARGURA_JANELA = 7
 ALTURA_JANELA = 7
 
 
-ALGORITMO = 0
+ALGORITMO = 1
 '''
 Algoritmo a ser utilizado:
 0 - "Ingenuo" (DONE - Ignorando margens)
-1 - Filtros Separáveis (WIP - Ignorando margens)
+1 - Filtros Separáveis (DONE - Ignorando margens)
 2 - Imagens Integrais (WIP)
 '''
 
@@ -23,8 +23,8 @@ Algoritmo a ser utilizado:
 def ingenuo(img, w, h):
     nova_img = np.copy(img)
 
-    for y in range(h, len(img[0])-h):
-        for x in range(w, len(img)-w):
+    for y in range(int(h/2), len(img[0])-int(h/2)):
+        for x in range(int(w/2), len(img)-int(w/2)):
             soma = [0, 0, 0]
             for j in range(int(y-h/2), int(y+h/2)):
                 for i in range(int(x-w/2), int(x+w/2)):
@@ -73,26 +73,47 @@ def pixel_integral(img_integral, i, j, h, w):
     return pixel
 
 
-def separaveis(img, h, w):
+def separaveis(img, w, h):
+    buffer = np.copy(img)
     nova_img = np.copy(img)
-    img_horizontal = np.copy(img)
-    for i in range(len(img[0])):
-        for j in range(w, len(img)-w):
-            soma = [0, 0, 0]
-            for l in range(int(j-w/2), int(j+w/2)):
-                soma[0] += img[i][l][0]
-                soma[1] += img[i][l][1]
-                soma[2] += img[i][l][2]
-            img_horizontal[i][j] = [s/w for s in soma]
-    for j in range(len(img)):
-        for i in range(h, len(img[0])-h):
-            soma = [0, 0, 0]
-            tamanho = [int(i-h/2), int(i+h/2)]
-            for k in range(tamanho[0], tamanho[1]):
-                soma[0] += img_horizontal[k][j][0]
-                soma[1] += img_horizontal[k][j][1]
-                soma[2] += img_horizontal[k][j][2]
-            nova_img[i][j] = [s/h for s in soma]
+    
+    #Borra buffer
+    for y in range(len(img[0])):
+        soma = [0, 0, 0]
+        primeiro = True
+        for x in range(int(w/2), len(img)-int(w/2)):
+            primeiro_pixel = int(x-w/2)
+            ultimo_pixel = int(x+w/2)
+            if primeiro:
+                primeiro = False
+                for i in range(primeiro_pixel, ultimo_pixel):
+                    soma[0] += img[i][y][0]
+                    soma[1] += img[i][y][1]
+                    soma[2] += img[i][y][2]
+            else:
+                soma[0] = soma[0] - img[primeiro_pixel][y][0] + img[ultimo_pixel][y][0]
+                soma[1] = soma[1] - img[primeiro_pixel][y][1] + img[ultimo_pixel][y][1]
+                soma[2] = soma[2] - img[primeiro_pixel][y][2] + img[ultimo_pixel][y][2]
+            buffer[x][y] = [s/w for s in soma]
+
+    #Borra imagem final
+    for x in range(int(w/2), len(img)-int(w/2)):
+        soma = [0, 0, 0]
+        primeiro = True
+        for y in range(int(h/2), len(img[0])-int(h/2)):
+            primeiro_pixel = int(y-h/2)
+            ultimo_pixel = int(y+h/2)
+            if primeiro:
+                primeiro = False
+                for i in range(primeiro_pixel, ultimo_pixel):
+                    soma[0] += buffer[x][i][0]
+                    soma[1] += buffer[x][i][1]
+                    soma[2] += buffer[x][i][2]
+            else:
+                soma[0] = soma[0] - buffer[x][primeiro_pixel][0] + buffer[x][ultimo_pixel][0]
+                soma[1] = soma[1] - buffer[x][primeiro_pixel][1] + buffer[x][ultimo_pixel][1]
+                soma[2] = soma[2] - buffer[x][primeiro_pixel][2] + buffer[x][ultimo_pixel][2]
+            nova_img[x][y] = [s/h for s in soma]
     return nova_img
 
 
