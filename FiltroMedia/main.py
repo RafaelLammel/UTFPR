@@ -7,16 +7,17 @@ CAMINHO_IMAGEM = 'Imagens/'
 INPUT_IMAGEM = 'b01 - Original.bmp'
 
 # Largura e Altura da janela (Escolher sempre tamanhos ímpares para ambos)
-LARGURA_JANELA = 7
-ALTURA_JANELA = 7
+LARGURA_JANELA = 5
+ALTURA_JANELA = 5
 
 
-ALGORITMO = 1
+ALGORITMO = 2
 '''
 Algoritmo a ser utilizado:
 0 - "Ingenuo" (DONE - Ignorando margens)
-1 - Filtros Separáveis (DONE - Ignorando margens)
-2 - Imagens Integrais (WIP)
+1 - Filtros Separáveis (BUG - Começaram a surgir alguns pixels com cores estranhas sem explicação 
+    em alguns pontos da imagem colorida, dentro da área filtrada)
+2 - Imagens Integrais (DONE)
 '''
 
 
@@ -28,49 +29,47 @@ def ingenuo(img, w, h):
             soma = [0, 0, 0]
             for j in range(int(y-h/2), int(y+h/2)):
                 for i in range(int(x-w/2), int(x+w/2)):
-                    soma[0] += img[i][j][0]
-                    soma[1] += img[i][j][1]
-                    soma[2] += img[i][j][2]
-            nova_img[x][y] = [s / (w*h) for s in soma]
+                    soma += img[i][j]
+            nova_img[x][y] = soma / (w*h)
     return nova_img
 
 
-def integral(img, h, w):
+def integral(img, w, h):
     # transformar em float
-    img = img.astype(np.float32) / 255
+    img = img.astype(np.float32)
     img_integral = np.copy(img)
-    # cria a imagem integral
-    for i in range(len(img[0])):
-        for j in range(len(img)):
-            if i == 0 and j == 0:
-                img_integral[i][j] = img[i][j]
-            elif i != 0 and j != 0:
-                img_integral[i][j] = (img[i][j]+img_integral[i][j-1] +
-                                      img_integral[i-1][j]-img_integral[i-1][j-1])
-            elif i == 0:
-                img_integral[i][j] = img[i][j]+img_integral[i][j-1]
-            elif j == 0:
-                img_integral[i][j] = img[i][j]+img_integral[i-1][j]
-    #cria imagem com a media
-    for i in range(len(img[0])):
-        for j in range(len(img)):
-            for k in range(h, 0, -1):
-                if i-k >= 0:
-                    break
-            for m in range(w, 0, -1):
-                if j-m >= 0:
-                    break
-            img[i][j] = pixel_integral(img_integral, i, j, k, m)
+    nova_img = np.copy(img)
 
-    img = img * 255
-    img = img.astype(np.uint8)
-    return img
+    # Criando a imagem integral, um eixo por vez
+    for y in range(len(img[0])):
+        for x in range(1, len(img)):
+            img_integral[x][y] = img[x][y] + img_integral[x-1][y]
+            
+    for y in range(1, len(img[0])):
+        for x in range(len(img)):
+            img_integral[x][y] = img_integral[x][y] + img_integral[x][y-1]
+    
+    # Fazendo a soma dos 4 pixels e criando a nova imagem de saída com o filtro da média
+    for y in range(len(img[0])):
+        for x in range(len(img)):
+            topo = int(x-w/2)
+            inferior = int(x+w/2)
+            direita = int(y+h/2)
+            esquerda = int(y-h/2)
+            if topo < 0:
+                topo = 0
+            if inferior >= len(img):
+                inferior = len(img)-1
+            if direita >= len(img[0]):
+                direita = len(img[0])-1
+            if esquerda < 0:
+                esquerda = 0
+            # Perto das bordas a janela é menor, então é necessário calcular o tamanho da janela atual
+            altura = inferior - topo
+            largura = direita - esquerda
+            nova_img[x][y] = (img_integral[topo][esquerda] - img_integral[topo][direita] + img_integral[inferior][direita] - img_integral[inferior][esquerda]) / ((altura if altura > 0 else 1) * (largura if largura > 0 else 1))
 
-
-def pixel_integral(img_integral, i, j, h, w):
-    pixel = ((img_integral[i][j]-img_integral[i-h][j] -
-                  img_integral[i][j-w]+img_integral[i-h][j-w])/(w*h))
-    return pixel
+    return nova_img
 
 
 def separaveis(img, w, h):
@@ -87,14 +86,10 @@ def separaveis(img, w, h):
             if primeiro:
                 primeiro = False
                 for i in range(primeiro_pixel, ultimo_pixel):
-                    soma[0] += img[i][y][0]
-                    soma[1] += img[i][y][1]
-                    soma[2] += img[i][y][2]
+                    soma += img[i][y]
             else:
-                soma[0] = soma[0] - img[primeiro_pixel][y][0] + img[ultimo_pixel][y][0]
-                soma[1] = soma[1] - img[primeiro_pixel][y][1] + img[ultimo_pixel][y][1]
-                soma[2] = soma[2] - img[primeiro_pixel][y][2] + img[ultimo_pixel][y][2]
-            buffer[x][y] = [s/w for s in soma]
+                soma = (soma - img[primeiro_pixel][y] + img[ultimo_pixel][y])
+            buffer[x][y] = soma / w
 
     #Borra imagem final
     for x in range(int(w/2), len(img)-int(w/2)):
@@ -106,14 +101,11 @@ def separaveis(img, w, h):
             if primeiro:
                 primeiro = False
                 for i in range(primeiro_pixel, ultimo_pixel):
-                    soma[0] += buffer[x][i][0]
-                    soma[1] += buffer[x][i][1]
-                    soma[2] += buffer[x][i][2]
+                    soma += buffer[x][i]
             else:
-                soma[0] = soma[0] - buffer[x][primeiro_pixel][0] + buffer[x][ultimo_pixel][0]
-                soma[1] = soma[1] - buffer[x][primeiro_pixel][1] + buffer[x][ultimo_pixel][1]
-                soma[2] = soma[2] - buffer[x][primeiro_pixel][2] + buffer[x][ultimo_pixel][2]
-            nova_img[x][y] = [s/h for s in soma]
+                soma = (soma - buffer[x][primeiro_pixel] + buffer[x][ultimo_pixel])
+            nova_img[x][y] = soma / h
+
     return nova_img
 
 
