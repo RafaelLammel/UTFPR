@@ -1,5 +1,6 @@
 import cv2
 import sys
+import math
 import numpy as np
 
 # Caminho da imagem a ser processada
@@ -11,7 +12,7 @@ LARGURA_JANELA = 5
 ALTURA_JANELA = 5
 
 
-ALGORITMO = 2
+ALGORITMO = 0
 '''
 Algoritmo a ser utilizado:
 0 - "Ingenuo" (DONE - Ignorando margens)
@@ -24,11 +25,11 @@ Algoritmo a ser utilizado:
 def ingenuo(img, w, h):
     nova_img = np.copy(img)
 
-    for y in range(int(h/2), len(img[0])-int(h/2)):
-        for x in range(int(w/2), len(img)-int(w/2)):
+    for y in range(math.floor(h/2), len(img[0])-math.ceil(h/2)):
+        for x in range(math.floor(w/2), len(img)-math.ceil(w/2)):
             soma = [0, 0, 0]
-            for j in range(int(y-h/2), int(y+h/2)):
-                for i in range(int(x-w/2), int(x+w/2)):
+            for j in range(y-math.floor(h/2), y+math.ceil(h/2)):
+                for i in range(x-math.floor(w/2), x+math.ceil(w/2)):
                     soma += img[i][j]
             nova_img[x][y] = soma / (w*h)
     return nova_img
