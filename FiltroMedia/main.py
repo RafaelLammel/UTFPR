@@ -8,11 +8,11 @@ CAMINHO_IMAGEM = 'Imagens/'
 INPUT_IMAGEM = 'b01 - Original.bmp'
 
 # Largura e Altura da janela (Escolher sempre tamanhos ímpares para ambos)
-LARGURA_JANELA = 13
-ALTURA_JANELA = 13
+LARGURA_JANELA = 7
+ALTURA_JANELA = 7
 
 
-ALGORITMO = 1
+ALGORITMO = 2
 '''
 Algoritmo a ser utilizado:
 0 - "Ingenuo" (DONE - Ignorando margens)
@@ -90,10 +90,10 @@ def integral(img, w, h):
     # Fazendo a soma dos 4 pixels e criando a nova imagem de saída com o filtro da média
     for y in range(len(img[0])):
         for x in range(len(img)):
-            topo = int(x-w/2)
-            inferior = int(x+w/2)
-            direita = int(y+h/2)
-            esquerda = int(y-h/2)
+            topo = x-math.floor(w/2)
+            inferior = x+math.floor(w/2)
+            direita = y+math.floor(h/2)
+            esquerda = y-math.floor(h/2)
             if topo < 0:
                 topo = 0
             if inferior >= len(img):
