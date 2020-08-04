@@ -1,0 +1,2 @@
+2020/08/03 21:12:54 Micro started
+2020/08/03 21:13:34 snippets-plugin -> function onBeforeTextEvent(ev) = userdata: 0xc000715050

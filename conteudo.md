@@ -74,3 +74,41 @@
 		* para imagens com 8bpp é comun usar 256 faixars
 		* para imagens com 24bpp RGB, podemos usar 3 histogramas com 256 faixas, ou um histograma 3D com 256^3 faixas
 		* para imagens com valores não-inteiros, precisamos definir faixas
+
+* [convolução](https://youtu.be/4G8F_fB71Rg)
+	* filtragem no dominio espacial
+		* filtros com janelas deslizantes
+		* dominio espacial
+			 * no espaço da imagem
+		* divido em 2 grupos
+			* *lineares* considerando a,b e c iamgens
+			a+b=c
+						
+			F(a)+F(b)=F(a)+F(b)=F(a+b)=F(c)
+			"o filtro é linear se a saida no centro da janela for uma soma ponderada dos valores dentro da janela na imagem de entrada"
+			matriz de coeficientes(kernel)
+			normalmente filtra os 3 canais da imagem independente
+			*media* linear
+			* *não lineares* seletor
+			*mediana/minimo/maximo* não linear
+	* aplicar um filtro linear espacial
+	* "convolução é um operador linear que, a partir de duas funções 
+	dadas,resulta nume terceira que mede a área subentendida pela 
+	superposição damesmas em função do deslocamento existente entre elas"
+		* operador linear = filtro linear
+		* duas funções dadas = imagem e kernel
+		* resulta numa terceira = imagem filtrada
+		* deslocamenteo = janela deslizante
+		* superposição = aplicação do kernel na imagem
+	* utilidades
+		* reberveração(audio)
+		* simulação de caixa acustica
+		* deep learning com redes convolucionais
+			* aprende filtros
+
+* [Distribuição Gaussiana](https://youtu.be/_RwOy023br0)
+	* visão computacional
+	* ruido de sensor de camera(desvio padrão)
+	* medir tamanho medio de um grão de arroz
+	* a area entre \mi -\delta e \mi+\delta é 0.6827(68.27%)
+	* utfpr CR normalizado (Z-score)
