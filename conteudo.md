@@ -1,39 +1,39 @@
 # aula 1
 
-* processamento de imagens
-   * imagem->imagem, pega uma imagem e processa ela em varios sentidos dependendo do contexto, junta uma na outra, tira fundo
-   * usado em aparelhos eletronicos(telas),imagens medicas, geoprocessamento, visualização de imagensde experimento cientifico, inspeção de estradas de ferros
-* visão computaciona
-   * imagem->dados,informações, pega uma imagem ja processada e tira informações e dados dela,catalogando objetos, analise meteorológicas, reconhecimento facial
-* computação grafico
-   * imagem->imagem->pega uma imagem e coloca nela algo gerado por um algoritmo(gerado apenacomputacionalmente), pega uma imagem/video sem fogo, gerar o fogo por algoritmos e colocar ele naimagem
-* representação de imagens f(x,y) f[y][x] f(x,y)=y é o mesmo que f[y][x]=y gerando uma imagem degradê
+# processamento de imagens
+* imagem->imagem, pega uma imagem e processa ela em varios sentidos dependendo do contexto, junta uma na outra, tira fundo
+* usado em aparelhos eletronicos(telas),imagens medicas, geoprocessamento, visualização de imagensde experimento cientifico, inspeção de estradas de ferros
+ visão computaciona
+* imagem->dados,informações, pega uma imagem ja processada e tira informações e dados dela,catalogando objetos, analise meteorológicas, reconhecimento facial
+# computação grafico
+* imagem->imagem->pega uma imagem e coloca nela algo gerado por um algoritmo(gerado apenacomputacionalmente), pega uma imagem/video sem fogo, gerar o fogo por algoritmos e colocar ele naimagem
+# representação de imagens f(x,y) f[y][x] f(x,y)=y é o mesmo que f[y][x]=y gerando uma imagem degradê
 * 1pixel = 1 bytes(8bpp)
 * R(vermelho),G(verde), B(azul)
-	* Cada pixel f(x,y) é associado a uma tupla de 3 valores(f:Z2→Z3).f(x,y)=(r,g,b)
-	* Img[c][y][x]
-	* O modo mais usado tem 1 byte para cada canal (24bpp)
-	* podem ser representadas2563cores pelo rgb
-# aula 2
-* escala de cinza
-	* mais simples de trabalhar
-	* conversão simples = (r+g+b)/3
-	* metodo mais preciso  i = (0.299r + 0.587g + 0.114b) o
-		* os pesos vem da sensibilidade dos olhos, comosomos mais sensiveis ao verde ele tem mais peso
-* contar objetos
-	* binarização+rotulagem
-		* n muito boa
-	* binarização+segmentação+componente conexo
-		0. segmentaçã0
-			* dividir os pixel em regiões
-		0. binarização
-			* dividir os pixel em duas partes: fundo e frente, objetos de interesse e o resto(é um tipo de segmentação)
-		0. componente conexo
-			* colocar um blob(componente/parte de interesse) separados por uma parte q n é de interesse
-			* vizinho 4 ou 8
-		0. rotulagem
-			* marcar cada blob com um identificador
-* binarização com limiar grobal
+* Cada pixel f(x,y) é associado a uma tupla de 3 valores(f:Z2→Z3).f(x,y)=(r,g,b)
+* Img[c][y][x]
+* O modo mais usado tem 1 byte para cada canal (24bpp)
+* podem ser representadas2563cores pelo rgb
+
+# escala de cinza
+* mais simples de trabalhar
+* conversão simples = (r+g+b)/3
+* metodo mais preciso  i = (0.299r + 0.587g + 0.114b) o
+	* os pesos vem da sensibilidade dos olhos, comosomos mais sensiveis ao verde ele tem mais peso
+# contar objetos
+* binarização+rotulagem
+	* n muito boa
+* binarização+segmentação+componente conexo
+	0. segmentaçã0
+		* dividir os pixel em regiões
+	0. binarização
+		* dividir os pixel em duas partes: fundo e frente, objetos de interesse e o resto(é um tipo de segmentação)
+	0. componente conexo
+		* colocar um blob(componente/parte de interesse) separados por uma parte q n é de interesse
+		* vizinho 4 ou 8
+	0. rotulagem
+		* marcar cada blob com um identificador
+# binarização com limiar grobal
 	* é uma operação por pixel
 	```
 	para cade linha y
@@ -47,14 +47,13 @@
 		```python
 		numpy.where(Img > limiar, objeto, fundo)
 		```
-* flood fill
+# flood fill
 	1. percorre a imagem, procurando um pixel não rotulado
 	1. quando encontrar, usa o pixel como "semente"
 	1 "inunda" a imagem, marcando com o mesmo rótulo a semente, seus vizinhos, os vizinhos dos vizinhos, etc(recursividade, pilha)
 	1. para quando não encontrar mais pixels não rotulados conectados a semente, volta ao passao *1*
 
-# aula 3
-* normalização
+# normalização
 	* remapeia as intensidades dos pixels para outra faixa de valores(tipo uma trasnformação linear)
 	* as vezes é chamada de alargamento de contraste(contrast stretching) ou de histograma(na verdade usa um histograma)
 	* acentua o contraste, mas não cria novos dados
@@ -75,40 +74,39 @@
 		* para imagens com 24bpp RGB, podemos usar 3 histogramas com 256 faixas, ou um histograma 3D com 256^3 faixas
 		* para imagens com valores não-inteiros, precisamos definir faixas
 
-* [convolução](https://youtu.be/4G8F_fB71Rg)
-	* filtragem no dominio espacial
-		* filtros com janelas deslizantes
-		* dominio espacial
-			 * no espaço da imagem
-		* divido em 2 grupos
-			* *lineares* considerando a,b e c iamgens
-			a+b=c
-						
-			F(a)+F(b)=F(a)+F(b)=F(a+b)=F(c)
-			"o filtro é linear se a saida no centro da janela for uma soma ponderada dos valores dentro da janela na imagem de entrada"
-			matriz de coeficientes(kernel)
-			normalmente filtra os 3 canais da imagem independente
-			*media* linear
-			* *não lineares* seletor
-			*mediana/minimo/maximo* não linear
-	* aplicar um filtro linear espacial
-	* "convolução é um operador linear que, a partir de duas funções 
+# [convolução](https://youtu.be/4G8F_fB71Rg)
+* filtragem no dominio espacial
+	* filtros com janelas deslizantes
+	* dominio espacial
+		 * no espaço da imagem
+	* divido em 2 grupos
+		* *lineares* considerando a,b e c iamgens
+		a+b=c
+		F(a)+F(b)=F(a)+F(b)=F(a+b)=F(c)
+		"o filtro é linear se a saida no centro da janela for uma soma ponderada dos valores dentro da janela na imagem de entrada"
+		matriz de coeficientes(kernel)
+		normalmente filtra os 3 canais da imagem independente
+		*media* linear
+		* *não lineares* seletor
+		*mediana/minimo/maximo* não linear
+* aplicar um filtro linear espacial
+* "convolução é um operador linear que, a partir de duas funções 
 	dadas,resulta nume terceira que mede a área subentendida pela 
 	superposição damesmas em função do deslocamento existente entre elas"
-		* operador linear = filtro linear
-		* duas funções dadas = imagem e kernel
-		* resulta numa terceira = imagem filtrada
-		* deslocamenteo = janela deslizante
-		* superposição = aplicação do kernel na imagem
-	* utilidades
-		* reberveração(audio)
-		* simulação de caixa acustica
-		* deep learning com redes convolucionais
-			* aprende filtros
+	* operador linear = filtro linear
+	* duas funções dadas = imagem e kernel
+	* resulta numa terceira = imagem filtrada
+	* deslocamenteo = janela deslizante
+	* superposição = aplicação do kernel na imagem
+* utilidades
+	* reberveração(audio)
+	* simulação de caixa acustica
+	* deep learning com redes convolucionais
+		* aprende filtros
 
-* [Distribuição Gaussiana](https://youtu.be/_RwOy023br0)
-	* visão computacional
-	* ruido de sensor de camera(desvio padrão)
-	* medir tamanho medio de um grão de arroz
-	* a area entre \mi -\delta e \mi+\delta é 0.6827(68.27%)
-	* utfpr CR normalizado (Z-score)
+# [Distribuição Gaussiana](https://youtu.be/_RwOy023br0)
+* visão computacional
+* ruido de sensor de camera(desvio padrão)
+* medir tamanho medio de um grão de arroz
+* a area entre \mi -\delta e \mi+\delta é 0.6827(68.27%)
+* utfpr CR normalizado (Z-score)
