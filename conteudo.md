@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 * processamento de imagens
    * imagem->imagem, pega uma imagem e processa ela em varios sentidos dependendo do contexto, junta uma na outra, tira fundo
    * usado em aparelhos eletronicos(telas),imagens medicas, geoprocessamento, visualização de imagensde experimento cientifico, inspeção de estradas de ferros
@@ -68,7 +67,6 @@
 	0. rotulagem
 		* marcar cada blob com um identificador
 # binarização com limiar grobal
->>>>>>> 27adbd524aba29c1ba96f6975843c071ab639ee0
 	* é uma operação por pixel
 	```
 	para cade linha y
@@ -109,7 +107,6 @@
 		* para imagens com 24bpp RGB, podemos usar 3 histogramas com 256 faixas, ou um histograma 3D com 256^3 faixas
 		* para imagens com valores não-inteiros, precisamos definir faixas
 
-<<<<<<< HEAD
 # cores e ajustes
 brilho, constraste e gamma
 * operação pixel a pixel
@@ -204,25 +201,7 @@ deslocando o contraste pra meio g(x,y) = (f(x,y)-0.5)*C +0.5+B
 # matiz
 
 # filtro gausiano
-* [convolução](https://youtu.be/4G8F_fB71Rg)
-	* filtragem no dominio espacial
-A		* filtros com janelas deslizantes
-		* dominio espacial
-			 * no espaço da imagem
-		* divido em 2 grupos
-			* *lineares* considerando a,b e c imagens
-			a+b=c
-						
-			F(a)+F(b)=F(a)+F(b)=F(a+b)=F(c)
-			"o filtro é linear se a saida no centro da janela for uma soma ponderada dos valores dentro da janela na imagem de entrada"
-			matriz de coeficientes(kernel)
-			normalmente filtra os 3 canais da imagem independente
-			*media* linear
-			* *não lineares* seletor
-			*mediana/minimo/maximo* não linear
-	* aplicar um filtro linear espacial
-	* "convolução é um operador linear que, a partir de duas funções 
-# [convolução](https://youtu.be/4G8F_fB71Rg)
+## [convolução](https://youtu.be/4G8F_fB71Rg)
 * filtragem no dominio espacial
 	* filtros com janelas deslizantes
 	* dominio espacial
