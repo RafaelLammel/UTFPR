@@ -1,4 +1,4 @@
-﻿using System.Net;
+﻿using System.Security.Cryptography;
 
 namespace CompartilhamentoNoticias.Models
 {
@@ -7,5 +7,6 @@ namespace CompartilhamentoNoticias.Models
         public string Nome { get; set; }
         public string EndPoint { get; set; }
         public byte[] ChavePublica { get; set; }
+        public int IdAtualNoticas { get; set; }
     }
 }
