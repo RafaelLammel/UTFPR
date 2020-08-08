@@ -89,12 +89,32 @@ namespace CompartilhamentoNoticias
                         // Exibir notícias
                         case "2":
                             Console.WriteLine();
-                            Noticias.ForEach(x => Console.WriteLine(x.Id + "       " + x.Texto + "     " + x.Autor));
+                            Noticias.ForEach(x => Console.WriteLine(x.Id + "       " + x.Texto + "     " + x.Autor + "      " + x.VotosFalso.Count));
                             Console.WriteLine();
                             break;
                         // Avaliar notícia como falso:
                         case "3":
-                            Console.WriteLine("Entre com o identificador da notícia: ");
+                            Console.Write("Entre com o identificador da notícia: ");
+                            try
+                            {
+                                int idNoticiaFalsa = int.Parse(Console.ReadLine());
+                                Noticia noticiaFalsa = Noticias.FirstOrDefault(x => x.Id == idNoticiaFalsa);
+                                if(noticiaFalsa != null)
+                                {
+                                    if (noticiaFalsa.VotosFalso.FirstOrDefault(x => x == Nome) == null)
+                                        EnviaFalso(noticiaFalsa, Nome);
+                                    else
+                                        Console.WriteLine("Você já avaliou essa notícia como falsa!");
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Notícia não encontrada!");
+                                }
+                            }
+                            catch(Exception e)
+                            {
+                                Console.WriteLine("Insira um valor válido\n");
+                            }
                             break;
                         default:
                             Console.WriteLine("Opção inválida!");
@@ -150,9 +170,9 @@ namespace CompartilhamentoNoticias
                         break;
                     // 2 - Recebimento de alerta falso
                     case 2:
-
-
-
+                        AlertaFalso alerta = JsonSerializer.Deserialize<AlertaFalso>(Encoding.UTF8.GetString(mensagemIn.Take(mensagemIn.Length - 1).ToArray()));
+                        Noticia noticiaFalsa = Noticias.FirstOrDefault(x => x.Id == alerta.IdNoticia);
+                        noticiaFalsa.VotosFalso.Add(alerta.Alertante);
                         break;
                 }
             }
@@ -165,7 +185,8 @@ namespace CompartilhamentoNoticias
                 Id = IdAtualNoticas,
                 Autor = Nome,
                 Texto = msg,
-                Assinatura = Assin.Assinar(msg)
+                Assinatura = Assin.Assinar(msg),
+                VotosFalso = new List<string>()
             });
             byte[] msgEmBytes = Encoding.UTF8.GetBytes(serialized);
             List<byte> msgB = new List<byte>();
@@ -209,5 +230,17 @@ namespace CompartilhamentoNoticias
             socket.Send(msg, msg.Length, "127.0.0.1", novoNoEP.Port);
         }
 
+        private static void EnviaFalso(Noticia noticiaFalsa, string nome)
+        {
+            string serialized = JsonSerializer.Serialize(new AlertaFalso()
+            {
+                IdNoticia = noticiaFalsa.Id,
+                Alertante = nome
+            });
+            List<byte> msgEmBytes = new List<byte>();
+            msgEmBytes.AddRange(Encoding.UTF8.GetBytes(serialized));
+            msgEmBytes.Add(2);
+            MulticastSocket.Send(msgEmBytes.ToArray(), msgEmBytes.Count, Group.ToString(), Port);
+        }
     }
 }
