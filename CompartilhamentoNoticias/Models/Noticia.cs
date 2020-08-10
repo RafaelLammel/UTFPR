@@ -9,5 +9,7 @@ namespace CompartilhamentoNoticias.Models
         public string Texto { get; set; }
         public byte[] Assinatura { get; set; }
         public List<string> VotosFalso { get; set; }
+        public int QtdNosEnviados { get; set; }
+        public decimal Reputacao { get; set; }
     }
 }

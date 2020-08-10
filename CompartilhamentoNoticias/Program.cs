@@ -77,6 +77,7 @@ namespace CompartilhamentoNoticias
                     Console.WriteLine("1 - Enviar notícia");
                     Console.WriteLine("2 - Visualizar notícias");
                     Console.WriteLine("3 - Avaliar notícia como falsa");
+                    Console.WriteLine("4 - Listar nós conectados");
                     string opcao = Console.ReadLine();
                     switch (opcao)
                     {
@@ -101,7 +102,11 @@ namespace CompartilhamentoNoticias
                                 Noticia noticiaFalsa = Noticias.FirstOrDefault(x => x.Id == idNoticiaFalsa);
                                 if(noticiaFalsa != null)
                                 {
-                                    if (noticiaFalsa.VotosFalso.FirstOrDefault(x => x == Nome) == null)
+                                    if(noticiaFalsa.Autor == Nome)
+                                    {
+                                        Console.WriteLine("Não é possível avaliar a própria notícia!");
+                                    }
+                                    else if (noticiaFalsa.VotosFalso.FirstOrDefault(x => x == Nome) == null)
                                         EnviaFalso(noticiaFalsa, Nome);
                                     else
                                         Console.WriteLine("Você já avaliou essa notícia como falsa!");
@@ -115,6 +120,11 @@ namespace CompartilhamentoNoticias
                             {
                                 Console.WriteLine("Insira um valor válido\n");
                             }
+                            break;
+                        case "4":
+                            Console.WriteLine();
+                            Nos.ForEach(x => Console.WriteLine(string.Format(x.Nome + "   " + "{0:P2}", x.Reputacao)));
+                            Console.WriteLine();
                             break;
                         default:
                             Console.WriteLine("Opção inválida!");
@@ -150,7 +160,8 @@ namespace CompartilhamentoNoticias
                         {
                             Nome = novoNo.Nome,
                             Chave = novoNo.ChavePublica,
-                            Reputacao = 0
+                            Reputacao = 1,
+                            QtdNoticias = 0
                         });
                         EnviaUnicastNovoNo(IPEndPoint.Parse(novoNo.EndPoint));
                         break;
@@ -165,6 +176,7 @@ namespace CompartilhamentoNoticias
                             {
                                 Noticias.Add(noticia);
                                 IdAtualNoticas++;
+                                autor.QtdNoticias++;
                             }
                         }
                         break;
@@ -173,6 +185,7 @@ namespace CompartilhamentoNoticias
                         AlertaFalso alerta = JsonSerializer.Deserialize<AlertaFalso>(Encoding.UTF8.GetString(mensagemIn.Take(mensagemIn.Length - 1).ToArray()));
                         Noticia noticiaFalsa = Noticias.FirstOrDefault(x => x.Id == alerta.IdNoticia);
                         noticiaFalsa.VotosFalso.Add(alerta.Alertante);
+                        CalculaReputacao(noticiaFalsa);
                         break;
                 }
             }
@@ -186,7 +199,9 @@ namespace CompartilhamentoNoticias
                 Autor = Nome,
                 Texto = msg,
                 Assinatura = Assin.Assinar(msg),
-                VotosFalso = new List<string>()
+                VotosFalso = new List<string>(),
+                QtdNosEnviados = Nos.Count,
+                Reputacao = 0
             });
             byte[] msgEmBytes = Encoding.UTF8.GetBytes(serialized);
             List<byte> msgB = new List<byte>();
@@ -212,7 +227,7 @@ namespace CompartilhamentoNoticias
                 {
                     Nome = noGrupo.Nome,
                     Chave = noGrupo.ChavePublica,
-                    Reputacao = 0
+                    Reputacao = 1
                 });
                 if (noGrupo.IdAtualNoticas > IdAtualNoticas) IdAtualNoticas = noGrupo.IdAtualNoticas;
                 Console.WriteLine(noGrupo.Nome);
@@ -241,6 +256,19 @@ namespace CompartilhamentoNoticias
             msgEmBytes.AddRange(Encoding.UTF8.GetBytes(serialized));
             msgEmBytes.Add(2);
             MulticastSocket.Send(msgEmBytes.ToArray(), msgEmBytes.Count, Group.ToString(), Port);
+        }
+
+        private static void CalculaReputacao(Noticia noticia)
+        {
+            decimal reputacaoNoticia = (decimal)noticia.VotosFalso.Count  / (noticia.QtdNosEnviados - 1);
+            noticia.Reputacao = reputacaoNoticia;
+            No AutorNo = Nos.FirstOrDefault(x => x.Nome == noticia.Autor);
+            decimal somaReputacao = 0;
+            Noticias.ForEach(x =>
+            {
+                somaReputacao += x.Reputacao; 
+            });
+            AutorNo.Reputacao = 1 - (somaReputacao / AutorNo.QtdNoticias);
         }
     }
 }
