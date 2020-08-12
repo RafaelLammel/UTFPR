@@ -83,19 +83,18 @@ namespace CompartilhamentoNoticias
                     {
                         // Enviar notícia
                         case "1":
-                            Console.WriteLine("Entre com a notícia: ");
+                            Console.Write("\nEntre com a notícia: ");
                             string noticia = Console.ReadLine();
                             EnviarNoticia(noticia);
                             break;
                         // Exibir notícias
                         case "2":
-                            Console.WriteLine();
-                            Noticias.ForEach(x => Console.WriteLine(x.Id + "       " + x.Texto + "     " + x.Autor + "      " + x.VotosFalso.Count));
-                            Console.WriteLine();
+                            Console.WriteLine("\n{0} | {1} | {2} | Votos Falsos", "ID".PadRight(3), "Notícia".PadRight(30), "Autor".PadRight(10));
+                            Noticias.ForEach(x => Console.WriteLine("{0} | {1} | {2} | {3}", x.Id.ToString().PadRight(3), x.Texto.PadRight(30), x.Autor.PadRight(10), x.VotosFalso.Count));
                             break;
                         // Avaliar notícia como falso:
                         case "3":
-                            Console.Write("Entre com o identificador da notícia: ");
+                            Console.Write("\nEntre com o identificador da notícia: ");
                             try
                             {
                                 int idNoticiaFalsa = int.Parse(Console.ReadLine());
@@ -116,15 +115,15 @@ namespace CompartilhamentoNoticias
                                     Console.WriteLine("Notícia não encontrada!");
                                 }
                             }
-                            catch(Exception e)
+                            catch(Exception)
                             {
-                                Console.WriteLine("Insira um valor válido\n");
+                                Console.WriteLine("Insira um valor válido");
                             }
                             break;
                         case "4":
-                            Console.WriteLine();
-                            Nos.ForEach(x => Console.WriteLine(string.Format(x.Nome + "   " + "{0:P2}", x.Reputacao)));
-                            Console.WriteLine();
+                            Console.WriteLine("\n{0} | Reputação*", "Nó".PadRight(10));
+                            Nos.ForEach(x => Console.WriteLine("{0} | {1:P2}", x.Nome.PadRight(10), x.Reputacao));
+                            Console.WriteLine("\n*Quanto maior, mais confiável");
                             break;
                         default:
                             Console.WriteLine("Opção inválida!");
