@@ -2,7 +2,7 @@
 
 namespace CompartilhamentoNoticias.Models
 {
-    class Noticia
+    public class Noticia
     {
         public int Id { get; set; }
         public string Autor { get; set; }

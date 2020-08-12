@@ -12,45 +12,36 @@ namespace CompartilhamentoNoticias
 {
     class Program
     {
-        private static string Nome;
-        private static Assinatura Assin;
-        private static UdpClient MulticastSocket;
-        private static UdpClient socket;
-        private static List<No> Nos;
-        private static List<Noticia> Noticias;
-        private static IPAddress Group;
-        private static int Port;
-        private static int IdAtualNoticas;
-
         static void Main(string[] args)
         {
             // Inicializando items e pedindo o nome do nó
-            Assin = new Assinatura();
-            Nos = new List<No>();
-            Noticias = new List<Noticia>();
-            IdAtualNoticas = 1;
-            Port = 6789;
+            ComunicacaoSockets com = new ComunicacaoSockets();
+            Assinatura assin = new Assinatura();
+            List<No> nos = new List<No>();
+            List<Noticia> noticias = new List<Noticia>();
+            int idAtualNoticias = 1;
+            int porta = 6789;
             Console.Write("Seja bem vindo ao noticias peer to peer!\nPor favor, entre com seu nome: ");
-            Nome = Console.ReadLine();
+            string Nome = Console.ReadLine();
             try
             {
                 // Inicializando socket Unicast, Multicast e definindo endereço de Multicast
-                socket = new UdpClient(0);
-                MulticastSocket = new UdpClient();
-                Group = IPAddress.Parse("228.5.6.7");
+                UdpClient socket = new UdpClient(0);
+                UdpClient MulticastSocket = new UdpClient();
+                IPAddress Group = IPAddress.Parse("228.5.6.7");
 
-                // Atribuindo socket Multicast na porta Port e liberando reuso da porta para outros Sockets multicast
+                // Atribuindo socket Multicast na porta porta e liberando reuso da porta para outros Sockets multicast
                 MulticastSocket.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-                MulticastSocket.Client.Bind(new IPEndPoint(IPAddress.Any, Port));
+                MulticastSocket.Client.Bind(new IPEndPoint(IPAddress.Any, porta));
 
                 // Entra no grupo e serializa as informações do nó em JSON
                 // escolhemos essa estratégia por ser simples de serializar e desserializar JSON em objetos C#
                 MulticastSocket.JoinMulticastGroup(Group);
-                var teste = Assin.ChavePublica.ToString();
+                var teste = assin.ChavePublica.ToString();
                 string serialized = JsonSerializer.Serialize(new Entrada() 
                 {
                     Nome = Nome,
-                    ChavePublica = Assin.ChavePublica,
+                    ChavePublica = assin.ChavePublica,
                     EndPoint = socket.Client.LocalEndPoint.ToString()
                 });
                 byte[] msgEmBytes = Encoding.UTF8.GetBytes(serialized);
@@ -62,12 +53,12 @@ namespace CompartilhamentoNoticias
                 msg.Add(0);
 
                 // Envio do datagrama para o grupo multicast
-                MulticastSocket.Send(msg.ToArray(), msg.Count, Group.ToString(), Port);
+                MulticastSocket.Send(msg.ToArray(), msg.Count, Group.ToString(), porta);
 
                 // Cria uma Task que roda em paralelo com o programa principal,
                 // para receber mensagens do grupo Multicast e outra para Unicast
-                Task.Run(RecebeMensagem);
-                Task.Run(RecebeUnicast);
+                Task.Run(() => { com.RecebeMensagem(Nome, MulticastSocket, nos, assin, noticias, idAtualNoticias, socket); });
+                Task.Run(() => { com.RecebeUnicast(socket, Nome, nos, idAtualNoticias); });
 
                 // Thread principal vai cuidar da interação com usuário
                 while (true)
@@ -85,12 +76,12 @@ namespace CompartilhamentoNoticias
                         case "1":
                             Console.Write("\nEntre com a notícia: ");
                             string noticia = Console.ReadLine();
-                            EnviarNoticia(noticia);
+                            com.EnviarNoticia(noticia, idAtualNoticias, Nome, assin, nos, Group, porta, MulticastSocket);
                             break;
                         // Exibir notícias
                         case "2":
                             Console.WriteLine("\n{0} | {1} | {2} | Votos Falsos", "ID".PadRight(3), "Notícia".PadRight(30), "Autor".PadRight(10));
-                            Noticias.ForEach(x => Console.WriteLine("{0} | {1} | {2} | {3}", x.Id.ToString().PadRight(3), x.Texto.PadRight(30), x.Autor.PadRight(10), x.VotosFalso.Count));
+                            noticias.ForEach(x => Console.WriteLine("{0} | {1} | {2} | {3}", x.Id.ToString().PadRight(3), x.Texto.PadRight(30), x.Autor.PadRight(10), x.VotosFalso.Count));
                             break;
                         // Avaliar notícia como falso:
                         case "3":
@@ -98,7 +89,7 @@ namespace CompartilhamentoNoticias
                             try
                             {
                                 int idNoticiaFalsa = int.Parse(Console.ReadLine());
-                                Noticia noticiaFalsa = Noticias.FirstOrDefault(x => x.Id == idNoticiaFalsa);
+                                Noticia noticiaFalsa = noticias.FirstOrDefault(x => x.Id == idNoticiaFalsa);
                                 if(noticiaFalsa != null)
                                 {
                                     if(noticiaFalsa.Autor == Nome)
@@ -106,7 +97,7 @@ namespace CompartilhamentoNoticias
                                         Console.WriteLine("Não é possível avaliar a própria notícia!");
                                     }
                                     else if (noticiaFalsa.VotosFalso.FirstOrDefault(x => x == Nome) == null)
-                                        EnviaFalso(noticiaFalsa, Nome);
+                                        com.EnviaFalso(noticiaFalsa, Nome, MulticastSocket, Group, porta);
                                     else
                                         Console.WriteLine("Você já avaliou essa notícia como falsa!");
                                 }
@@ -122,7 +113,7 @@ namespace CompartilhamentoNoticias
                             break;
                         case "4":
                             Console.WriteLine("\n{0} | Reputação*", "Nó".PadRight(10));
-                            Nos.ForEach(x => Console.WriteLine("{0} | {1:P2}", x.Nome.PadRight(10), x.Reputacao));
+                            nos.ForEach(x => Console.WriteLine("{0} | {1:P2}", x.Nome.PadRight(10), x.Reputacao));
                             Console.WriteLine("\n*Quanto maior, mais confiável");
                             break;
                         default:
@@ -135,139 +126,6 @@ namespace CompartilhamentoNoticias
             {
                 Console.WriteLine(e.Message);
             }
-        }
-
-        private static void RecebeMensagem()
-        {
-            // O método Recieve do UdpClient precisa conhecer o endereço do remetente que está esperando,
-            // com o Endpoint abaixo ele espera e recebe de qualquer remetente
-            IPEndPoint endpoint = new IPEndPoint(IPAddress.Any, 0);
-
-            while (true)
-            {
-                // Espera receber uma mensagem
-                byte[] mensagemIn = MulticastSocket.Receive(ref endpoint);
-                
-                // Verifica o ultimo byte, que usamos como identificador do tipo do datagrama
-                switch (mensagemIn[mensagemIn.Length - 1])
-                {
-                    // 0 - Nó entrando, é necessário registrar na lista e enviar por Unicast a chave pública deste nó
-                    case 0:
-                        Entrada novoNo = JsonSerializer.Deserialize<Entrada>(Encoding.UTF8.GetString(mensagemIn.Take(mensagemIn.Length - 1).ToArray()));
-                        if(!novoNo.Nome.Equals(Nome)) Console.WriteLine("Nó: " + novoNo.Nome + " se conectou ao grupo multicast!");
-                        Nos.Add(new No()
-                        {
-                            Nome = novoNo.Nome,
-                            Chave = novoNo.ChavePublica,
-                            Reputacao = 1,
-                            QtdNoticias = 0
-                        });
-                        EnviaUnicastNovoNo(IPEndPoint.Parse(novoNo.EndPoint));
-                        break;
-                    // 1 - Recebimento de notícia
-                    case 1:
-                        Noticia noticia = JsonSerializer.Deserialize<Noticia>(Encoding.UTF8.GetString(mensagemIn.Take(mensagemIn.Length - 1).ToArray()));
-                        // Verifica assinatura
-                        No autor = Nos.FirstOrDefault(x => x.Nome == noticia.Autor);
-                        if (Assin.Validar(noticia.Texto, noticia.Assinatura, autor.Chave)) 
-                        {
-                            if (Noticias.FirstOrDefault(x => x.Id == noticia.Id) == null)
-                            {
-                                Noticias.Add(noticia);
-                                IdAtualNoticas++;
-                                autor.QtdNoticias++;
-                            }
-                        }
-                        break;
-                    // 2 - Recebimento de alerta falso
-                    case 2:
-                        AlertaFalso alerta = JsonSerializer.Deserialize<AlertaFalso>(Encoding.UTF8.GetString(mensagemIn.Take(mensagemIn.Length - 1).ToArray()));
-                        Noticia noticiaFalsa = Noticias.FirstOrDefault(x => x.Id == alerta.IdNoticia);
-                        noticiaFalsa.VotosFalso.Add(alerta.Alertante);
-                        CalculaReputacao(noticiaFalsa);
-                        break;
-                }
-            }
-        }
-
-        private static void EnviarNoticia(string msg)
-        {
-            string serialized = JsonSerializer.Serialize(new Noticia()
-            {
-                Id = IdAtualNoticas,
-                Autor = Nome,
-                Texto = msg,
-                Assinatura = Assin.Assinar(msg),
-                VotosFalso = new List<string>(),
-                QtdNosEnviados = Nos.Count,
-                Reputacao = 0
-            });
-            byte[] msgEmBytes = Encoding.UTF8.GetBytes(serialized);
-            List<byte> msgB = new List<byte>();
-            msgB.AddRange(msgEmBytes);
-            msgB.Add(1);
-            MulticastSocket.Send(msgB.ToArray(), msgB.Count, Group.ToString(), Port);
-        }
-
-        private static void RecebeUnicast()
-        {
-            // O método Recieve do UdpClient precisa conhecer o endereço do remetente que está esperando,
-            // com o Endpoint abaixo ele espera e recebe de qualquer remetente
-            IPEndPoint endpoint = new IPEndPoint(IPAddress.Any, 0);
-
-            Console.WriteLine("\nNós conectados (incluido o próprio nó): ");
-
-            while (true)
-            {
-                // Espera receber uma mensagem
-                byte[] mensagemIn = socket.Receive(ref endpoint);
-                Entrada noGrupo = JsonSerializer.Deserialize<Entrada>(Encoding.UTF8.GetString(mensagemIn));
-                if (noGrupo.Nome != Nome) Nos.Add(new No()
-                {
-                    Nome = noGrupo.Nome,
-                    Chave = noGrupo.ChavePublica,
-                    Reputacao = 1
-                });
-                if (noGrupo.IdAtualNoticas > IdAtualNoticas) IdAtualNoticas = noGrupo.IdAtualNoticas;
-                Console.WriteLine(noGrupo.Nome);
-            }
-        }
-
-        private static void EnviaUnicastNovoNo(IPEndPoint novoNoEP)
-        {
-            string datagrama = JsonSerializer.Serialize(new Entrada()
-            {
-                Nome = Nome,
-                ChavePublica = Assin.ChavePublica,
-            });
-            byte[] msg = Encoding.UTF8.GetBytes(datagrama);
-            socket.Send(msg, msg.Length, "127.0.0.1", novoNoEP.Port);
-        }
-
-        private static void EnviaFalso(Noticia noticiaFalsa, string nome)
-        {
-            string serialized = JsonSerializer.Serialize(new AlertaFalso()
-            {
-                IdNoticia = noticiaFalsa.Id,
-                Alertante = nome
-            });
-            List<byte> msgEmBytes = new List<byte>();
-            msgEmBytes.AddRange(Encoding.UTF8.GetBytes(serialized));
-            msgEmBytes.Add(2);
-            MulticastSocket.Send(msgEmBytes.ToArray(), msgEmBytes.Count, Group.ToString(), Port);
-        }
-
-        private static void CalculaReputacao(Noticia noticia)
-        {
-            decimal reputacaoNoticia = (decimal)noticia.VotosFalso.Count  / (noticia.QtdNosEnviados - 1);
-            noticia.Reputacao = reputacaoNoticia;
-            No AutorNo = Nos.FirstOrDefault(x => x.Nome == noticia.Autor);
-            decimal somaReputacao = 0;
-            Noticias.ForEach(x =>
-            {
-                somaReputacao += x.Reputacao; 
-            });
-            AutorNo.Reputacao = 1 - (somaReputacao / AutorNo.QtdNoticias);
         }
     }
 }
