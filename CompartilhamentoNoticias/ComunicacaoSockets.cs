@@ -17,6 +17,7 @@ namespace CompartilhamentoNoticias
             // O método Recieve do UdpClient precisa conhecer o endereço do remetente que está esperando,
             // com o Endpoint abaixo ele espera e recebe de qualquer remetente
             IPEndPoint endpoint = new IPEndPoint(IPAddress.Any, 0);
+            Reputacao rep = new Reputacao();
 
             while (true)
             {
@@ -53,7 +54,16 @@ namespace CompartilhamentoNoticias
                                 noticias.Add(noticia);
                                 idAtualNoticas++;
                                 autor.QtdNoticias++;
+                                rep.CalculaReputacao(noticia, nos, noticias);
                             }
+                            else
+                            {
+                                Console.WriteLine("Id da notícia já existe!");
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Não verificado!");
                         }
                         break;
                     // 2 - Recebimento de alerta falso
@@ -62,7 +72,6 @@ namespace CompartilhamentoNoticias
                         AlertaFalso alerta = JsonSerializer.Deserialize<AlertaFalso>(Encoding.UTF8.GetString(mensagemIn.Take(mensagemIn.Length - 1).ToArray()));
                         Noticia noticiaFalsa = noticias.FirstOrDefault(x => x.Id == alerta.IdNoticia);
                         noticiaFalsa.VotosFalso.Add(alerta.Alertante);
-                        Reputacao rep = new Reputacao();
                         rep.CalculaReputacao(noticiaFalsa, nos, noticias);
                         break;
                     // 3 - Um nó vai se desconectar, é preciso remove-lo da lista local

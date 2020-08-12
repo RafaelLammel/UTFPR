@@ -85,7 +85,7 @@ namespace CompartilhamentoNoticias
                         case "1":
                             Console.Write("\nEntre com a notícia: ");
                             string noticia = Console.ReadLine();
-                            com.EnviarNoticia(noticia, idAtualNoticias, nome, assin, nos, grupo, porta, multicastSocket);
+                            com.EnviarNoticia(noticia, noticias.Count+1, nome, assin, nos, grupo, porta, multicastSocket);
                             break;
                         // Exibir notícias
                         case "2":
