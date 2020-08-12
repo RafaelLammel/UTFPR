@@ -34,7 +34,7 @@ namespace CompartilhamentoNoticias
                 MulticastSocket.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
                 MulticastSocket.Client.Bind(new IPEndPoint(IPAddress.Any, porta));
 
-                // Entra no grupo e serializa as informações do nó em JSON
+                // Entra no grupo e serializa as informações do nó em String/JSON
                 // escolhemos essa estratégia por ser simples de serializar e desserializar JSON em objetos C#
                 MulticastSocket.JoinMulticastGroup(Group);
                 var teste = assin.ChavePublica.ToString();
@@ -47,8 +47,8 @@ namespace CompartilhamentoNoticias
                 byte[] msgEmBytes = Encoding.UTF8.GetBytes(serialized);
                 List<byte> msg = new List<byte>();
 
-                // Além do datagrama de entrada do nó, adicionamos um último bit que serve para identificar
-                // o que aquele datagrama faz
+                // Além da mensagem de entrada do nó, adicionamos um último bit que serve para identificar
+                // o que aquela mensagem faz
                 msg.AddRange(msgEmBytes);
                 msg.Add(0);
 
@@ -86,6 +86,7 @@ namespace CompartilhamentoNoticias
                         // Avaliar notícia como falso:
                         case "3":
                             Console.Write("\nEntre com o identificador da notícia: ");
+                            // O try catch foi adicionado no caso do usuário não inserir um número inteiro
                             try
                             {
                                 int idNoticiaFalsa = int.Parse(Console.ReadLine());
@@ -111,11 +112,13 @@ namespace CompartilhamentoNoticias
                                 Console.WriteLine("Insira um valor válido");
                             }
                             break;
+                        // Exibir a reputação dos nós conectados
                         case "4":
                             Console.WriteLine("\n{0} | Reputação*", "Nó".PadRight(10));
                             nos.ForEach(x => Console.WriteLine("{0} | {1:P2}", x.Nome.PadRight(10), x.Reputacao));
                             Console.WriteLine("\n*Quanto maior, mais confiável");
                             break;
+                        // Para qualquer outra coisa digitada, portanto inválida
                         default:
                             Console.WriteLine("Opção inválida!");
                             break;
