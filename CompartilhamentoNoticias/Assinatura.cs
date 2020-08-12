@@ -33,8 +33,8 @@ namespace CompartilhamentoNoticias
         {
             using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
             {
-                int teste = 0;
-                rsa.ImportRSAPublicKey(chave, out teste);
+                int bytesRead;
+                rsa.ImportRSAPublicKey(chave, out bytesRead);
                 return rsa.VerifyData(Encoding.UTF8.GetBytes(msg), new MD5CryptoServiceProvider(), assinatura);
             }
         }
