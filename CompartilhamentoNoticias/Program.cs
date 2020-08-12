@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using CompartilhamentoNoticias.Models;
 
@@ -22,25 +23,25 @@ namespace CompartilhamentoNoticias
             int idAtualNoticias = 1;
             int porta = 6789;
             Console.Write("Seja bem vindo ao noticias peer to peer!\nPor favor, entre com seu nome: ");
-            string Nome = Console.ReadLine();
+            string nome = Console.ReadLine();
             try
             {
                 // Inicializando socket Unicast, Multicast e definindo endereço de Multicast
                 UdpClient socket = new UdpClient(0);
-                UdpClient MulticastSocket = new UdpClient();
-                IPAddress Group = IPAddress.Parse("228.5.6.7");
+                UdpClient multicastSocket = new UdpClient();
+                IPAddress grupo = IPAddress.Parse("228.5.6.7");
 
                 // Atribuindo socket Multicast na porta porta e liberando reuso da porta para outros Sockets multicast
-                MulticastSocket.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-                MulticastSocket.Client.Bind(new IPEndPoint(IPAddress.Any, porta));
+                multicastSocket.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                multicastSocket.Client.Bind(new IPEndPoint(IPAddress.Any, porta));
 
                 // Entra no grupo e serializa as informações do nó em String/JSON
                 // escolhemos essa estratégia por ser simples de serializar e desserializar JSON em objetos C#
-                MulticastSocket.JoinMulticastGroup(Group);
+                multicastSocket.JoinMulticastGroup(grupo);
                 var teste = assin.ChavePublica.ToString();
-                string serialized = JsonSerializer.Serialize(new Entrada() 
+                string serialized = JsonSerializer.Serialize(new Entrada()
                 {
-                    Nome = Nome,
+                    Nome = nome,
                     ChavePublica = assin.ChavePublica,
                     EndPoint = socket.Client.LocalEndPoint.ToString()
                 });
@@ -53,12 +54,20 @@ namespace CompartilhamentoNoticias
                 msg.Add(0);
 
                 // Envio do datagrama para o grupo multicast
-                MulticastSocket.Send(msg.ToArray(), msg.Count, Group.ToString(), porta);
+                multicastSocket.Send(msg.ToArray(), msg.Count, grupo.ToString(), porta);
 
                 // Cria uma Task que roda em paralelo com o programa principal,
                 // para receber mensagens do grupo Multicast e outra para Unicast
-                Task.Run(() => { com.RecebeMensagem(Nome, MulticastSocket, nos, assin, noticias, idAtualNoticias, socket); });
-                Task.Run(() => { com.RecebeUnicast(socket, Nome, nos, idAtualNoticias); });
+                CancellationTokenSource cancelaMulticast = new CancellationTokenSource();
+                CancellationTokenSource cancelaUnicast = new CancellationTokenSource();
+                Task.Run(() => { com.RecebeMensagem(nome, multicastSocket, nos, assin, noticias, idAtualNoticias, socket); }, cancelaMulticast.Token);
+                Task.Run(() => { com.RecebeUnicast(socket, nome, nos, idAtualNoticias); }, cancelaUnicast.Token);
+
+                // Um evento que dispara quando CTRL+C é pressionado
+                Console.CancelKeyPress += new ConsoleCancelEventHandler((object sender, ConsoleCancelEventArgs args) => 
+                {
+                    EncerraPrograma(multicastSocket, socket, grupo, porta, nome, com, cancelaMulticast, cancelaUnicast);
+                });
 
                 // Thread principal vai cuidar da interação com usuário
                 while (true)
@@ -76,7 +85,7 @@ namespace CompartilhamentoNoticias
                         case "1":
                             Console.Write("\nEntre com a notícia: ");
                             string noticia = Console.ReadLine();
-                            com.EnviarNoticia(noticia, idAtualNoticias, Nome, assin, nos, Group, porta, MulticastSocket);
+                            com.EnviarNoticia(noticia, idAtualNoticias, nome, assin, nos, grupo, porta, multicastSocket);
                             break;
                         // Exibir notícias
                         case "2":
@@ -91,14 +100,14 @@ namespace CompartilhamentoNoticias
                             {
                                 int idNoticiaFalsa = int.Parse(Console.ReadLine());
                                 Noticia noticiaFalsa = noticias.FirstOrDefault(x => x.Id == idNoticiaFalsa);
-                                if(noticiaFalsa != null)
+                                if (noticiaFalsa != null)
                                 {
-                                    if(noticiaFalsa.Autor == Nome)
+                                    if (noticiaFalsa.Autor == nome)
                                     {
                                         Console.WriteLine("Não é possível avaliar a própria notícia!");
                                     }
-                                    else if (noticiaFalsa.VotosFalso.FirstOrDefault(x => x == Nome) == null)
-                                        com.EnviaFalso(noticiaFalsa, Nome, MulticastSocket, Group, porta);
+                                    else if (noticiaFalsa.VotosFalso.FirstOrDefault(x => x == nome) == null)
+                                        com.EnviaFalso(noticiaFalsa, nome, multicastSocket, grupo, porta);
                                     else
                                         Console.WriteLine("Você já avaliou essa notícia como falsa!");
                                 }
@@ -107,7 +116,7 @@ namespace CompartilhamentoNoticias
                                     Console.WriteLine("Notícia não encontrada!");
                                 }
                             }
-                            catch(Exception)
+                            catch (Exception)
                             {
                                 Console.WriteLine("Insira um valor válido");
                             }
@@ -125,10 +134,31 @@ namespace CompartilhamentoNoticias
                     }
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine(e.Message);
             }
+        }
+
+        // Função que encerra os sockets antes de finalizar o programa
+        private static void EncerraPrograma(
+            UdpClient multicastSocket,
+            UdpClient socket,
+            IPAddress grupo,
+            int porta,
+            string nome,
+            ComunicacaoSockets com,
+            CancellationTokenSource cancelaMulticast,
+            CancellationTokenSource cancelaUnicast
+        )
+        {
+            cancelaMulticast.Cancel();
+            cancelaUnicast.Cancel();
+            com.Desconecta(nome, multicastSocket, grupo, porta);
+            multicastSocket.DropMulticastGroup(grupo);
+            multicastSocket.Close();
+            socket.Close();
+            Console.WriteLine("Desconectado!\n");
         }
     }
 }

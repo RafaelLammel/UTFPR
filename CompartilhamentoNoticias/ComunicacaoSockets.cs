@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
 using CompartilhamentoNoticias.Models;
@@ -64,6 +65,13 @@ namespace CompartilhamentoNoticias
                         noticiaFalsa.VotosFalso.Add(alerta.Alertante);
                         Reputacao rep = new Reputacao();
                         rep.CalculaReputacao(noticiaFalsa, nos, noticias);
+                        break;
+                    // 3 - Um nó vai se desconectar, é preciso remove-lo da lista local
+                    case 3:
+                        string nomeNo = Encoding.UTF8.GetString(mensagemIn.Take(mensagemIn.Length - 1).ToArray());
+                        No noRemover = nos.FirstOrDefault(x => x.Nome == nomeNo);
+                        nos.Remove(noRemover);
+                        Console.WriteLine($"\nO nó {nomeNo} se desconectou\n");
                         break;
                 }
             }
@@ -149,6 +157,15 @@ namespace CompartilhamentoNoticias
             List<byte> msgEmBytes = new List<byte>();
             msgEmBytes.AddRange(Encoding.UTF8.GetBytes(serialized));
             msgEmBytes.Add(2);
+            multicastSocket.Send(msgEmBytes.ToArray(), msgEmBytes.Count, grupo.ToString(), porta);
+        }
+
+        // Avisa por multicast que o nó atual está saindo do grupo
+        public void Desconecta(string nome, UdpClient multicastSocket, IPAddress grupo, int porta)
+        {
+            List<byte> msgEmBytes = new List<byte>();
+            msgEmBytes.AddRange(Encoding.UTF8.GetBytes(nome));
+            msgEmBytes.Add(3);
             multicastSocket.Send(msgEmBytes.ToArray(), msgEmBytes.Count, grupo.ToString(), porta);
         }
     }
