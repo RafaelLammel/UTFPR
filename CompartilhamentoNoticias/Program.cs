@@ -53,15 +53,15 @@ namespace CompartilhamentoNoticias
                 msg.AddRange(msgEmBytes);
                 msg.Add(0);
 
-                // Envio do datagrama para o grupo multicast
-                multicastSocket.Send(msg.ToArray(), msg.Count, grupo.ToString(), porta);
-
                 // Cria uma Task que roda em paralelo com o programa principal,
                 // para receber mensagens do grupo Multicast e outra para Unicast
                 CancellationTokenSource cancelaMulticast = new CancellationTokenSource();
                 CancellationTokenSource cancelaUnicast = new CancellationTokenSource();
                 Task.Run(() => { com.RecebeMensagem(nome, multicastSocket, nos, assin, noticias, idAtualNoticias, socket); }, cancelaMulticast.Token);
-                Task.Run(() => { com.RecebeUnicast(socket, nome, nos, idAtualNoticias); }, cancelaUnicast.Token);
+                Task.Run(() => { com.RecebeUnicast(socket, nos, idAtualNoticias); }, cancelaUnicast.Token);
+
+                // Envio do datagrama para o grupo multicast
+                multicastSocket.Send(msg.ToArray(), msg.Count, grupo.ToString(), porta);
 
                 // Um evento que dispara quando CTRL+C é pressionado
                 Console.CancelKeyPress += new ConsoleCancelEventHandler((object sender, ConsoleCancelEventArgs args) => 

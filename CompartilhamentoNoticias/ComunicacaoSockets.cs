@@ -31,7 +31,7 @@ namespace CompartilhamentoNoticias
                         // Desserializa a mensagem e adiciona o novo nó na lista local
                         Entrada novoNo = JsonSerializer.Deserialize<Entrada>(Encoding.UTF8.GetString(mensagemIn.Take(mensagemIn.Length - 1).ToArray()));
                         if (!novoNo.Nome.Equals(nome)) Console.WriteLine("Nó: " + novoNo.Nome + " se conectou ao grupo multicast!");
-                        nos.Add(new No()
+                        if (novoNo.Nome != nome) nos.Add(new No()
                         {
                             Nome = novoNo.Nome,
                             Chave = novoNo.ChavePublica,
@@ -100,7 +100,7 @@ namespace CompartilhamentoNoticias
         }
 
         // Quando o nó entra no grupo, este método lida com os envios de chave pública dos outros nós por meio de Unicast
-        public void RecebeUnicast(UdpClient socket, string nome, List<No> nos, int idAtualNoticias)
+        public void RecebeUnicast(UdpClient socket, List<No> nos, int idAtualNoticias)
         {
             // O método Recieve do UdpClient precisa conhecer o endereço do remetente que está esperando,
             // com o Endpoint abaixo ele espera e recebe de qualquer remetente
@@ -115,7 +115,7 @@ namespace CompartilhamentoNoticias
 
                 // Converte a mensagem no objeto de entrada, e insere o nó em uma lista local
                 Entrada noGrupo = JsonSerializer.Deserialize<Entrada>(Encoding.UTF8.GetString(mensagemIn));
-                if (noGrupo.Nome != nome) nos.Add(new No()
+                nos.Add(new No()
                 {
                     Nome = noGrupo.Nome,
                     Chave = noGrupo.ChavePublica,
