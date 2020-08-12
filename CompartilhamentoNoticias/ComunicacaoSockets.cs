@@ -39,7 +39,7 @@ namespace CompartilhamentoNoticias
                             Reputacao = 1,
                             QtdNoticias = 0
                         });
-                        EnviaUnicastNovoNo(IPEndPoint.Parse(novoNo.EndPoint), nome, assin, socket);
+                        EnviaUnicastNovoNo(IPEndPoint.Parse(novoNo.EndPoint), nome, assin, socket, nos);
                         break;
                     // 1 - Recebimento de notícia
                     case 1:
@@ -114,10 +114,9 @@ namespace CompartilhamentoNoticias
             // O método Recieve do UdpClient precisa conhecer o endereço do remetente que está esperando,
             // com o Endpoint abaixo ele espera e recebe de qualquer remetente
             IPEndPoint endpoint = new IPEndPoint(IPAddress.Any, 0);
-
-            Console.WriteLine("\nNós conectados (incluido o próprio nó): ");
-
-            while (true)
+            int nosConectados;
+            Console.WriteLine("\nCarregando nós conectados (incluindo o próprio nó)...");
+            do
             {
                 // Espera receber uma mensagem
                 byte[] mensagemIn = socket.Receive(ref endpoint);
@@ -132,18 +131,21 @@ namespace CompartilhamentoNoticias
                 });
                 // Recebe o ID atual das notícias
                 if (noGrupo.IdAtualNoticas > idAtualNoticias) idAtualNoticias = noGrupo.IdAtualNoticas;
+                nosConectados = noGrupo.NosConectados;
                 Console.WriteLine(noGrupo.Nome);
-            }
+            } while (nos.Count < nosConectados);
         }
 
         // Quando um novo nó entra no grupo, este método deve ser disparado, enviando a chave pública e o nome do nó atual
-        public void EnviaUnicastNovoNo(IPEndPoint novoNoEP, string nome, Assinatura assin, UdpClient socket)
+        // para o nó que acabou de entrar, via unicast
+        public void EnviaUnicastNovoNo(IPEndPoint novoNoEP, string nome, Assinatura assin, UdpClient socket, List<No> nos)
         {
             // Cria e serializa um objeto de entrada
             string datagrama = JsonSerializer.Serialize(new Entrada()
             {
                 Nome = nome,
                 ChavePublica = assin.ChavePublica,
+                NosConectados = nos.Count
             });
 
             // Transforma em Array de bytes e envia a mensagem

@@ -54,19 +54,18 @@ namespace CompartilhamentoNoticias
                 msg.Add(0);
 
                 // Cria uma Task que roda em paralelo com o programa principal,
-                // para receber mensagens do grupo Multicast e outra para Unicast
+                // para receber mensagens do grupo Multicast
                 CancellationTokenSource cancelaMulticast = new CancellationTokenSource();
-                CancellationTokenSource cancelaUnicast = new CancellationTokenSource();
                 Task.Run(() => { com.RecebeMensagem(nome, multicastSocket, nos, assin, noticias, idAtualNoticias, socket); }, cancelaMulticast.Token);
-                Task.Run(() => { com.RecebeUnicast(socket, nos, idAtualNoticias); }, cancelaUnicast.Token);
 
-                // Envio do datagrama para o grupo multicast
+                // Envio do datagrama para o grupo multicast, e recebendo de todos os nós suas chaves no RecebeUnicast
                 multicastSocket.Send(msg.ToArray(), msg.Count, grupo.ToString(), porta);
+                com.RecebeUnicast(socket, nos, idAtualNoticias);
 
                 // Um evento que dispara quando CTRL+C é pressionado
                 Console.CancelKeyPress += new ConsoleCancelEventHandler((object sender, ConsoleCancelEventArgs args) => 
                 {
-                    EncerraPrograma(multicastSocket, socket, grupo, porta, nome, com, cancelaMulticast, cancelaUnicast);
+                    EncerraPrograma(multicastSocket, socket, grupo, porta, nome, com, cancelaMulticast);
                 });
 
                 // Thread principal vai cuidar da interação com usuário
@@ -148,12 +147,10 @@ namespace CompartilhamentoNoticias
             int porta,
             string nome,
             ComunicacaoSockets com,
-            CancellationTokenSource cancelaMulticast,
-            CancellationTokenSource cancelaUnicast
+            CancellationTokenSource cancelaMulticast
         )
         {
             cancelaMulticast.Cancel();
-            cancelaUnicast.Cancel();
             com.Desconecta(nome, multicastSocket, grupo, porta);
             multicastSocket.DropMulticastGroup(grupo);
             multicastSocket.Close();

@@ -8,5 +8,6 @@ namespace CompartilhamentoNoticias.Models
         public string EndPoint { get; set; }
         public byte[] ChavePublica { get; set; }
         public int IdAtualNoticas { get; set; }
+        public int NosConectados { get; set; }
     }
 }
