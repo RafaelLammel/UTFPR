@@ -81,17 +81,17 @@
 		numpy.where(Img > limiar, objeto, fundo)
 		```
 # flood fill
-	1. percorre a imagem, procurando um pixel não rotulado
-	1. quando encontrar, usa o pixel como "semente"
-	1 "inunda" a imagem, marcando com o mesmo rótulo a semente, seus vizinhos, os vizinhos dos vizinhos, etc(recursividade, pilha)
-	1. para quando não encontrar mais pixels não rotulados conectados a semente, volta ao passao *1*
+1. percorre a imagem, procurando um pixel não rotulado
+1. quando encontrar, usa o pixel como "semente"
+1. "inunda" a imagem, marcando com o mesmo rótulo a semente, seus vizinhos, os vizinhos dos vizinhos, etc(recursividade, pilha)
+1. para quando não encontrar mais pixels não rotulados conectados a semente, volta ao passao *1*
 
 # normalização
-	* remapeia as intensidades dos pixels para outra faixa de valores(tipo uma trasnformação linear)
-	* as vezes é chamada de alargamento de contraste(contrast stretching) ou de histograma(na verdade usa um histograma)
-	* acentua o contraste, mas não cria novos dados
-	* se a imagem original tinha n valores diferentes, a imagem normalizada tambem tem n valores diferentes
-	* para evitar problemas causados por extremos raros, podemos descartar uma porcentagem dos pixels com valores extremos
+* remapeia as intensidades dos pixels para outra faixa de valores(tipo uma trasnformação linear)
+* as vezes é chamada de alargamento de contraste(contrast stretching) ou de histograma(na verdade usa um histograma)
+* acentua o contraste, mas não cria novos dados
+* se a imagem original tinha n valores diferentes, a imagem normalizada tambem tem n valores diferentes
+* para evitar problemas causados por extremos raros, podemos descartar uma porcentagem dos pixels com valores extremos
 	
 ![formula](https://render.githubusercontent.com/render/math?math=\LARGE%20g(x,y)=%20\frac{f(x,y)-min_i}{max_i%20-%20min_i}(max_o%20-%20min_o%20)+%20min_o)
 
@@ -247,13 +247,45 @@ deslocando o contraste pra meio g(x,y) = (f(x,y)-0.5)*C +0.5+B
             * imagem ligeramente borrada
         * nitidez a direita 
             * imagem com detalhes realçados
+* nitidez a esuqerda(borrar)	
 	* efeito mais sutil que o filtro da media
 	* filtro gaussiano
-		* suavização gaussiana
+		* a distruibuição gaussiana é descrita por
+			* um valor medio( mi)
+			* um desvio padrão (sigma)
+		* suavização gaussiana(borra)
 		* filtro linear e espacial
 		* kernel com mesmo sigmas podem dar resultados diferentes
-		* separave
+		* separavel
         * o kernel se aproxima de uma distribuição gaussiana 2D alinhada aos eixos x e y
+		* o kernel é simétrico em cada eixo
+			* valores a esquerda do centro são iguais aos valores a direita do centro(mas espelhados)
+		* o kernel é discreto, os valores formam uma aproximação de uma curva gaussicana
+		 * é nromal usar valores, como +- 2sigma ou +- 1.5 sigma
+		 	* kernel maior: mais proximo de uma curva gaussiana real
+			* kernel menor: menos calculos
+		* box blur X gaussian blur
+			* o filtro gaussiano permite variações menores na quantidade de suavização
+			* o filtro gaussiano não cria "fantasmas"
+			* a interpretação do box bluer em uma linha, ele faz umas rampa
+			* a interpretação do gaussiano em uma linha, ele faz subida suave
+* nitidez a direita( realçar detalhes)
+	* realçar os detalhes também realça ruidos
+	* unsharp masking
+		* cria uma versão borrada da imagem original
+		* subtria a versão borrada da imagem original
+			* o que resta é uma imagem contendo os detalhes removidos
+		* verifica quais são os detalhes mais significativos
+			* onde a diferença é maior que um limiar
+		* soma os detalhes significativos a imagem original
+			* as difrenças normalmente tem valores pequenos, então multiplicamos elas por um (alfa) antes da soma
+	* unsharp masking: paremetros
+		* sigma do filtro gaussiano
+			* quanto maior, maiores são os "detalhes" realçados
+		* limiar que indica o que é um detalhe significativo
+			* quanto maior, mais "afiados" os detalhes precisam ser
+		* multiplicador \alfa aplicado a difrençã antes da soma
+			* quanto maior, mais realçados os detalhes são
 
 # [Distribuição Gaussiana](https://youtu.be/_RwOy023br0)
 * visão computacional
@@ -261,3 +293,30 @@ deslocando o contraste pra meio g(x,y) = (f(x,y)-0.5)*C +0.5+B
 * medir tamanho medio de um grão de arroz
 * a area entre \mi -\delta e \mi+\delta é 0.6827(68.27%)
 * utfpr CR normalizado (Z-score)
+
+# bloom
+* é um artefato(anomalia/erro) produzido por cameras reais
+* o brilho de regiões claras da imagem "vaza"
+* este efeito é criticado as vezes, porque:
+	* é um artefato
+	* não funciona como a visão humana
+	* o uso as vezes é considerado exagerado
+* geralmente é usado no pre-processamento
+* ideia geral
+	1. criamos uma mascara contendo as fontes de luz
+		* usando pos-processamento, se utiliza o "bright-pass"
+			* uma versão da imagem contendo apenas os pixels com intensidade ou luminancia mais alta
+	1. borramos a mascara, fazendo a luz "vazar" para os arredores
+		* a imagem "ideal" normanete é obtida borrando a imagem várias vezes, e somando as imagem borradas
+			* suavização gaussiana, dobrando o valor de \sigma a cada imagem
+			* otimização
+				* a filtragem gaussina pode ser um pouco cara, especialmente para valores grandes de \sigma
+				* seja uma imagem I com NxMpixels, borrada usando suavização gaussiana, com \sigma = x
+				* seja uma imagem J com N/2 x M/2 pixels, borrada usando suavização gaussiana, com \sigma = x/2
+				* I e J tem exatemente os mesmo dados(matematicamente)
+				* em vez de dobrar o valor de \sigma a cada imagem, usamos o mesmo valor de \sigma, mas para uma imagem com metade da altura e largura
+				* a imagem depois é reescalada para o tamanho original
+	1. "colamos" a máscara sobre a imagem original
+		* basta somar as duas imagens, precisa encontrar formas de evitar que o resultado fique muito "esotourado"
+		* a soma pode ser ponderada por fatores de correção
+			* g(x,y) = a*f(x,y)+B*mascara(x,y)
