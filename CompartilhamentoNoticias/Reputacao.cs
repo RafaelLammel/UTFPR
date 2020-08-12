@@ -16,7 +16,9 @@ namespace CompartilhamentoNoticias
             decimal somaReputacao = 0;
             noticias.ForEach(x =>
             {
-                somaReputacao += x.Reputacao;
+                if(x.Autor == noticia.Autor) { 
+                    somaReputacao += x.Reputacao; 
+                }
             });
             // Após o calculo, atribuimos a nova reputação ao autor
             autorNo.Reputacao = 1 - (somaReputacao / autorNo.QtdNoticias);
