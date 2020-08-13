@@ -67,7 +67,7 @@
 	0. rotulagem
 		* marcar cada blob com um identificador
 # binarização com limiar grobal
-	* é uma operação por pixel
+* é uma operação por pixel
 	```
 	para cade linha y
 		para cada linha x
@@ -76,10 +76,10 @@
 			senão
 				Img[y][x] = fundo
 	```
-	* em python
-		```python
-		numpy.where(Img > limiar, objeto, fundo)
-		```
+* em python
+	```
+	numpy.where(Img > limiar, objeto, fundo)
+	```
 # flood fill
 1. percorre a imagem, procurando um pixel não rotulado
 1. quando encontrar, usa o pixel como "semente"
@@ -201,7 +201,7 @@ deslocando o contraste pra meio g(x,y) = (f(x,y)-0.5)*C +0.5+B
 # matiz
 
 # filtro gausiano
-## [convolução](https://youtu.be/4G8F_fB71Rg)
+## convolução
 * filtragem no dominio espacial
 	* filtros com janelas deslizantes
 	* dominio espacial
@@ -232,7 +232,7 @@ deslocando o contraste pra meio g(x,y) = (f(x,y)-0.5)*C +0.5+B
 		* aprende filtros
 
 
-* [Distribuição Gaussiana](https://youtu.be/_RwOy023br0)
+* Distribuição Gaussiana
 	* visão computacional
 	* ruido de sensor de camera(desvio padrão)
 	* medir tamanho medio de um grão de arroz
@@ -287,7 +287,7 @@ deslocando o contraste pra meio g(x,y) = (f(x,y)-0.5)*C +0.5+B
 		* multiplicador \alfa aplicado a difrençã antes da soma
 			* quanto maior, mais realçados os detalhes são
 
-# [Distribuição Gaussiana](https://youtu.be/_RwOy023br0)
+# Distribuição Gaussiana
 * visão computacional
 * ruido de sensor de camera(desvio padrão)
 * medir tamanho medio de um grão de arroz
@@ -320,3 +320,5 @@ deslocando o contraste pra meio g(x,y) = (f(x,y)-0.5)*C +0.5+B
 		* basta somar as duas imagens, precisa encontrar formas de evitar que o resultado fique muito "esotourado"
 		* a soma pode ser ponderada por fatores de correção
 			* g(x,y) = a*f(x,y)+B*mascara(x,y)
+# redimensionamiento
+* o borrão é por causa de escalar para uma resolução maior e n por causa do redimensionamiento
