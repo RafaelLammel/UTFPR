@@ -18,7 +18,7 @@ def filtro_bright_pass(img):
     hls = cv2.cvtColor(img, cv2.COLOR_BGR2HLS)
     for y in range(len(hls[0])):
         for x in range(len(hls)):
-            if hls[x][y][1] <= 150 and hls[x][y][2] <= 230:
+            if hls[x][y][1] <= 130 and hls[x][y][2] <= 250:
                 hls[x, y] = [0, 0, 0]
     return cv2.cvtColor(hls, cv2.COLOR_HLS2BGR)
 
