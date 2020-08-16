@@ -8,7 +8,7 @@ LIMIAR = 135
 SIGMA = 2
 ALFA = 1
 BETA = 0.2
-ALGORITMO = 2
+ALGORITMO = 1
 
 LARGURA_JANELA = 5
 ALTURA_JANELA = 5
@@ -24,10 +24,16 @@ def filtro_bright_pass(img):
 
 
 def gaussian_blom(img):
-    blur = []
+    blur = [None] * 5
+    desvio_padrao = 10
+    tamanho_janela = desvio_padrao * 3
     for i in range(5):
-        blur[i] = cv2.GaussianBlur(img, (0, 0), SIGMA * i)
+        tamanho = int(tamanho_janela / 2) if int(tamanho_janela / 2) % 2 != 0 else int(tamanho_janela / 2) + 1
+        blur[i] = cv2.GaussianBlur(img, (tamanho, tamanho), desvio_padrao)
         cv2.imwrite(f"imagens/processadas/borrado - {i}.bmp", blur[i])
+        desvio_padrao = desvio_padrao * 2
+        tamanho_janela = desvio_padrao * 3
+    return mascara(img, blur)
 
 
 def boxblur_bloom(img):
@@ -47,7 +53,7 @@ def mascara(img, blur):
 
 def bloom(img):
     if ALGORITMO == 1:
-        gaussian_blom(img)
+        img = gaussian_blom(img)
     elif ALGORITMO == 2:
         img = boxblur_bloom(img)
     return img
