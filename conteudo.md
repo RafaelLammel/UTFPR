@@ -322,3 +322,94 @@ deslocando o contraste pra meio g(x,y) = (f(x,y)-0.5)*C +0.5+B
 			* g(x,y) = a*f(x,y)+B*mascara(x,y)
 # redimensionamiento
 * o borrão é por causa de escalar para uma resolução maior e n por causa do redimensionamiento
+
+# morfologia
+* tecnicas com base em teoria dos conjuntos
+	* conjuntos de pixels
+* operadores morfológicos básicos:
+	*filetros espaciais não-lineares
+* I (+) K
+	* dilatação
+	* engorda as regiões de pixels brancos 
+	* se tem algum vizinho setado, saida 1, senão 0
+		* em escala de cinza, recebe o maior valor sob o kernel
+* I (-) K
+	* erosão
+	* afina as regiões de pixels brancos
+	* se todos os vizinhos estão setados, saida 1, senão 0
+		* em escala de cinza, recebe o menor valor sob o kernel
+* todos os outros operadores morfológicos se baseiam na dilatação e na erosão
+* "engorda"/"afina" so é valido se o pixel central esta setado no kernel
+* retirar contornos
+	* contorno interno: I-(I(-)K)
+	* contorno externo: (I(+)K)-I
+* abertura
+	* erosão seguida de dilatação
+	* (I(-)K)(+)K
+	* remove ruidos(fora do blob)
+	* suaviza o formato do blob
+* fechamento
+	* dilatação seguida de erosão
+	* (I(+)K)(-)K
+	* fecha buracos(ruido dentro do blob)
+	* suaviza o formato do blob
+* filtro da mediana binario
+	* remove ruidos
+	* em imagens binárias, a mediana de uma região é igual ao valor que mais aparece na região
+	* somar os pixels em cada vizinhaça,e verificar se a soma é maior que o tamnho da região dividido por 2
+	* imagens integrais
+* kernel quadrado com pixel de interesse no centro
+	* fica igual aos filtros para minimos e maximos locais
+	* são separávereis
+# anti-aliasing
+* aliasing
+	* ocorre por as imagens são discretas
+	* efeito visuvel: a froteira entre certos objetos parece "serrilhada"
+* anti-aliasing
+	* tem como objetivo atenuar a aparencia serrilhada
+	* a cor dos pixels na fronteira entre dois objetos pode ser uma mistura das cores dos objetos
+* superamostragem(supersampling)
+	* SSAA
+	* renderizar a cena em uma resolução maior do que a final, reduzindo a imagem usando interpolação
+	* produz os melhores resultados visiveis
+	* alto custo computacional
+	* muito usada quando o resultado não é apresentado em tempo real
+* maior parte das técnicas envolve amostragem de pontos extras, no tempo ou no espaço
+* post-processing anti-aliasing
+	* tecnicas usada apos a renderização
+	* geram imagem ja com a resolução final
+	* são mais rapidas que outros tipos de tecnica
+1. ideia
+	* misturar os valor dos pixels
+	* borrar a imagem
+	* borra a imagem toda, suavizando todos os detalhes
+2. ideia
+	* borrar a iamgem apenas em algumas regiões
+	* bordas e gradientes
+* borda
+	* descontinuidades
+		* medir descontibuidades usando derivadas
+* gradiente
+	* conceito de derivada em amsi de uma dimensão
+	* um ponto de descontinuidade(borda) é aquele cujo gradiente tem um valor muito alto ou baixo
+	* medindo gradientes
+	*kernel
+		* horizontal {[-1,0,1]}
+			* como esta passando pela horizontal, reage melhor a bordas verticais
+		* vertical {[-1],[0],[1]}
+			* como esta passando pela vertical, reage melhor a bprdas horizontaos
+* filtros de sobel
+	* pode ser interessante dividir as saidas por 4,58, 287, para manter tudo no intervalo [-1,1]
+	* kernel 3x3 {[-1,0,1],[-2,0,2],[-1,0,1]}
+		* separaravel
+			* {[-1,0,1]} e {[1],[2],[1]}
+* magnetude e orientação
+	* os gradientes podem ser vistos como vetores(matematicos)
+	* magnitude = sqrt(Dx^2+Dy^2)
+		* valor maximo , sqrt(2)
+		* limiar
+			* oq tiver pra cima, considera borda
+	* orientação arctan(Dy/Dx)
+		* arctan2 para passar o quadrante
+* alternativas
+	* timar os maiores valores encontrados em cada canal
