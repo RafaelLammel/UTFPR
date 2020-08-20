@@ -4,35 +4,38 @@ import sys
 
 IMAGEM_CAMINHO = "imagens/"
 IMAGEM_ENTRADA = "imagem_02.bmp"
-LIMIAR = 135
-SIGMA = 2
+
+LIMIAR_LUM = 127
+
 ALFA = 1
 BETA = 0.2
-ALGORITMO = 1
 
 LARGURA_JANELA = 5
 ALTURA_JANELA = 5
 
+ALGORITMO = 2
+'''
+Algoritmo 1 = Filtro Gaussiana
+Algoritmo 2 = Filtro Box Blur
+'''
 
 def filtro_bright_pass(img):
     hls = cv2.cvtColor(img, cv2.COLOR_BGR2HLS)
     for y in range(len(hls[0])):
         for x in range(len(hls)):
-            if hls[x][y][1] <= 130 and hls[x][y][2] <= 250:
+            if hls[x][y][1] <= LIMIAR_LUM:
                 hls[x, y] = [0, 0, 0]
+    cv2.imwrite(f"imagens/processadas/mascara.bmp", cv2.cvtColor(hls, cv2.COLOR_HLS2BGR))
     return cv2.cvtColor(hls, cv2.COLOR_HLS2BGR)
 
 
 def gaussian_blom(img):
     blur = [None] * 5
     desvio_padrao = 10
-    tamanho_janela = desvio_padrao * 3
     for i in range(5):
-        tamanho = int(tamanho_janela / 2) if int(tamanho_janela / 2) % 2 != 0 else int(tamanho_janela / 2) + 1
-        blur[i] = cv2.GaussianBlur(img, (tamanho, tamanho), desvio_padrao)
+        blur[i] = cv2.GaussianBlur(img, (0, 0), desvio_padrao)
         cv2.imwrite(f"imagens/processadas/borrado - {i}.bmp", blur[i])
         desvio_padrao = desvio_padrao * 2
-        tamanho_janela = desvio_padrao * 3
     return mascara(img, blur)
 
 
@@ -48,7 +51,9 @@ def boxblur_bloom(img):
 
 def mascara(img, blur):
     # somatoria de todas as imagens na lista usando numpy
-    return np.array(blur).sum(axis=0)
+    # truncando valor em 255
+    aux = np.array(blur).sum(axis=0)
+    return np.where(aux > 255, 255, aux)
 
 
 def bloom(img):
