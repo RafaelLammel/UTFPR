@@ -413,3 +413,19 @@ deslocando o contraste pra meio g(x,y) = (f(x,y)-0.5)*C +0.5+B
 		* arctan2 para passar o quadrante
 * alternativas
 	* timar os maiores valores encontrados em cada canal
+# HDR
+* alcance dinamico
+	* em imagens com subesposição, algumas regióes podem aparecer totalmente sem contraste(ficam totalmente pretas)
+		* regiões muito escuras tentedem a ser muito contaminadas por ruído
+	* em imagens com superexposição, o sensor pode saturar em algumas regiões(fica totalmente brancas)
+		* a luz pode tb "vazar" e deixar outras regiões muito claras
+* informamente, significa ter mais do que 8bpp por canal
+
+* hardware
+	* sensores com alcance dinâmico maior
+	* saidas com 12 ou mais bpp por canal
+	* resultados "diretos"
+	* alto custo
+* software
+	* capturar imagens com diferentes graus de exposição
+	* combinar as imagens em uma saida com 12 ou mais bpp por canal
