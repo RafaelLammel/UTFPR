@@ -25,15 +25,19 @@ def main():
 
             # Realiza a limiarização adaptativa, devido as diferenças de iluminação que atrapalham
             # a limiarização global em algumas imagens
-            img_bin = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 41, -20.0)
+            img_bin = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 49, -20.0)
             cv2.imwrite(f"{PATH}/Processadas/{out_filename} - binarizada.bmp", img_bin)
 
             # Realiza a abertura, para remover ruídos da imagem binarizada
-            kernel = np.ones((7,7), np.uint8)
+            kernel = np.ones((5,5), np.uint8)
             img_open = cv2.morphologyEx(img_bin, cv2.MORPH_OPEN, kernel)
             cv2.imwrite(f"{PATH}/Processadas/{out_filename} - aberta.bmp", img_open)
             
-            # Salva a imagem com os arrozes circulados (TODO)
+            # Identifica e desenha contornos no arroz
+            contours, _ = cv2.findContours(img_open, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            cv2.drawContours(img_out, contours, -1, (0, 0, 255), 2)
+
+            # Salva a imagem com os arrozes circulados (WIP)
             cv2.imwrite(f"{PATH}/Processadas/{out_filename} - out.bmp", img_out)
 
 
