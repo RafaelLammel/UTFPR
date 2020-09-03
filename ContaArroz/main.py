@@ -10,16 +10,47 @@ def contagem_estatistica(estatisticas):
     # pega o indice do maior componente(no caso o fundo) e deleta ele
     indice = np.unravel_index(np.argmax(estatisticas, axis=None), estatisticas.shape)
     estatisticas = np.delete(estatisticas, indice[0], 0)
-
+    
+    # Faz a contagem, descartando arrozes que estão com área muito grande;
+    # Nessa primeira contagem, usamos a mediana de todos e temos uma mediana
+    # mais ou menos, pois ela é afetada pelos blobs maiores.
+    # Consideramos só aqueles que estão próximos ou menores da mediana,
+    # ou seja, há uma grande chance desses arrozes na primeira contagem serem apenas 1 e 
+    # não 2 ou mais grudados
+    # (Menores pois há grãos bem pequenos nas imagens)
     contador = 0
     mediana = np.median(estatisticas, axis=0)
-    media = np.mean(estatisticas, axis=0)
+    grudados = []
+    grudados_mediana = []
     for i in range(len(estatisticas)):
-        contador += 1
-        if estatisticas[i][4] > mediana[4]:
-            total = estatisticas[i][4] / (mediana[4])
-            if total >= 2:
-                contador += int(total)
+        # Se for próximo ou menor do que o valor da mediana, adicionamos na contagem e guardamos em 
+        # um grupo. Se não for, é muito possível que seja um blob com vários grãos grudados.
+        # Guardamos em outro grupo.
+        total = round(estatisticas[i][4] / mediana[4])
+        if total <= 1:
+            contador += 1
+            grudados_mediana.append(estatisticas[i])
+        else:
+            grudados.append(estatisticas[i])
+    
+    # Nessa segunda contagem, temos dois grupos: os grãos que já foram contados
+    # (muito possivelmente são apenas 1 grão) e os grãos que ainda não foram
+    # (muito possivelmente são 2 ou mais grudados). Dessa forma, calculamos uma nova mediana,
+    # porém utilizando apenas os blobs que tem maior possibilidade de ser apenas um grão, os 
+    # já contados e assim temos uma mediana um pouco mais precisa, nos dando a área de um arroz 
+    # um pouco mais precisa.
+    if len(grudados) > 0:
+        nova_mediana = np.median(grudados_mediana, axis=0)
+        for i in range(len(grudados)):
+            # Aqui simplesmente pegamos o quantas vezes maior aproximdamente é aquele blob
+            # da mediana e somamos esse valor no contador de arroz.
+            # Debuggando, foi notado que o valor de "total" para alguns blobs foi arredondado para baixo
+            # por muito pouco (Ex.: X.49, e arredondava para baixo). Como esse método da mediana
+            # não da certeza sobre a area de um grão, ele não é tão preciso, portanto adicionamos essa 
+            # constante pequena, só pra jogar esses que ficam muito próximos do meio pra cima.
+            total = round((grudados[i][4] / nova_mediana[4]) + 0.15)
+            contador += total
+
     return contador
 
 
@@ -47,6 +78,7 @@ def main():
             kernel = np.ones((5, 5), np.uint8)
             img_open = cv2.morphologyEx(img_bin, cv2.MORPH_OPEN, kernel)
             cv2.imwrite(f"{PATH}/Processadas/{out_filename} - aberta.bmp", img_open)
+
             # marca os componentes conexos, retorna:
             # * quantiade de rotulos
             # * imagens rotulada
@@ -58,15 +90,6 @@ def main():
             quantidade = contagem_estatistica(estatisticas)
             porcetagem = round((100 * quantidade) / int(filename[:-4]), 1)
             print(f"{filename} -> {quantidade} componentes -> {porcetagem}% de acerto")
-
-            # Identifica e desenha contornos no arroz
-            contours, _ = cv2.findContours(
-                img_open, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
-            )
-            cv2.drawContours(img_out, contours, -1, (0, 0, 255), 2)
-
-            # Salva a imagem com os arrozes circulados (WIP)
-            cv2.imwrite(f"{PATH}/Processadas/{out_filename} - out.bmp", img_out)
 
 
 if __name__ == "__main__":
