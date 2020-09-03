@@ -429,3 +429,49 @@ deslocando o contraste pra meio g(x,y) = (f(x,y)-0.5)*C +0.5+B
 * software
 	* capturar imagens com diferentes graus de exposição
 	* combinar as imagens em uma saida com 12 ou mais bpp por canal
+# detecção de bordas
+* borda:
+	* descontinuidade na intesensidade
+	* medir descontinuidade com gradientes
+* limiarização com base na magnitede dos gradientes
+	* os gradientes podem ficar forte em varios pixels vizinhos, fazendo as bordas aparecerem muito "grossas"
+	* afinar borda
+		* remover iterativamente pixels brancos, evitando:
+			* remover "terminações" de linhas
+			* separar um componente conexo
+	* zhang-suen
+		* remover a cada iteração pixels setados que tem varios outros pixels setados como vizinhos
+	* pode ocorrer de bordas perto de outras bordas virarem uma borda só
+* as bordas no gradiente
+	* as bordas estão nas posições que possuem maginitude alta e em maximos locais
+	* usa orientação para encontrar a direção da borda
+	* borda verticais: orientação proxima de 0° ou 180°
+	* borda horizontais: orientação proxima de 90° ou 270°
+	
+* detector de bordas de canny
+	1. computa a magnitude e orientação dos gradientes
+	1. quantiza a orientação em 4 direções
+		* (quase) horizontal
+		* (quase) vertical
+		* (quase) diagonal com a direita acima
+		* (quase) diagonal com a esquerda acima
+	1. elimina ponstos que não são maximos locais na direção do gradiente
+	1. limiarização com histerese
+* limiarização com histerese
+	* 2 limiares
+	* magnitude acidma do limiar superior -> é borda
+	* magnitude acima do limuar inferior -> não é borda
+	* magnitude entre os dois limiares
+		* borda, se houver um caminho conectando o pixel a outro pixel de borda
+			* vizinho 8, inundação
+	* evita bordas quebradas
+* imagens coloridas
+	* converti pra escala de cinza
+	* computar o gradiente para os 3 canais, selecionar aquele que tiver a maior magnitude
+	* detectar bordas nos 3 canais independentemente, considerar a união das 3 imanges
+* redução de ruidas
+	* filtro da media
+		* pode duplicar bordas,e podem modificar os gradientes
+	* filtro gaussiano
+		* bom
+
