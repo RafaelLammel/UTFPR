@@ -24,11 +24,18 @@ public class Cliente {
         do {
             System.out.println("Selcione uma opção:");
             System.out.println("1 - Registrar interesse em uma ação");
-
+            System.out.println("2 - Obter lista de cotações corrente");
             opcao = in.nextLine();
             switch(opcao) {
                 case "1":
                     referenciaServidor.registrarInteresse(1, referenciaCliente);
+                    break;
+                case "2":
+                    System.out.println("\n========LISTA DE COTAÇÕES========");
+                    referenciaServidor.listarCotacoes().forEach(x -> {
+                        System.out.println(x.getPreco() + " ---- " + x.getNome());
+                    });
+                    System.out.println();
                     break;
             }
 

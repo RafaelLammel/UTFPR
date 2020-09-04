@@ -12,11 +12,6 @@ public class Acao implements Serializable {
     private String nome;
     private float preco;
 
-    public Acao(String nome, float preco) {
-        this.nome = nome;
-        this.preco = preco;
-    }
-
     public String getNome() {
         return nome;
     }
