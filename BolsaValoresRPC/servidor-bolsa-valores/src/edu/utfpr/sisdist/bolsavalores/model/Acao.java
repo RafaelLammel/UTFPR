@@ -12,7 +12,8 @@ public class Acao implements Serializable {
     private String nome;
     private float preco;
 
-    public Acao(String nome, float preco) {
+    public Acao(int id, String nome, float preco) {
+        this.id = id;
         this.nome = nome;
         this.preco = preco;
     }

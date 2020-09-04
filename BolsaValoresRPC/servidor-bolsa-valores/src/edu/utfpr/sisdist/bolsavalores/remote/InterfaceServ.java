@@ -8,6 +8,8 @@ import edu.utfpr.sisdist.bolsavalores.model.Acao;
 
 public interface InterfaceServ extends Remote {
 
+    void adicionaCliente(InterfaceCli interfaceCli) throws RemoteException;
+
     void registrarInteresse(int id, InterfaceCli interfaceCli) throws RemoteException;
 
     List<Acao> listarCotacoes() throws RemoteException;

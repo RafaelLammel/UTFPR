@@ -7,34 +7,45 @@ import java.util.List;
 import java.util.Optional;
 
 import edu.utfpr.sisdist.bolsavalores.model.Acao;
-import edu.utfpr.sisdist.bolsavalores.model.Interesse;
+import edu.utfpr.sisdist.bolsavalores.model.Cliente;
 import edu.utfpr.sisdist.bolsavalores.remote.InterfaceCli;
 import edu.utfpr.sisdist.bolsavalores.remote.InterfaceServ;
 
 public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
 
-    private List<Interesse> interesses;
     private List<Acao> cotacoes;
+    private List<Cliente> clientes;
 
     public ServImpl() throws RemoteException {
-        interesses = new ArrayList<>();
         cotacoes = new ArrayList<>();
-        cotacoes.add(new Acao("Google", 1000));
-        cotacoes.add(new Acao("Microsoft", 5000));
+        clientes = new ArrayList<>();
+        cotacoes.add(new Acao(1, "Google", 1000));
+        cotacoes.add(new Acao(2, "Microsoft", 5000));
+    }
+
+    @Override
+    public void adicionaCliente(InterfaceCli interfaceCli) throws RemoteException{
+        clientes.add(new Cliente(interfaceCli));
     }
 
     @Override
     public void registrarInteresse(int id, InterfaceCli interfaceCli) throws RemoteException {
-        // Verifica se esse cliente já não registrou interesse
-        Optional<Interesse> interesse = interesses.stream()
-            .filter(x -> x.getIdAcao() == id && x.getInterfaceCli().equals(interfaceCli))
-            .findFirst();
+        Optional<Acao> acao = cotacoes.stream()
+            .filter(x -> x.getId() == id).findFirst();
         
-        // Se não adiciona na lista
-        if(!interesse.isPresent())
-            interesses.add(new Interesse(id, interfaceCli));
-        
-        System.out.println("Interesse registrado!");
+        if(acao.isPresent()) {
+            Optional<Cliente> cliente = clientes.stream()
+                .filter(x -> x.getinterfaceCli().equals(interfaceCli)).findFirst();
+            if(cliente.isPresent()) {
+                cliente.get().getInteresses().add(id);
+            }
+            else {
+                System.out.println("Cliente não encontrado!");
+            }
+        }
+        else {
+            System.out.println("Ação não está presente na lista de cotações!");
+        }
     }
 
     @Override

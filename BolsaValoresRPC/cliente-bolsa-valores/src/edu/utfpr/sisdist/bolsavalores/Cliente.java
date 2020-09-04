@@ -17,6 +17,8 @@ public class Cliente {
         InterfaceServ referenciaServidor = (InterfaceServ)referenciaServicoNomes.lookup("BolsaValores");
         InterfaceCli referenciaCliente = new CliImpl(referenciaServidor);
 
+        referenciaServidor.adicionaCliente(referenciaCliente);
+
         System.out.println("Bem vindo a bolsa de valores!");
         
         String opcao = "";
@@ -28,7 +30,9 @@ public class Cliente {
             opcao = in.nextLine();
             switch(opcao) {
                 case "1":
-                    referenciaServidor.registrarInteresse(1, referenciaCliente);
+                    System.out.println("digite um código de ação");
+                    int id = Integer.parseInt(in.nextLine());
+                    referenciaServidor.registrarInteresse(id, referenciaCliente);
                     break;
                 case "2":
                     System.out.println("\n========LISTA DE COTAÇÕES========");
