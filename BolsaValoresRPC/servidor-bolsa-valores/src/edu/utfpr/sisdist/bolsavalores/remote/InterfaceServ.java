@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 import edu.utfpr.sisdist.bolsavalores.model.Acao;
+import edu.utfpr.sisdist.bolsavalores.model.Transacao;
 
 public interface InterfaceServ extends Remote {
 
@@ -13,5 +14,9 @@ public interface InterfaceServ extends Remote {
     void registrarInteresse(int id, InterfaceCli interfaceCli) throws RemoteException;
 
     List<Acao> listarCotacoes() throws RemoteException;
+
+    void compra(Transacao compra);
+
+    void venda(Transacao venda);
 
 }

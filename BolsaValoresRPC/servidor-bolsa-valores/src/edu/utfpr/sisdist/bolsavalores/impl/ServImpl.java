@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import edu.utfpr.sisdist.bolsavalores.model.Acao;
 import edu.utfpr.sisdist.bolsavalores.model.Cliente;
+import edu.utfpr.sisdist.bolsavalores.model.Transacao;
 import edu.utfpr.sisdist.bolsavalores.remote.InterfaceCli;
 import edu.utfpr.sisdist.bolsavalores.remote.InterfaceServ;
 
@@ -15,10 +16,14 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
 
     private List<Acao> cotacoes;
     private List<Cliente> clientes;
+    private List<Transacao> compras;
+    private List<Transacao> vendas;
 
     public ServImpl() throws RemoteException {
         cotacoes = new ArrayList<>();
         clientes = new ArrayList<>();
+        compras = new ArrayList<>();
+        vendas = new ArrayList<>();
         cotacoes.add(new Acao(1, "Google", 1000));
         cotacoes.add(new Acao(2, "Microsoft", 5000));
     }
@@ -52,5 +57,34 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
     public List<Acao> listarCotacoes() {
         return cotacoes;
     }
+
+    @Override
+    public void compra(Transacao compra){
+        compras.add(compra);
+        verificaTransacoes();
+    }
+
+    @Override
+    public void venda(Transacao venda){
+        vendas.add(venda);
+        verificaTransacoes();
+    }
+
+    public void verificaTransacoes(){
+        for(Transacao compra : compras){
+            for(Transacao venda : vendas){
+                if(compra.getId() == venda.getId()){
+                    if(compra.getQtd() > venda.getQtd()){
+                        Optional<Cliente> cliente = clientes.stream()
+                            .filter(x -> x.getinterfaceCli().equals(compra.getReferenciaCliente())).findFirst();
+                        if(cliente.isPresent()){
+                            cliente.carteira.add()
+                        }
+                    }
+                }
+               
+        }
+    }
+
     
 }

@@ -11,11 +11,13 @@ public class Acao implements Serializable {
     private int id;
     private String nome;
     private float preco;
+    private int qtd;
 
-    public Acao(int id, String nome, float preco) {
+    public Acao(int id, String nome, float preco, int qtd) {
         this.id = id;
         this.nome = nome;
         this.preco = preco;
+        this.qtd = qtd;
     }
 
     public String getNome() {
@@ -42,4 +44,8 @@ public class Acao implements Serializable {
         return id;
     }
 
+    public int getQtd() {
+        return this.qtd;
+    }
+    
 }
