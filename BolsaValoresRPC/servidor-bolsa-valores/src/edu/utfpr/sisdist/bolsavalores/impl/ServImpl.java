@@ -49,7 +49,7 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
     }
 
     @Override
-    public void registrarInteresse(int id, InterfaceCli interfaceCli) throws RemoteException {
+    public void registrarCotacao(int id, InterfaceCli interfaceCli) throws RemoteException {
         Optional<Cliente> cliente = clientes.stream()
             .filter(x -> x.getinterfaceCli().equals(interfaceCli)).findFirst();
         if(cliente.isPresent()) {
@@ -58,6 +58,33 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
         else {
             System.out.println("Cliente não encontrado!");
         }
+    }
+
+    @Override
+    public void removeCotacao(int id, InterfaceCli interfaceCli) throws RemoteException {
+        Optional<Cliente> cliente = this.clientes.stream()
+            .filter(x -> x.getinterfaceCli().equals(interfaceCli)).findFirst();
+        if(cliente.isPresent()) {
+            cliente.get().getCotacoes().remove(Integer.valueOf(id));
+        }
+        else {
+            System.out.println("Cliente não encontrado!");
+        }
+    }
+
+    @Override
+    public Map<Integer, Float> listaCotacao(InterfaceCli interfaceCli) throws RemoteException {
+        Optional<Cliente> cliente = this.clientes.stream()
+            .filter(x -> x.getinterfaceCli().equals(interfaceCli)).findFirst();
+        if(cliente.isPresent()) {
+            Map<Integer, Float> c = new HashMap<Integer, Float>();
+            for(Integer acao : cliente.get().getCotacoes()) {
+                c.put(acao, acoes.get(acao));
+            }
+            return c;
+        }
+        System.out.println("Cliente não encontrado!");
+        return null;
     }
 
     @Override
