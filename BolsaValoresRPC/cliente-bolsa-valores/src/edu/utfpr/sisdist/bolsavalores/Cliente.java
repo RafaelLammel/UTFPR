@@ -20,13 +20,15 @@ public class Cliente {
         referenciaServidor.adicionaCliente(referenciaCliente);
 
         System.out.println("Bem vindo a bolsa de valores!");
-        
+
         String opcao = "";
         Scanner in = new Scanner(System.in);
         do {
             System.out.println("Selcione uma opção:");
             System.out.println("1 - Registrar interesse em uma ação");
             System.out.println("2 - Obter lista de cotações corrente");
+            System.out.println("3 - Colocar uma ação para vender");
+            System.out.println("4 - Fazer um pedido de compra");
             opcao = in.nextLine();
             switch(opcao) {
                 case "1":
@@ -35,11 +37,22 @@ public class Cliente {
                     referenciaServidor.registrarInteresse(id, referenciaCliente);
                     break;
                 case "2":
-                    System.out.println("\n========LISTA DE COTAÇÕES========");
-                    referenciaServidor.listarCotacoes().forEach(x -> {
-                        System.out.println(x.getPreco() + " ---- " + x.getNome());
+                    System.out.println("\n========AÇÕES NA CARTEIRA========");
+                    referenciaServidor.getCarteira(referenciaCliente).forEach(x -> {
+                        System.out.println(x.getId() + " ---- " + x.getQtd());
                     });
                     System.out.println();
+                    break;
+                case "3":
+                    //System.out.println("digite o código da ação para ser vendida:");
+                    //int id = Integer.parseInt(in.nextLine());
+                    
+                    break;
+                case "4":
+                    /*System.out.println("digite o código da ação:");
+                    int id = Integer.parseInt(in.nextLine());
+                    System.out.println("Digite o valor:");
+                    float valor = Float.parseFloat(in.nextLine());*/
                     break;
             }
 

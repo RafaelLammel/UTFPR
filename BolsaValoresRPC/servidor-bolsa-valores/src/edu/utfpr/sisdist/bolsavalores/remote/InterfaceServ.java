@@ -13,10 +13,10 @@ public interface InterfaceServ extends Remote {
 
     void registrarInteresse(int id, InterfaceCli interfaceCli) throws RemoteException;
 
-    List<Acao> listarCotacoes() throws RemoteException;
+    public List<Acao> getCarteira(InterfaceCli interfaceCli) throws RemoteException;
 
-    void compra(Transacao compra);
+    void compra(Transacao compra) throws RemoteException;
 
-    void venda(Transacao venda);
+    void venda(Transacao venda) throws RemoteException;
 
 }

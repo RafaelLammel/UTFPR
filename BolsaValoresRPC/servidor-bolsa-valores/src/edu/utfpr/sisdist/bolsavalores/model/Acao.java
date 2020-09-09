@@ -10,13 +10,10 @@ public class Acao implements Serializable {
     private static final long serialVersionUID = 1L;
     private int id;
     private String nome;
-    private float preco;
     private int qtd;
 
-    public Acao(int id, String nome, float preco, int qtd) {
+    public Acao(int id, int qtd) {
         this.id = id;
-        this.nome = nome;
-        this.preco = preco;
         this.qtd = qtd;
     }
 
@@ -32,20 +29,16 @@ public class Acao implements Serializable {
         this.nome = nome;
     }
 
-    public float getPreco() {
-        return preco;
-    }
-
-    public void setPreco(float preco) {
-        this.preco = preco;
-    }
-
     public int getId() {
         return id;
     }
 
     public int getQtd() {
         return this.qtd;
+    }
+
+    public void setQtd(int qtd) {
+        this.qtd = qtd;
     }
     
 }

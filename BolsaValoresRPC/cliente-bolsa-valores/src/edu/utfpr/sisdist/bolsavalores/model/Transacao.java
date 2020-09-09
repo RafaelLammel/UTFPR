@@ -1,10 +1,9 @@
 package edu.utfpr.sisdist.bolsavalores.model;
-
 import java.io.Serializable;
 
 import edu.utfpr.sisdist.bolsavalores.remote.InterfaceCli;
 
-public class Transacao implements Serializable{
+public class Transacao implements Serializable {
 
     /**
      *
