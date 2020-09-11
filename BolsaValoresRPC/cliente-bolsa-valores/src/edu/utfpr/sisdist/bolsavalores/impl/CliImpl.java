@@ -13,5 +13,10 @@ public class CliImpl extends UnicastRemoteObject implements InterfaceCli {
     public CliImpl(InterfaceServ interfaceServ) throws RemoteException {
         this.interfaceServ = interfaceServ;
     }
+
+    @Override
+    public void notificarEventos(String msg) throws RemoteException {
+        System.out.println(msg);
+    }
     
 }

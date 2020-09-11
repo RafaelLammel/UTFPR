@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import edu.utfpr.sisdist.bolsavalores.remote.InterfaceCli;
 
-public class Transacao implements Serializable{
+public class Transacao implements Serializable {
 
     /**
      *
@@ -13,13 +13,23 @@ public class Transacao implements Serializable{
     private int id;
     private float preco;
     private int qtd;
+    private long delay;
     InterfaceCli referenciaCliente;
 
-    public Transacao(int id, float preco, int qtd, InterfaceCli referenciaCliente){
+    public Transacao(int id, float preco, int qtd, long delay, InterfaceCli referenciaCliente) {
         this.id = id;
         this.preco = preco;
         this.qtd = qtd;
+        this.delay = delay;
         this.referenciaCliente = referenciaCliente;
+    }
+
+    public long getDelay() {
+        return delay;
+    }
+
+    public void setDelay(long delay) {
+        this.delay = delay;
     }
 
     public int getId() {

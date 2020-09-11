@@ -40,6 +40,7 @@ public class Cliente {
             int id;
             float valor;
             int qtd;
+            long prazo;
             switch(opcao) {
                 case "1":
                     System.out.println("Digite um código de ação: ");
@@ -72,7 +73,9 @@ public class Cliente {
                     valor = Float.parseFloat(in.nextLine());
                     System.out.println("digite a quantidade para a venda:");
                     qtd = Integer.parseInt(in.nextLine());
-                    referenciaServidor.venda(new Transacao(id, valor, qtd, referenciaCliente));
+                    System.out.println("digite o prazo da oferta:");
+                    prazo = Long.parseLong(in.nextLine());
+                    referenciaServidor.venda(new Transacao(id, valor, qtd, prazo, referenciaCliente));
                     break;
                 case "6":
                     System.out.println("digite o código da ação:");
@@ -81,7 +84,9 @@ public class Cliente {
                     valor = Float.parseFloat(in.nextLine());
                     System.out.println("digite a quantidade para a venda:");
                     qtd = Integer.parseInt(in.nextLine());
-                    referenciaServidor.compra(new Transacao(id, valor, qtd, referenciaCliente));
+                    System.out.println("digite o prazo da oferta:");
+                    prazo = Long.parseLong(in.nextLine());
+                    referenciaServidor.compra(new Transacao(id, valor, qtd, prazo, referenciaCliente));
                     break;
             }
 

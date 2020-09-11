@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import edu.utfpr.sisdist.bolsavalores.model.*;
 import edu.utfpr.sisdist.bolsavalores.remote.*;
@@ -89,7 +91,7 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
 
     @Override
     public void compra(Transacao compra) throws RemoteException{
-        compras.add(compra);
+        this.compras.add(compra);
         for(Transacao venda : this.vendas) {
             if(compra.getReferenciaCliente() != venda.getReferenciaCliente() &&
                 compra.getPreco() == venda.getPreco() &&
@@ -100,27 +102,74 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
                     if(comprador.isPresent() && vendedor.isPresent()) {
                         comprador.get().addAcao(compra.getId(), compra.getQtd());
                         vendedor.get().removeAcao(compra.getId(), compra.getQtd());
+                        comprador.get().getinterfaceCli().notificarEventos("Compra da ação " + compra.getId() + " efetuada com sucesso!");
+                        vendedor.get().getinterfaceCli().notificarEventos("Venda da ação " + venda.getId() + " efetuada com sucesso!");
+                        this.compras.remove(compra);
+                        this.vendas.remove(venda);
+                        return;
                     }
+            }
+        }
+        TimerTask task = new TimerTask() {
+            public void run() {
+                System.out.println("entrou no run de compra\n");
+                for(Transacao aux : compras){
+                    System.out.println("\n" + aux.getId() + ":" + aux.getPreco());
+                }
+                compras.remove(compra);
+            }
+        };
+        Timer timer = new Timer("Timer");
+        timer.schedule(task, compra.getDelay());
+    }
+
+    @Override
+    public void venda(Transacao venda) throws RemoteException {
+        Optional<Cliente> vendedor = this.clientes.stream().filter(x -> x.getinterfaceCli().equals(venda.getReferenciaCliente())).findFirst();
+        if(vendedor.isPresent()) {
+            Optional<Acao> acao = vendedor.get().getCarteira().stream().filter(x -> x.getId() == venda.getId()).findFirst();
+            if(acao.isPresent()) {
+                if(acao.get().getQtd() >= venda.getQtd()) { 
+                    this.vendas.add(venda);
+                    for(Transacao compra : this.compras) {
+                        if(compra.getReferenciaCliente() != venda.getReferenciaCliente() &&
+                           compra.getPreco() == venda.getPreco() &&
+                           compra.getId() == venda.getId() &&
+                           compra.getQtd() == venda.getQtd()) {
+                                Optional<Cliente> comprador = this.clientes.stream().filter(x -> x.getinterfaceCli().equals(compra.getReferenciaCliente())).findFirst();
+                                if(comprador.isPresent()) {
+                                    comprador.get().addAcao(compra.getId(), compra.getQtd());
+                                    vendedor.get().removeAcao(compra.getId(), compra.getQtd());
+                                    comprador.get().getinterfaceCli().notificarEventos("Compra da ação " + compra.getId() + " efetuada com sucesso!");
+                                    vendedor.get().getinterfaceCli().notificarEventos("Venda da ação " + venda.getId() + " efetuada com sucesso!");
+                                    this.compras.remove(compra);
+                                    this.vendas.remove(venda);
+                                    return;
+                                }
+                        }
+                    }
+                    TimerTask task = new TimerTask() {
+                        public void run() {
+                            System.out.println("entrou no run de venda\n");
+                            for(Transacao aux : vendas){
+                                System.out.println("\n" + aux.getId() + ":" + aux.getPreco());
+                            }
+                            vendas.remove(venda);
+                        }
+                    };
+                    Timer timer = new Timer("Timer");
+                    timer.schedule(task, venda.getDelay());
+                }
             }
         }
     }
 
-    @Override
-    public void venda(Transacao venda) throws RemoteException{
-        vendas.add(venda);
-        for(Transacao compra : this.compras) {
-            if(compra.getReferenciaCliente() != venda.getReferenciaCliente() &&
-               compra.getPreco() == venda.getPreco() &&
-               compra.getId() == venda.getId() &&
-               compra.getQtd() == venda.getQtd()) {
-                    Optional<Cliente> comprador = this.clientes.stream().filter(x -> x.getinterfaceCli().equals(compra.getReferenciaCliente())).findFirst();
-                    Optional<Cliente> vendedor = this.clientes.stream().filter(x -> x.getinterfaceCli().equals(venda.getReferenciaCliente())).findFirst();
-                    if(comprador.isPresent() && vendedor.isPresent()) {
-                        comprador.get().addAcao(compra.getId(), compra.getQtd());
-                        vendedor.get().removeAcao(compra.getId(), compra.getQtd());
-                    }
-            }
-        }
+    public void atualizaValor(){
+        int max = 50;
+        int min = -50;
+        Integer id = gerador.nextInt(acoes.size());
+        this.acoes.put(id, acoes.get(id) + ((float)gerador.nextInt(max-min) + min));
+        
     }
 
 }
