@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.utfpr.sisdist.bolsavalores.model.Acao;
+import edu.utfpr.sisdist.bolsavalores.model.Interesse;
 import edu.utfpr.sisdist.bolsavalores.model.Transacao;
 
 public interface InterfaceServ extends Remote {
@@ -23,5 +24,9 @@ public interface InterfaceServ extends Remote {
     void compra(Transacao compra) throws RemoteException;
 
     void venda(Transacao venda) throws RemoteException;
+
+    void registraInteresse(int id, float teto, float piso, InterfaceCli interfaceCli) throws RemoteException;
+
+    List<Interesse> listaInteresses(InterfaceCli interfaceCli) throws RemoteException;
 
 }

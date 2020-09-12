@@ -11,14 +11,16 @@ public class Cliente {
     private InterfaceCli interfaceCli;
     private List<Acao> carteira;
     private List<Integer> cotacoes;
+    private List<Interesse> interesses;
 
     public Cliente(InterfaceCli interfaceCli) {
         this.interfaceCli = interfaceCli;
-        carteira = new ArrayList<>();
-        cotacoes = new ArrayList<>();
+        this.carteira = new ArrayList<>();
+        this.cotacoes = new ArrayList<>();
+        this.interesses = new ArrayList<>();
     }
     
-    public InterfaceCli getinterfaceCli() {
+    public InterfaceCli getInterfaceCli() {
         return this.interfaceCli;
     }
 
@@ -36,6 +38,10 @@ public class Cliente {
 
     public List<Acao> getCarteira() {
         return this.carteira;
+    }
+
+    public List<Interesse> getInteresses() {
+        return this.interesses;
     }
 
     public void addAcao(int id, int qtd) {
@@ -58,5 +64,6 @@ public class Cliente {
             acao.get().setQtd(novaQtd);
         }
     }
+
 
 }

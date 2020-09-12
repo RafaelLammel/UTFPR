@@ -41,6 +41,8 @@ public class Cliente {
             float valor;
             int qtd;
             long prazo;
+            float teto;
+            float piso;
             switch(opcao) {
                 case "1":
                     System.out.println("Digite um código de ação: ");
@@ -88,6 +90,19 @@ public class Cliente {
                     prazo = Long.parseLong(in.nextLine());
                     referenciaServidor.compra(new Transacao(id, valor, qtd, prazo, referenciaCliente));
                     break;
+                case "7":
+                    System.out.println("digite o código da ação: ");
+                    id = Integer.parseInt(in.nextLine());
+                    System.out.println("digite o valor de teto: ");
+                    teto = Float.parseFloat(in.nextLine());
+                    System.out.println("digite o valor de piso: ");
+                    piso = Float.parseFloat(in.nextLine());
+                    referenciaServidor.registraInteresse(id, teto, piso, referenciaCliente);
+                case "9":
+                    System.out.println("\n========LISTA DE INTERESSES========");
+                    referenciaServidor.listaInteresses(referenciaCliente).forEach(x -> {
+                        System.out.println(x.getId() + " -- " + x.getTeto() + " -- " + x.getPiso());
+                    });
             }
 
         } while(opcao != "-1");
