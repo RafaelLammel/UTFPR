@@ -4,7 +4,17 @@ import numpy as np
 
 PATH = "img"
 BG = "bg.bmp"
-INPUT_IMAGES = ["0.bmp", "1.bmp", "2.bmp", "3.bmp", "4.bmp", "5.bmp", "6.bmp", "7.bmp", "8.bmp"]
+INPUT_IMAGES = [
+    "0.bmp",
+    "1.bmp",
+    "2.bmp",
+    "3.bmp",
+    "4.bmp",
+    "5.bmp",
+    "6.bmp",
+    "7.bmp",
+    "8.bmp",
+]
 
 
 def main():
@@ -18,7 +28,7 @@ def main():
 
             # Convertendo imagem para HLS e criando uma máscara
             hls = cv2.cvtColor(img, cv2.COLOR_BGR2HLS)
-            mask = cv2.inRange(hls, (40, 51, 77), (70, 179, 255))
+            mask = cv2.inRange(hls, (50, 50, 61), (70, 179, 255))
 
             # Usando a máscara, remove o fundo verde da imagem
             img_masked = np.copy(img)
@@ -28,7 +38,7 @@ def main():
             bg_crop = cv2.resize(bg, (len(img[0]), len(img)))
             bg_crop[mask == 0] = [0, 0, 0]
 
-            # Juntando imagem sem 
+            # Juntando imagem sem
             img_out = img_masked + bg_crop
             cv2.imwrite(f"img/res/{out_filename} - final.bmp", img_out)
 
