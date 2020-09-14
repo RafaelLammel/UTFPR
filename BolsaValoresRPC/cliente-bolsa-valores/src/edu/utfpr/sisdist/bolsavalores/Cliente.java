@@ -43,16 +43,23 @@ public class Cliente {
             long prazo;
             float teto;
             float piso;
+            String msg = "";
             switch(opcao) {
                 case "1":
                     System.out.println("Digite um código de ação: ");
                     id = Integer.parseInt(in.nextLine());
-                    referenciaServidor.registrarCotacao(id, referenciaCliente);
+                    msg = referenciaServidor.registrarCotacao(id, referenciaCliente);
+                    if (!msg.isEmpty()) {
+                        System.out.println(msg);
+                    }
                     break;
                 case "2":
                     System.out.println("Digite o código que quer eliminar: ");
                     id = Integer.parseInt(in.nextLine());
-                    referenciaServidor.removeCotacao(id, referenciaCliente);
+                    msg =referenciaServidor.removeCotacao(id, referenciaCliente);
+                    if (!msg.isEmpty()) {
+                        System.out.println(msg);
+                    }
                     break;
                 case "3":
                     System.out.println("\n========AÇÕES NA COTAÇÃO========");
@@ -77,7 +84,9 @@ public class Cliente {
                     qtd = Integer.parseInt(in.nextLine());
                     System.out.println("digite o prazo da oferta:");
                     prazo = Long.parseLong(in.nextLine());
-                    referenciaServidor.venda(new Transacao(id, valor, qtd, prazo, referenciaCliente));
+                    msg = referenciaServidor.venda(new Transacao(id, valor, qtd, prazo, referenciaCliente));
+                    if(!msg.isEmpty())
+                        System.out.println(msg);
                     break;
                 case "6":
                     System.out.println("digite o código da ação:");

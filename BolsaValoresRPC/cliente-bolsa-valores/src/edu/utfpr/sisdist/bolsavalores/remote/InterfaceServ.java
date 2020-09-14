@@ -13,9 +13,9 @@ public interface InterfaceServ extends Remote {
 
     void adicionaCliente(InterfaceCli interfaceCli) throws RemoteException;
 
-    void registrarCotacao(int id, InterfaceCli interfaceCli) throws RemoteException;
+    String registrarCotacao(int id, InterfaceCli interfaceCli) throws RemoteException;
 
-    void removeCotacao(int id, InterfaceCli interfaceCli) throws RemoteException;
+    String removeCotacao(int id, InterfaceCli interfaceCli) throws RemoteException;
     
     Map<Integer, Float> listaCotacao(InterfaceCli interfaceCli) throws RemoteException;
 
@@ -23,7 +23,7 @@ public interface InterfaceServ extends Remote {
 
     void compra(Transacao compra) throws RemoteException;
 
-    void venda(Transacao venda) throws RemoteException;
+    String venda(Transacao venda) throws RemoteException;
 
     void registraInteresse(int id, float teto, float piso, InterfaceCli interfaceCli) throws RemoteException;
 

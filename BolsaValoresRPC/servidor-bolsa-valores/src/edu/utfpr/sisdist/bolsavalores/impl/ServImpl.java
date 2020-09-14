@@ -62,27 +62,32 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
     }
 
     @Override
-    public void registrarCotacao(int id, InterfaceCli interfaceCli) throws RemoteException {
+    public String registrarCotacao(int id, InterfaceCli interfaceCli) throws RemoteException {
         Optional<Cliente> cliente = clientes.stream()
             .filter(x -> x.getInterfaceCli().equals(interfaceCli)).findFirst();
         if(cliente.isPresent()) {
-            cliente.get().registrarCotacao(id);
+            for(Integer acao : acoes.keySet()) {
+                if(acao == id) {
+                    cliente.get().registrarCotacao(id);
+                    return "";
+                }
+            }
+            return "Ação não existe na bolsa!";
         }
-        else {
-            System.out.println("Cliente não encontrado!");
-        }
+        return "Cliente não encontrado!";
     }
 
     @Override
-    public void removeCotacao(int id, InterfaceCli interfaceCli) throws RemoteException {
+    public String removeCotacao(int id, InterfaceCli interfaceCli) throws RemoteException {
         Optional<Cliente> cliente = this.clientes.stream()
             .filter(x -> x.getInterfaceCli().equals(interfaceCli)).findFirst();
         if(cliente.isPresent()) {
-            cliente.get().getCotacoes().remove(Integer.valueOf(id));
+            if(cliente.get().getCotacoes().remove(Integer.valueOf(id))) {
+                return "";
+            }
+            return "Ação não está na sua lista de cotações!";
         }
-        else {
-            System.out.println("Cliente não encontrado!");
-        }
+        return "Cliente não encontrado!";
     }
 
     @Override
@@ -101,7 +106,7 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
     }
 
     @Override
-    public void compra(Transacao compra) throws RemoteException{
+    public synchronized void compra(Transacao compra) throws RemoteException{
         this.compras.add(compra);
         for(Transacao venda : this.vendas) {
             if(compra.getReferenciaCliente() != venda.getReferenciaCliente() &&
@@ -136,7 +141,7 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
     }
 
     @Override
-    public void venda(Transacao venda) throws RemoteException {
+    public synchronized String venda(Transacao venda) throws RemoteException {
         Optional<Cliente> vendedor = this.clientes.stream().filter(x -> x.getInterfaceCli().equals(venda.getReferenciaCliente())).findFirst();
         if(vendedor.isPresent()) {
             Optional<Acao> acao = vendedor.get().getCarteira().stream().filter(x -> x.getId() == venda.getId()).findFirst();
@@ -157,7 +162,7 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
                                     comprador.get().getCotacoes().add(compra.getId()); // adicionando a compra na lista de cotações do cliente
                                     this.compras.remove(compra);
                                     this.vendas.remove(venda);
-                                    return;
+                                    return "";
                                 }
                         }
                     }
@@ -172,9 +177,13 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
                     };
                     Timer timer = new Timer("Timer");
                     timer.schedule(task, venda.getDelay());
+                    return "";
                 }
+                return "Você tem menos da quantidade que colocou na venda!";
             }
+            return "Você não possui essa ação!";
         }
+        return "Cliente não encontrado!";
     }
 
     @Override
@@ -193,8 +202,14 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
     public void atualizaValor() throws RemoteException{
         int max = 50;
         int min = -50;
-        for(Integer acao : acoes.keySet()){
-            acoes.put(acao, acoes.get(acao) + ((float)gerador.nextInt(max-min) + min));
+        for(Integer acao : acoes.keySet()) {
+            float novoValor = acoes.get(acao) + ((float)gerador.nextInt(max-min) + min);
+            if(novoValor <= 0) {
+                acoes.put(acao, 1f);
+            }
+            else {
+                acoes.put(acao, novoValor);
+            }
         }
         notificaMargem();
     }
