@@ -23,6 +23,10 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
     Map<Integer, Float> acoes = new HashMap<Integer, Float>();
     Random gerador = new Random();
 
+    /**
+     * Ao iniciar o servidor, iniciamos junto todos os seus atributos e um timer que
+     * atualiza aleatóriamente o valor das ações
+     */
     public ServImpl() throws RemoteException {
         clientes = new ArrayList<>();
         compras = new ArrayList<>();
@@ -41,6 +45,11 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
         timer.schedule(task, 30000, 30000);
     }
 
+    /**
+     * Quando um cliente se conecta, essa função cria um novo cliente e guarda os dados dele
+     * (optamos por cada cliente começar com 2 ações)
+     * E t
+     */
     @Override
     public void adicionaCliente(InterfaceCli interfaceCli) throws RemoteException{
         Cliente cliente = new Cliente(interfaceCli);
@@ -52,6 +61,9 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
         }
     }
 
+    /**
+     * Retorna as ações na carteira do cliente
+     */
     @Override
     public List<Acao> getCarteira(InterfaceCli interfaceCli) throws RemoteException {
         Optional<Cliente> cliente = this.clientes.stream().filter(x -> x.getInterfaceCli().equals(interfaceCli)).findFirst();
@@ -61,6 +73,9 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
         return null;
     }
 
+    /**
+     * Registra uma cotação na lista de cotações do cliente
+     */
     @Override
     public String registrarCotacao(int id, InterfaceCli interfaceCli) throws RemoteException {
         Optional<Cliente> cliente = clientes.stream()
@@ -77,6 +92,9 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
         return "Cliente não encontrado!";
     }
 
+    /**
+     * Remove uma ação da lista de cotações do cliente
+     */
     @Override
     public String removeCotacao(int id, InterfaceCli interfaceCli) throws RemoteException {
         Optional<Cliente> cliente = this.clientes.stream()
@@ -105,21 +123,30 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
         return null;
     }
 
+    /**
+     * Guarda a oferta de compra em uma lista de ofertas de compra até que o prazo expire
+     */
     @Override
     public synchronized void compra(Transacao compra) throws RemoteException{
         this.compras.add(compra);
         for(Transacao venda : this.vendas) {
+            // Com a lista de vendas, realiza as verificações necessárias para
+            // ver se existe um par igual
             if(compra.getReferenciaCliente() != venda.getReferenciaCliente() &&
                 compra.getPreco() == venda.getPreco() &&
                 compra.getId() == venda.getId() &&
                 compra.getQtd() == venda.getQtd()) {
                     Optional<Cliente> comprador = this.clientes.stream().filter(x -> x.getInterfaceCli().equals(compra.getReferenciaCliente())).findFirst();
                     Optional<Cliente> vendedor = this.clientes.stream().filter(x -> x.getInterfaceCli().equals(venda.getReferenciaCliente())).findFirst();
+                    // Se existir, realiza a compra/venda para o par
+                    // e adiciona a ação na lista de cotações do comprador.
+                    // Também dispara uma notificação aos dois envolvidos do par para
+                    // sinalizar a conclusão do processo.
                     if(comprador.isPresent() && vendedor.isPresent()) {
                         comprador.get().addAcao(compra.getId(), compra.getQtd());
                         vendedor.get().removeAcao(compra.getId(), compra.getQtd());
-                        comprador.get().getInterfaceCli().notificarEventos("Compra da ação " + compra.getId() + "quantidade: " + compra.getQtd() + "Preço: " + compra.getPreco() + "efetuada com sucesso!" + "\n");
-                        vendedor.get().getInterfaceCli().notificarEventos("Venda da ação " + venda.getId() + "quantidade: " + venda.getQtd() + "Preço: " + venda.getPreco() + "efetuada com sucesso!" + "\n");
+                        comprador.get().getInterfaceCli().notificarEventos("\nCompra da ação " + compra.getId() + " quantidade: " + compra.getQtd() + " Preço: " + compra.getPreco() + " efetuada com sucesso!\n");
+                        vendedor.get().getInterfaceCli().notificarEventos("\nVenda da ação " + venda.getId() + " quantidade: " + venda.getQtd() + " Preço: " + venda.getPreco() + " efetuada com sucesso!\n");
                         comprador.get().getCotacoes().add(compra.getId()); // adicionando a compra na lista de cotações do cliente
                         this.compras.remove(compra);
                         this.vendas.remove(venda);
@@ -127,9 +154,10 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
                     }
             }
         }
+        // Um Timer marcado para encerrar a oferta de acordo com o tempo informado
+        // pelo comprador
         TimerTask task = new TimerTask() {
             public void run() {
-                System.out.println("entrou no run de compra\n");
                 for(Transacao aux : compras){
                     System.out.println("\n" + aux.getId() + ":" + aux.getPreco());
                 }
@@ -140,25 +168,36 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
         timer.schedule(task, compra.getDelay());
     }
 
+    /**
+     * Guarda a oferta de venda em uma lista de ofertas de venda até que o prazo expire
+     */
     @Override
     public synchronized String venda(Transacao venda) throws RemoteException {
         Optional<Cliente> vendedor = this.clientes.stream().filter(x -> x.getInterfaceCli().equals(venda.getReferenciaCliente())).findFirst();
         if(vendedor.isPresent()) {
             Optional<Acao> acao = vendedor.get().getCarteira().stream().filter(x -> x.getId() == venda.getId()).findFirst();
+            // Na oferta de venda, é necessário mais verificações.
+            // Verificamos se o cliente possui a ação e a quantidade que ele quer vender.
             if(acao.isPresent()) {
                 if(acao.get().getQtd() >= venda.getQtd()) { 
                     this.vendas.add(venda);
                     for(Transacao compra : this.compras) {
+                        // Com a lista de compras, realiza as verificações necessárias para
+                        // ver se existe um par igual
                         if(compra.getReferenciaCliente() != venda.getReferenciaCliente() &&
                            compra.getPreco() == venda.getPreco() &&
                            compra.getId() == venda.getId() &&
                            compra.getQtd() == venda.getQtd()) {
+                                // Se existir, realiza a compra/venda para o par
+                                // e adiciona a ação na lista de cotações do comprador.
+                                // Também dispara uma notificação aos dois envolvidos do par para
+                                // sinalizar a conclusão do processo.
                                 Optional<Cliente> comprador = this.clientes.stream().filter(x -> x.getInterfaceCli().equals(compra.getReferenciaCliente())).findFirst();
                                 if(comprador.isPresent()) {
                                     comprador.get().addAcao(compra.getId(), compra.getQtd());
                                     vendedor.get().removeAcao(compra.getId(), compra.getQtd());
-                                    comprador.get().getInterfaceCli().notificarEventos("Compra da ação " + compra.getId() + "quantidade: " + compra.getQtd() + "Preço: " + compra.getPreco() + "efetuada com sucesso!" + "\n");
-                                    vendedor.get().getInterfaceCli().notificarEventos("Venda da ação " + venda.getId() + "quantidade: " + venda.getQtd() + "Preço: " + venda.getPreco() + "efetuada com sucesso!" + "\n");
+                                    comprador.get().getInterfaceCli().notificarEventos("\nCompra da ação " + compra.getId() + " quantidade: " + compra.getQtd() + " Preço: " + compra.getPreco() + " efetuada com sucesso!\n");
+                                    vendedor.get().getInterfaceCli().notificarEventos("\nVenda da ação " + venda.getId() + " quantidade: " + venda.getQtd() + " Preço: " + venda.getPreco() + " efetuada com sucesso!\n");
                                     comprador.get().getCotacoes().add(compra.getId()); // adicionando a compra na lista de cotações do cliente
                                     this.compras.remove(compra);
                                     this.vendas.remove(venda);
@@ -186,6 +225,9 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
         return "Cliente não encontrado!";
     }
 
+    /**
+     * Registra uma açãi na lista de interesses
+     */
     @Override
     public void registraInteresse(int id, float teto, float piso, InterfaceCli interfaceCli) throws RemoteException {
         Interesse interesse = new Interesse(id, teto, piso);
@@ -199,6 +241,9 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
         }
     }
     
+    /**
+     * Adiciona ou decrementa um valor aleatório de todas as ações
+     */
     public void atualizaValor() throws RemoteException{
         int max = 50;
         int min = -50;
@@ -212,8 +257,13 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
             }
         }
         notificaMargem();
+        //com os novos valores definidos, verificamos se o valor não ultrapassa os
+        //limites definidos pelo cliente na lista de interesse
     }
 
+    /**
+     * Notifica o cliente caso o valor uma ação ultrapassa o limite de piso e teto definido pelo cliente
+     */
     public void notificaMargem() throws RemoteException{
         for(Cliente cliente : this.clientes) {
             if(cliente.getInteresses().size() > 0) {
@@ -221,22 +271,27 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
                     float valor = acoes.get(interesse.getId());
                     if (interesse.getUltimoValor() != valor) {
                         if(interesse.getPiso() > valor) {
-                            cliente.getInterfaceCli().notificarEventos("A ação de Id " + interesse.getId() + " caiu abaixo do seu limite de piso: \n" +
+                            cliente.getInterfaceCli().notificarEventos("\nA ação de Id " + interesse.getId() + " caiu abaixo do seu limite de piso: \n" +
                                                 "Limite definido: " + interesse.getPiso() +
-                                                "Valor atual: " + valor);
+                                                " Valor atual: " + valor);
                         }
+                        //atualiza "ultimo valor", para que o cliente não receba notificações repetidas
                         if(interesse.getTeto() < valor) {
-                            cliente.getInterfaceCli().notificarEventos("A ação de Id " + interesse.getId() + " caiu abaixo do seu limite de piso: \n" +
+                            cliente.getInterfaceCli().notificarEventos("\nA ação de Id " + interesse.getId() + " caiu abaixo do seu limite de piso: \n" +
                                                 "Limite definido: " + interesse.getTeto() +
-                                                "Valor atual: " + valor);
+                                                " Valor atual: " + valor);
                         }
                         interesse.setUltimoValor(valor);
+
                     }
                 }
             }
         }
     }
-
+    
+    /**
+     * Lista os interesses
+     */                    
     @Override
     public List<Interesse> listaInteresses(InterfaceCli interfaceCli) throws RemoteException{
         Optional<Cliente> cliente = this.clientes.stream().filter(x -> x.getInterfaceCli().equals(interfaceCli)).findFirst();

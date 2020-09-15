@@ -9,6 +9,7 @@ import edu.utfpr.sisdist.bolsavalores.remote.InterfaceServ;
 
 public class Servidor {
 
+    // Iniciando o servidor
     public static void main(String[] args) throws RemoteException {
         System.out.println("Servidor Iniciando...");
         Registry referenciaServicoNomes = LocateRegistry.createRegistry(1099);
