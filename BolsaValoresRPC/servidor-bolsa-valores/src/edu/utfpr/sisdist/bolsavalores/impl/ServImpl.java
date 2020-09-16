@@ -269,15 +269,15 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
             if(cliente.getInteresses().size() > 0) {
                 for(Interesse interesse : cliente.getInteresses()) {
                     float valor = acoes.get(interesse.getId());
+                    //atualiza "ultimo valor", para que o cliente não receba notificações repetidas
                     if (interesse.getUltimoValor() != valor) {
                         if(interesse.getPiso() > valor) {
-                            cliente.getInterfaceCli().notificarEventos("\nA ação de Id " + interesse.getId() + " caiu abaixo do seu limite de piso: \n" +
+                            cliente.getInterfaceCli().notificarEventos("\nA ação de Id " + interesse.getId() + " ficou abaixo do seu limite de piso: \n" +
                                                 "Limite definido: " + interesse.getPiso() +
                                                 " Valor atual: " + valor);
                         }
-                        //atualiza "ultimo valor", para que o cliente não receba notificações repetidas
                         if(interesse.getTeto() < valor) {
-                            cliente.getInterfaceCli().notificarEventos("\nA ação de Id " + interesse.getId() + " caiu abaixo do seu limite de piso: \n" +
+                            cliente.getInterfaceCli().notificarEventos("\nA ação de Id " + interesse.getId() + " ficou acima do seu limite de teto: \n" +
                                                 "Limite definido: " + interesse.getTeto() +
                                                 " Valor atual: " + valor);
                         }
