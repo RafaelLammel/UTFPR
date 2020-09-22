@@ -17,6 +17,41 @@ INPUT_IMAGES = [
 ]
 
 
+def removeSat(img_hls):
+    hls_no_sat = np.copy(img_hls)
+    for y in range(len(img_hls[0])):
+        for x in range(len(img_hls)):
+            hls_no_sat[x][y][2] = 0
+    return hls_no_sat
+
+def spillSuppression(img, mask):
+    hls = cv2.cvtColor(img, cv2.COLOR_BGR2HLS)
+    img_no_sat = cv2.cvtColor(removeSat(hls), cv2.COLOR_HLS2BGR)
+    img_out = np.copy(img)
+    for y in range(len(img[0])):
+        for x in range(len(img)):
+            if mask[x][y][0] != 0:
+                hls_pixel = hls[x][y]
+                if hls_pixel[0] > 35 and hls_pixel[0] < 85:
+                    soma = [0, 0, 0]
+                    peso_soma = 0
+                    for j in range(-1, 2):
+                        for i in range(-1, 2):
+                            if i != 0 and j != 0:
+                                try:
+                                    if hls[x+i][y+j][0] < 35 or hls[x+i][j+y] > 85:
+                                        soma += img_out[x+i][y+j]
+                                        peso_soma += 1
+                                except:
+                                    pass
+
+                    if peso_soma != 0:
+                        img_out[x][y] = soma / peso_soma
+                    else:
+                        img_out[x][y] = img_no_sat[x][y]
+    return img_out
+
+
 def main():
     bg = cv2.imread(f"{PATH}/{BG}", cv2.IMREAD_COLOR)
     for filename in INPUT_IMAGES:
@@ -28,19 +63,23 @@ def main():
 
             # Convertendo imagem para HLS e criando uma máscara
             hls = cv2.cvtColor(img, cv2.COLOR_BGR2HLS)
-            mask = cv2.inRange(hls, (50, 50, 61), (70, 179, 255))
-
-            # Usando a máscara, remove o fundo verde da imagem
-            img_masked = np.copy(img)
-            img_masked[mask != 0] = [0, 0, 0]
+            mask = cv2.inRange(hls, (50, 51, 61), (85, 204, 255))
+            cv2.normalize(mask, mask, 0, 1, cv2.NORM_MINMAX)
+            mask = 1 - mask
+            mask = np.stack((mask,)*3,axis=-1)
 
             # Preparando Background para ser colocado
             bg_crop = cv2.resize(bg, (len(img[0]), len(img)))
-            bg_crop[mask == 0] = [0, 0, 0]
 
-            # Juntando imagem sem
-            img_out = img_masked + bg_crop
-            cv2.imwrite(f"img/res/{out_filename} - final.bmp", img_out)
+            # Juntando Background e Foreground
+            img_new = (mask * img) + ((1 - mask) * bg_crop)
+
+            # Fazendo Spill Suppression
+            img_out = spillSuppression(img_new, mask)
+
+
+            cv2.imwrite(f"img/res/{out_filename} - finalNovo.bmp", img_out.astype('uint8'))
+            cv2.imwrite(f"img/res/{out_filename} - final.bmp", img_new.astype('uint8'))
 
 
 if __name__ == "__main__":
