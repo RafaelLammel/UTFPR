@@ -474,4 +474,41 @@ deslocando o contraste pra meio g(x,y) = (f(x,y)-0.5)*C +0.5+B
 		* pode duplicar bordas,e podem modificar os gradientes
 	* filtro gaussiano
 		* bom
-
+# hough
+* ideia geral
+	1. localizar retas em uma imagem, representando-as como entidades geometricas
+* reta -> y=ax+b
+* força bruta
+	* para cada pixel pega todos pixel, traça uma reta e calcula quantos pixels estão abaixo da reta
+	* alta complexidade computacional
+	* pouca robustez a imprecisões
+	* no final podem existir muitas retas duplicadas
+* transformada
+	* é uma função de conversão de dominios
+* reta y=ax+b
+	* b=y-xa
+	* (1,1) -> b=1-a
+	* (3,3) -> b=3-3a
+	
+* para cada pixel de borda
+	* gera os valores de a e b de todas as retas q passam por (x,y)
+* procura por cruzamentos no dominio parametrico
+	* varias retas no domonio parametrico se cruzam em um ponto (a,b)
+		* a reta definida por y=ax+b passa por varios pixels de borda
+	* então, pontos do dominio parametrico onde varias retas se cruzam descrevem provaveies retas no dominio espacial
+* dominio (a,b) é problematico
+	* a equeção y=ax+b não permite representar retas verticais
+	* os valores de b podem variar muito(são potencialmente infinitos)o que imprede a geração de todas as retas que passam por um ponto
+* a reta é descrita por um angulo THETA e uma distancia r
+	* (0,10) -> r=10*sen(theta)
+	* (10,0) -> r=10*cos(theta)
+	* valor theta em radianos
+		* valor theta entre 0 e 2pi, descartando r negativo
+	* montamos um histograma 2d, com cada compartimento correspondendo a uma combinação (r,theta)
+		* a largura dos compartimentos diz quantos pixeis sob uma reta precisam estar alinhados
+		
+* algoritmo simples
+	1. separamos as retas detectadas em aproximadamente horizontais e aproximadamente verticais
+	1. encontramos para as retas aproximadamente horizontais o ponto medio de cruzamento com o eixo y
+	1. separamos as retas entre aquelas que estão acimas e abaixo do ponto medio computado
+	1. repetimos o processo para as retas aproximadamente verticais
