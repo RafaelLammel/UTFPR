@@ -17,6 +17,7 @@ INPUT_IMAGES = [
 ]
 
 
+# Cria e retorna uma versão sem saturação da imagem
 def removeSat(img_hls):
     hls_no_sat = np.copy(img_hls)
     for y in range(len(img_hls[0])):
@@ -24,6 +25,9 @@ def removeSat(img_hls):
             hls_no_sat[x][y][2] = 0
     return hls_no_sat
 
+
+# Procura por áreas verdes restantes e tenta resolver com uma média da vizinhança ou
+# removendo sua saturação
 def spillSuppression(img, mask):
     hls = cv2.cvtColor(img, cv2.COLOR_BGR2HLS)
     img_no_sat = cv2.cvtColor(removeSat(hls), cv2.COLOR_HLS2BGR)
@@ -32,9 +36,11 @@ def spillSuppression(img, mask):
         for x in range(len(img)):
             if mask[x][y][0] != 0:
                 hls_pixel = hls[x][y]
+                # Com um range maior, verifica se o pixel é "verde" e está na mascara
                 if hls_pixel[0] > 35 and hls_pixel[0] < 85:
                     soma = [0, 0, 0]
                     peso_soma = 0
+                    # Com uma janela 3x3, faz uma média dos valores na vizinhança que não são "verdes"
                     for j in range(-1, 2):
                         for i in range(-1, 2):
                             if i != 0 and j != 0:
@@ -44,7 +50,8 @@ def spillSuppression(img, mask):
                                         peso_soma += 1
                                 except:
                                     pass
-
+                    # Substitui o valor do pixel pela média da vizinhança, ou
+                    # se nenhum pixel da vizinhança serviu, remove a saturação
                     if peso_soma != 0:
                         img_out[x][y] = soma / peso_soma
                     else:
@@ -77,9 +84,7 @@ def main():
             # Fazendo Spill Suppression
             img_out = spillSuppression(img_new, mask)
 
-
-            cv2.imwrite(f"img/res/{out_filename} - finalNovo.bmp", img_out.astype('uint8'))
-            cv2.imwrite(f"img/res/{out_filename} - final.bmp", img_new.astype('uint8'))
+            cv2.imwrite(f"img/res/{out_filename} - final.bmp", img_out.astype('uint8'))
 
 
 if __name__ == "__main__":
