@@ -1,5 +1,8 @@
 package utfpr.edu.sisdist.bolsavalores.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,7 +16,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 @RestController
+@CrossOrigin(origins = "*")
 public class TransacaoController {
+
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
 
     @PostMapping("compra")
     public void compra(@RequestBody Transacao compra) {
@@ -36,7 +43,8 @@ public class TransacaoController {
                 if(comprador.isPresent() && vendedor.isPresent()) {
                     comprador.get().addAcao(compra.getId(), compra.getQtd());
                     vendedor.get().removeAcao(compra.getId(), compra.getQtd());
-                    // Fazer notificação do evento
+                    this.simpMessagingTemplate.convertAndSendToUser(String.valueOf(vendedor.get().getId()), "/notifica","Venda da ação " + venda.getId() + " quantidade: " + venda.getQtd() + " Preço: " + venda.getPreco() + " efetuada com sucesso!");
+                    this.simpMessagingTemplate.convertAndSendToUser(String.valueOf(comprador.get().getId()), "/notifica", "Compra da ação " + compra.getId() + " quantidade: " + compra.getQtd() + " Preço: " + compra.getPreco() + " efetuada com sucesso!");
                     comprador.get().getCotacoes().add(compra.getId()); // adicionando a compra na lista de cotações do cliente
                     Utilidades.getInstance().getCompras().remove(compra);
                     Utilidades.getInstance().getVendas().remove(venda);
@@ -85,7 +93,8 @@ public class TransacaoController {
                             if(comprador.isPresent()) {
                                 comprador.get().addAcao(compra.getId(), compra.getQtd());
                                 vendedor.get().removeAcao(compra.getId(), compra.getQtd());
-                                // Adicionar notificação
+                                this.simpMessagingTemplate.convertAndSendToUser(String.valueOf(vendedor.get().getId()), "/notifica","Venda da ação " + venda.getId() + " quantidade: " + venda.getQtd() + " Preço: " + venda.getPreco() + " efetuada com sucesso!");
+                                this.simpMessagingTemplate.convertAndSendToUser(String.valueOf(comprador.get().getId()), "/notifica", "Compra da ação " + compra.getId() + " quantidade: " + compra.getQtd() + " Preço: " + compra.getPreco() + " efetuada com sucesso!");
                                 comprador.get().getCotacoes().add(compra.getId()); // adicionando a compra na lista de cotações do cliente
                                 Utilidades.getInstance().getCompras().remove(compra);
                                 Utilidades.getInstance().getVendas().remove(venda);

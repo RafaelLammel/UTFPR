@@ -6,13 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import utfpr.edu.sisdist.bolsavalores.model.Acao;
 import utfpr.edu.sisdist.bolsavalores.model.Cliente;
@@ -22,10 +16,11 @@ import utfpr.edu.sisdist.bolsavalores.util.Utilidades;
 
 @RestController
 @RequestMapping("cliente")
+@CrossOrigin(origins = "*")
 public class ClienteController {
-    
+
     @PostMapping
-    public void adicionaCliente() {
+    public int adicionaCliente() {
         Cliente cliente = new Cliente();
         cliente.addAcao(Utilidades.getInstance().getIdAcaoAtual(), 50);
         cliente.addAcao(Utilidades.getInstance().getIdAcaoAtual()+1, 50);
@@ -37,6 +32,7 @@ public class ClienteController {
         for (Acao acao : cliente.getCarteira()){
             Utilidades.getInstance().getAcoes().put(acao.getId(), (float)gerador.nextInt(100));
         }
+        return cliente.getId();
     }
 
     @GetMapping("/{id}/carteira")
@@ -98,7 +94,7 @@ public class ClienteController {
                 .filter(x -> x.getId() == id).findFirst();
         if(cliente.isPresent()) {
             cliente.get().getInteresses().add(interesse);
-            // Adicionar notificar margem
+            Utilidades.getInstance().notificaMargem();
         }
         else {
             System.out.println("Cliente não encontrado");
