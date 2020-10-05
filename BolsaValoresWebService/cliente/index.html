@@ -1,10 +1,31 @@
 <html>
     <head>
         <title>Hello WebSocket</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     </head>
     <body>
+        <button type="button" class="btn btn-primary" onclick="getCarteira()">Mostrar carteira</button>
+        <button type="button" class="btn btn-primary" onclick="getCotacao()">Mostrar lista de cotações</button>
+        <button type="button" class="btn btn-primary" onclick="getListaInteresse()">Mostrar lista de interesses</button>
+        <form id="form-cotacao">
+            <label>Id da ação para adicionar na lista de cotações:</label>
+            <input id="id-cotacao" type="text"/>
+            <input type="submit" value="Enviar"/>
+        </form>
+        <form id="form-interesse">
+            <label>Id da ação para adicionar na lista de interesses:</label>
+            <input id="id-interesse" type="text"/>
+            <label>Teto:</label>
+            <input id="teto" type="text"/>
+            <label>Piso:</label>
+            <input id="piso" type="text"/>
+            <input type="submit" value="Enviar"/>
+        </form>
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
         <script src="./app.js"></script>
     </body>
 </html>

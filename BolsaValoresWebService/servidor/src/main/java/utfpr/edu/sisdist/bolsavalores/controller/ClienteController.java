@@ -51,7 +51,7 @@ public class ClienteController {
         if(cliente.isPresent()) {
             for(Integer acao : Utilidades.getInstance().getAcoes().keySet()) {
                 if(acao == id) {
-                    cliente.get().registrarCotacao(id);
+                    cliente.get().registrarCotacao(cotacao.getId());
                 }
             }
         }

@@ -76,8 +76,8 @@ public class TransacaoController {
             // Verificamos se o cliente possui a ação e a quantidade que ele quer vender.
             if(acao.isPresent()) {
                 if(acao.get().getQtd() >= venda.getQtd()) {
-                    Utilidades.getInstance().getVendas().add(venda);
-                    for(Transacao compra : Utilidades.getInstance().getVendas()) {
+                    Utilidades.getInstance().getCompras().add(venda);
+                    for(Transacao compra : Utilidades.getInstance().getCompras()) {
                         // Com a lista de compras, realiza as verificações necessárias para
                         // ver se existe um par igual
                         if(compra.getIdCliente() != venda.getIdCliente() &&

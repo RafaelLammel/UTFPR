@@ -8,7 +8,6 @@ import lombok.Setter;
 public class Acao {
 
     private int id;
-    private String nome;
     private int qtd;
 
     public Acao(int id, int qtd) {
