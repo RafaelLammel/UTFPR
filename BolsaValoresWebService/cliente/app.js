@@ -1,6 +1,6 @@
 var base_url = 'http://localhost:8080'
 
-var socket = new SockJS('http://localhost:8080/ws');
+var socket = new SockJS(`${base_url}/ws`);
 var stompClient = Stomp.over(socket);
 
 var id = 0;
@@ -85,4 +85,57 @@ function registraInteresse(e) {
         }
     }
     request.send(JSON.stringify(data));
+}
+
+var compraForm = document.getElementById("form-compra");
+compraForm.addEventListener('submit', compra);
+function compra(e) {
+    e.preventDefault();
+    let data = {
+        id: document.getElementById("id-compra").value,
+        idCliente: id,
+        preco: document.getElementById("preco-compra").value,
+        qtd: document.getElementById("qtd-compra").value,
+        delay: document.getElementById("delay-compra").value
+    }
+
+    request.open('POST', `${base_url}/compra`, true);
+    request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+    request.onload = function() {
+        if(this.status >= 200 && this.status < 400) {
+            console.log(this.response);
+        }
+    }
+    request.send(JSON.stringify(data));
+}
+
+var vendaForm = document.getElementById("form-venda");
+vendaForm.addEventListener('submit', venda);
+function venda(e) {
+    e.preventDefault();
+    let data = {
+        id: document.getElementById("id-venda").value,
+        idCliente: id,
+        preco: document.getElementById("preco-venda").value,
+        qtd: document.getElementById("qtd-venda").value,
+        delay: document.getElementById("delay-venda").value
+    }
+
+    request.open('POST', `${base_url}/venda`, true);
+    request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+    request.onload = function() {
+        if(this.status >= 200 && this.status < 400) {
+            console.log(this.response);
+        }
+    }
+    request.send(JSON.stringify(data));
+}
+
+var removeCotacaoForm = document.getElementById("form-remove-cotacao");
+removeCotacaoForm.addEventListener('submit', removeCotacao);
+function removeCotacao(e) {
+    e.preventDefault();
+    let idCotacao = document.getElementById("id-remove-cotacao").value;
+    request.open('DELETE', `${base_url}/cliente/${id}/cotacao/${idCotacao}`);
+    request.send();
 }

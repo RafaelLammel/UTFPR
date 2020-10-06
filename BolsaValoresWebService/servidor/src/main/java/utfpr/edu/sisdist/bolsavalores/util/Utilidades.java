@@ -5,19 +5,21 @@ import java.util.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Service;
 import utfpr.edu.sisdist.bolsavalores.model.Cliente;
 import utfpr.edu.sisdist.bolsavalores.model.Interesse;
 import utfpr.edu.sisdist.bolsavalores.model.Transacao;
 
 @Getter
 @Setter
+@Service
+@Scope("singleton")
 public class Utilidades {
 
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
-
-    private static Utilidades INSTANCIA = null;
 
     private int idAtual;
     private int idAcaoAtual;
@@ -26,7 +28,7 @@ public class Utilidades {
     private List<Transacao> compras;
     private List<Transacao> vendas;
 
-    private Utilidades() {
+    public Utilidades() {
         idAcaoAtual = 1;
         idAtual = 1;
         acoes = new HashMap<>();
@@ -40,17 +42,6 @@ public class Utilidades {
         };
         Timer timer = new Timer("Timer");
         timer.schedule(task, 30000, 30000);
-    }
-
-    public static Utilidades getInstance() {
-        if (INSTANCIA == null) {
-            synchronized (Utilidades.class) {
-                if (INSTANCIA == null) {
-                    INSTANCIA = new Utilidades();
-                }
-            }
-        }
-        return INSTANCIA;
     }
 
     /**
