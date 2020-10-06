@@ -4,52 +4,94 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+        <link rel="stylesheet" href="app.css">
     </head>
     <body>
-        <button type="button" class="btn btn-primary" onclick="getCarteira()">Mostrar carteira</button>
-        <button type="button" class="btn btn-primary" onclick="getCotacao()">Mostrar lista de cotações</button>
-        <button type="button" class="btn btn-primary" onclick="getListaInteresse()">Mostrar lista de interesses</button>
-        <form id="form-cotacao">
-            <label>Id da ação para adicionar na lista de cotações:</label>
-            <input id="id-cotacao" type="text"/>
-            <input type="submit" value="Enviar"/>
-        </form>
-        <form id="form-interesse">
-            <label>Id da ação para adicionar na lista de interesses:</label>
-            <input id="id-interesse" type="text"/>
-            <label>Teto:</label>
-            <input id="teto" type="text"/>
-            <label>Piso:</label>
-            <input id="piso" type="text"/>
-            <input type="submit" value="Enviar"/>
-        </form>
-        <form id="form-compra">
-            <label>Id da ação para compra:</label>
-            <input id="id-compra" type="text"/>
-            <label>Preço:</label>
-            <input id="preco-compra" type="text"/>
-            <label>Quantidade:</label>
-            <input id="qtd-compra" type="text"/>
-            <label>Delay:</label>
-            <input id="delay-compra" type="text"/>
-            <input type="submit" value="Enviar"/>
-        </form>
-        <form id="form-venda">
-            <label>Id da ação para venda:</label>
-            <input id="id-venda" type="text"/>
-            <label>Preço:</label>
-            <input id="preco-venda" type="text"/>
-            <label>Quantidade:</label>
-            <input id="qtd-venda" type="text"/>
-            <label>Delay:</label>
-            <input id="delay-venda" type="text"/>
-            <input type="submit" value="Enviar"/>
-        </form>
-        <form id="form-remove-cotacao">
-            <label>Id da ação para tirar da lista de cotações:</label>
-            <input id="id-remove-cotacao" type="text"/>
-            <input type="submit" value="Enviar"/>
-        </form>
+        <div class="lista-mensagens" style="position: fixed; z-index: 10;">
+            <div class="card" style="max-width: 300px; width: 300px; height: 150px;">
+                <h5 class="card-title" style="padding: 5px 0 5px 5px; margin: 0; border-bottom: 1px solid black;">Notificações</h5>
+                <div id="lista-mensagens-body" class="card-body" style="padding: 10px">
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="btn-group" role="group" style="margin: 10px 0 10px 0;">
+                <button type="button" class="btn btn-secondary" onclick="getCarteira()">Mostrar carteira</button>
+                <button type="button" class="btn btn-secondary" onclick="getCotacao()">Mostrar lista de cotações</button>
+                <button type="button" class="btn btn-secondary" onclick="getListaInteresse()">Mostrar lista de interesses</button>
+            </div>
+            <div class="card" style="margin-bottom: 10px;">
+                <div class="card-title" style="text-align: center;"><h2 id="title-card"></h2></div>
+                <div class="card-body" style="text-align: center;"><h2 id="body-card"></h2></div>
+            </div>
+            <form id="form-cotacao">
+                <div class="form-group">
+                    <label for="id-cotacao">Id da ação para adicionar na lista de cotações:</label>
+                    <input id="id-cotacao" type="text" class="form-control"/>
+                </div>
+                <button type="submit" class="btn btn-primary">Enviar</button>
+            </form>
+            <form id="form-interesse">
+                <div class="form-group">
+                    <label for="id-interesse">Id da ação para adicionar na lista de interesses:</label>
+                    <input id="id-interesse" type="text" class="form-control"/>
+                </div>
+                <div class="form-group">
+                    <label for="teto">Teto:</label>
+                    <input id="teto" type="text" class="form-control"/>
+                </div>
+                <div class="form-group">
+                    <label for="piso">Piso:</label>
+                    <input id="piso" type="text" class="form-control"/>
+                </div>
+                <button type="submit" class="btn btn-primary">Enviar</button>
+            </form>
+            <form id="form-compra">
+                <div class="form-group">
+                    <label for="id-compra">Id da ação para compra:</label>
+                    <input id="id-compra" type="text" class="form-control"/>
+                </div>
+                <div class="form-group">
+                    <label for="preco-compra">Preço:</label>
+                    <input class="form-control" id="preco-compra" type="text"/>
+                </div>
+                <div class="form-group">
+                    <label for="qtd-compra">Quantidade:</label>
+                    <input class="form-control" id="qtd-compra" type="text"/>
+                </div>
+                <div class="form-group">
+                    <label for="delay-compra">Delay:</label>
+                    <input class="form-control" id="delay-compra" type="text"/>
+                </div>
+                <button type="submit" class="btn btn-primary">Enviar</button>
+            </form>
+            <form id="form-venda">
+                <div class="form-group">
+                    <label for="id-venda">Id da ação para venda:</label>
+                    <input class="form-control" id="id-venda" type="text"/>
+                </div>
+                <div class="form-group">
+                    <label for="preco-venda">Preço:</label>
+                    <input class="form-control" id="preco-venda" type="text"/>
+                </div>
+                <div class="form-group">
+                    <label for="qtd-venda">Quantidade:</label>
+                    <input class="form-control" id="qtd-venda" type="text"/>
+                </div>
+                <div class="form-group">
+                    <label for="delay-venda">Delay:</label>
+                    <input class="form-control" id="delay-venda" type="text"/>
+                </div>
+                <button type="submit" class="btn btn-primary">Enviar</button>
+            </form>
+            <form id="form-remove-cotacao">
+                <div class="form-group">
+                    <label for="id-remove-cotacao">Id da ação para tirar da lista de cotações:</label>
+                    <input class="form-control" id="id-remove-cotacao" type="text"/>
+                </div>
+                <button type="submit" class="btn btn-primary">Enviar</button>
+            </form>
+        </div>
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>

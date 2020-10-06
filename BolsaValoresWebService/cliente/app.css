@@ -1,0 +1,19 @@
+form {
+    border: 2px solid black;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.lista-mensagens {
+    position: fixed;
+    z-index: 10;
+    top: 10;
+    right: 10;
+    overflow-y: scroll;
+    max-height: 150px;
+}
+
+.mensagem {
+    border-bottom: 1px solid black;
+    padding: 10px 0 10px 0;
+}

@@ -4,6 +4,7 @@ var socket = new SockJS(`${base_url}/ws`);
 var stompClient = Stomp.over(socket);
 
 var id = 0;
+var listaMensagens = document.getElementById("lista-mensagens-body");
 
 var request = new XMLHttpRequest();
 request.open('POST', `${base_url}/cliente`, true);
@@ -13,6 +14,7 @@ request.onload = function() {
         stompClient.connect({}, function (frame) {
             stompClient.subscribe(`/user/${id}/notifica`, function (res) {
                 console.log(res);
+                listaMensagens.innerHTML += `<p class="mensagem">${res.body}</p>`;
             });
         });
     }
@@ -23,7 +25,30 @@ function getCarteira() {
     request.open('GET', `${base_url}/cliente/${id}/carteira`, true);
     request.onload = function() {
         if(this.status >= 200 && this.status < 400) {
-            console.log(this.response);
+            document.getElementById("title-card").innerHTML = "Carteira"
+            let res = JSON.parse(this.response);
+            console.log(res);
+            let html = `
+            <table class="table table-bordered table-sm">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Quantidade</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+            res.forEach(e => {
+                html += `
+                <tr>
+                    <td>${e.id}</td>
+                    <td>${e.qtd}</td>
+                </tr>`
+            });
+            html += `
+                </tbody>
+            </table>
+            `
+            document.getElementById("body-card").innerHTML = html;
         }
     }
     request.send();
@@ -33,7 +58,31 @@ function getCotacao() {
     request.open('GET', `${base_url}/cliente/${id}/cotacao`, true);
     request.onload = function() {
         if(this.status >= 200 && this.status < 400) {
-            console.log(this.response);
+            document.getElementById("title-card").innerHTML = "Cotações"
+            let res = JSON.parse(this.response);
+            console.log(res);
+            let html = `
+            <table class="table table-bordered table-sm">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Valor</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+            for(let key in res) {
+                if(res.hasOwnProperty(key))
+                    html += `
+                    <tr>
+                        <td>${key}</td>
+                        <td>${res[key]}</td>
+                    </tr>`
+            }
+            html += `
+                </tbody>
+            </table>
+            `
+            document.getElementById("body-card").innerHTML = html;
         }
     }
     request.send();
@@ -43,7 +92,32 @@ function getListaInteresse() {
     request.open('GET', `${base_url}/cliente/${id}/interesse`, true);
     request.onload = function() {
         if(this.status >= 200 && this.status < 400) {
-            console.log(this.response);
+            document.getElementById("title-card").innerHTML = "Interesses"
+            let res = JSON.parse(this.response);
+            console.log(res);
+            let html = `
+            <table class="table table-bordered table-sm">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Teto</th>
+                        <th scope="col">Piso</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+            res.forEach(e => {
+                html += `
+                <tr>
+                    <td>${e.id}</td>
+                    <td>${e.teto}</td>
+                    <td>${e.piso}</td>
+                </tr>`
+            })
+            html += `
+                </tbody>
+            </table>
+            `
+            document.getElementById("body-card").innerHTML = html;
         }
     }
     request.send();
