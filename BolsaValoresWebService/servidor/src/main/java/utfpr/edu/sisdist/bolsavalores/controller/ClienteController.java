@@ -32,6 +32,8 @@ public class ClienteController {
         Cliente cliente = new Cliente();
         cliente.addAcao(utilidades.getIdAcaoAtual(), 50);
         cliente.addAcao(utilidades.getIdAcaoAtual()+1, 50);
+        cliente.getCotacoes().add(utilidades.getIdAcaoAtual());
+        cliente.getCotacoes().add(utilidades.getIdAcaoAtual()+1);
         utilidades.setIdAcaoAtual(utilidades.getIdAcaoAtual()+2);
         utilidades.getClientes().add(cliente);
         cliente.setId(utilidades.getIdAtual());
