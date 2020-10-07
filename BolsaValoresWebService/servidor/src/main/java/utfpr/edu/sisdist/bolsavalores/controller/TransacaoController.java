@@ -24,6 +24,9 @@ public class TransacaoController {
     @Autowired
     private Utilidades utilidades;
 
+    /**
+     * Guarda a oferta de compra em uma lista de ofertas de compra até que o prazo expire
+     */
     @PostMapping("compra")
     public void compra(@RequestBody Transacao compra) {
         utilidades.getCompras().add(compra);
@@ -68,6 +71,9 @@ public class TransacaoController {
         timer.schedule(task, compra.getDelay());
     }
 
+    /**
+     * Guarda a oferta de venda em uma lista de ofertas de venda até que o prazo expire
+     */
     @PostMapping("venda")
     public void venda(@RequestBody Transacao venda) {
         Optional<Cliente> vendedor = utilidades.getClientes().stream()

@@ -22,7 +22,7 @@ public class Cliente {
         this.interesses = new ArrayList<>();
     }
 
-    public void addAcao(int id, int qtd) {
+    public synchronized void addAcao(int id, int qtd) {
         Optional<Acao> acao = this.carteira.stream().filter(x -> x.getId() == id).findFirst();
         if(acao.isPresent()) {
             acao.get().setQtd(qtd + acao.get().getQtd());
@@ -32,7 +32,7 @@ public class Cliente {
         }
     }
 
-    public void removeAcao(int id, int qtd) {
+    public synchronized void removeAcao(int id, int qtd) {
         Optional<Acao> acao = this.carteira.stream().filter(x -> x.getId() == id).findFirst();
         int novaQtd = acao.get().getQtd() - qtd;
         if(novaQtd == 0) {

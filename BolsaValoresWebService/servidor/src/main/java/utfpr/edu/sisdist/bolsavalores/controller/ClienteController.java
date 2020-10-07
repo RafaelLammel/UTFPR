@@ -23,6 +23,10 @@ public class ClienteController {
     @Autowired
     private Utilidades utilidades;
 
+    /**
+     * Quando um cliente se conecta, essa função cria um novo cliente e guarda os dados dele
+     * (optamos por cada cliente começar com 2 ações)
+     */
     @PostMapping
     public int adicionaCliente() {
         Cliente cliente = new Cliente();
@@ -39,6 +43,9 @@ public class ClienteController {
         return cliente.getId();
     }
 
+    /**
+     * Retorna as ações na carteira do cliente
+     */
     @GetMapping("/{id}/carteira")
     public List<Acao> getCarteira(@PathVariable("id") int id) {
         Optional<Cliente> cliente = utilidades.getClientes().stream().filter(x -> x.getId() == id).findFirst();
@@ -48,6 +55,9 @@ public class ClienteController {
         return null;
     }
 
+    /**
+     * Registra uma cotação na lista de cotações do cliente
+     */
     @PostMapping("/{id}/cotacao")
     public void registrarCotacao(@RequestBody Cotacao cotacao, @PathVariable("id") int id) {
         Optional<Cliente> cliente = utilidades.getClientes().stream()
@@ -61,6 +71,9 @@ public class ClienteController {
         }
     }
 
+    /**
+     * Remove uma ação da lista de cotações do cliente
+     */
     @DeleteMapping("/{id}/cotacao/{idCotacao}")
     public void removeCotacao(@PathVariable("id") int id, @PathVariable("idCotacao") int idCotacao) {
         Optional<Cliente> cliente = utilidades.getClientes().stream()
@@ -84,6 +97,9 @@ public class ClienteController {
         return null;
     }
 
+    /**
+     * Lista os interesses
+     */
     @GetMapping("/{id}/interesse")
     public List<Interesse> listaInteresse(@PathVariable("id") int id) {
         Optional<Cliente> cliente = utilidades.getClientes().stream()
@@ -91,6 +107,9 @@ public class ClienteController {
         return cliente.get().getInteresses();
     }
 
+    /**
+     * Registra uma ação na lista de interesses
+     */
     @PostMapping("/{id}/interesse")
     public void registraInteresse(@RequestBody Interesse interesse, @PathVariable("id") int id) {
         interesse.setUltimoValor(-1);
