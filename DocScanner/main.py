@@ -12,6 +12,10 @@ PROCESS_PATH = "./Processadas"
 IMG = "img.jpeg"
 
 
+# Tamanho da janela do filtro da mediana
+MEDIAN_FILTER_WINDOW = 25
+
+
 # Parâmetros para o Canny
 CANNY_THRESHOLD1 = 50
 CANNY_THRESHOLD2 = 200
@@ -112,7 +116,7 @@ def getBordersFromLines(
 
     for line in lines:
         for rho, theta in line:
-            if rho == down_median or up_median or left_median or right_median:
+            if rho == down_median or rho == up_median or rho == left_median or rho == right_median:
                 if rho == down_median:
                     lower["rho"] = rho
                     lower["theta"] = theta
@@ -160,7 +164,7 @@ def main():
     cv2.imwrite(f"{PROCESS_PATH}/1 - gray.{FINAL_FILE_TYPE}", img_gray)
 
     # Borrando a imagem e aplicando Canny para um versão com bordas da imagem
-    img_blur = cv2.medianBlur(img_gray, 25)
+    img_blur = cv2.medianBlur(img_gray, MEDIAN_FILTER_WINDOW)
     cv2.imwrite(f"{PROCESS_PATH}/2 - blur.{FINAL_FILE_TYPE}", img_blur)
     img_edges = cv2.Canny(img_blur, CANNY_THRESHOLD1, CANNY_THRESHOLD2)
     cv2.imwrite(f"{PROCESS_PATH}/3 - edges.{FINAL_FILE_TYPE}", img_edges)
