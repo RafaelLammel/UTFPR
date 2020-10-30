@@ -14,6 +14,7 @@ public class Transacao implements Serializable {
     private float preco;
     private int qtd;
     private long delay;
+    private boolean efetuado;
     InterfaceCli referenciaCliente;
 
     public Transacao(int id, float preco, int qtd, long delay, InterfaceCli referenciaCliente) {
@@ -22,6 +23,7 @@ public class Transacao implements Serializable {
         this.qtd = qtd;
         this.delay = delay;
         this.referenciaCliente = referenciaCliente;
+        this.efetuado = false;
     }
 
     public long getDelay() {
@@ -47,5 +49,13 @@ public class Transacao implements Serializable {
     public InterfaceCli getReferenciaCliente() {
 		return this.referenciaCliente;
 	}
+
+    public void setEfetuado(boolean efetuado) {
+        this.efetuado = efetuado;
+    }
+
+    public boolean getEfetuado() {
+        return this.efetuado;
+    }
 
 }
