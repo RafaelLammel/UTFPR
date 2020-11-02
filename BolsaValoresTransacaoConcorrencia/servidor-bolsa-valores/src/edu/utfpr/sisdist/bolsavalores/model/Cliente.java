@@ -1,5 +1,10 @@
 package edu.utfpr.sisdist.bolsavalores.model;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -65,5 +70,69 @@ public class Cliente {
         }
     }
 
+    /**
+     * statusCompraVenda = 0 -> compra
+     * statusCompraVenda = 1 -> venda
+     */
+    public boolean preparar(Transacao compraVenda, int statusCompraVenda) {
+        try {
+            File myObj = new File("CarteiraIntermediaria_" + interfaceCli.hashCode() + ".txt");
+            myObj.createNewFile();
+            FileWriter fileWriter = new FileWriter("CarteiraIntermediaria_" + interfaceCli.hashCode() + ".txt");
+            int idRetirar = compraVenda.getId();
+            for(Acao acao : carteira) {         
+                if(idRetirar != acao.getId()) {
+                    fileWriter.write(acao.toString()+"\n");
+                }
+                else if((acao.getQtd() - compraVenda.getQtd() > 0) && statusCompraVenda == 1) {
+                    fileWriter.write(compraVenda.getId()+";"+(acao.getQtd() - compraVenda.getQtd())+"\n");
+                }
+            }
+            if(statusCompraVenda == 0) {
+                Optional<Acao> acao = this.carteira.stream().filter(x -> x.getId() == compraVenda.getId()).findFirst();
+                if(acao.isPresent()) {
+                    fileWriter.write(compraVenda.getId()+";"+(acao.get().getQtd()+compraVenda.getQtd())+"\n");
+                }
+                else {
+                    fileWriter.write(compraVenda.getId()+";"+compraVenda.getQtd()+"\n");
+                }
+            }
+            fileWriter.close();
+            return true;
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public void abortar() {
+        //log abortado
+        File f = new File("CarteiraIntermediaria_" + interfaceCli.hashCode() + ".txt");
+        f.delete();
+    }
+
+    public boolean efetuar() {
+        List<Acao> carteiraNova = new ArrayList<>();
+        try {
+            FileReader arq = new FileReader("CarteiraIntermediaria_" + interfaceCli.hashCode() + ".txt");
+            BufferedReader lerArq = new BufferedReader(arq);
+            String linha = lerArq.readLine();
+            while(linha != null){
+                String[] id = linha.split(";");
+                carteiraNova.add(new Acao(Integer.parseInt(id[0]), Integer.parseInt(id[1])));
+                linha = lerArq.readLine();
+            }      
+            arq.close();
+            File f = new File("CarteiraIntermediaria_" + interfaceCli.hashCode() + ".txt");
+            f.delete();
+            this.carteira = carteiraNova;
+            return true;
+        }
+        catch(Exception e) {
+            System.out.println("An error occurred.");
+            return false;
+        }
+    }
 
 }

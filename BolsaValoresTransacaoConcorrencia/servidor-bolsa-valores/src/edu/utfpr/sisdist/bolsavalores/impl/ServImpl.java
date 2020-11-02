@@ -137,8 +137,7 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
                     if(compra.getReferenciaCliente() != venda.getReferenciaCliente() &&
                         compra.getPreco() == venda.getPreco() &&
                         compra.getId() == venda.getId() &&
-                        compra.getQtd() == venda.getQtd() &&
-                        !venda.getEfetuado()) {
+                        compra.getQtd() == venda.getQtd()) {
                             Optional<Cliente> comprador = this.clientes.stream().filter(x -> x.getInterfaceCli().equals(compra.getReferenciaCliente())).findFirst();
                             Optional<Cliente> vendedor = this.clientes.stream().filter(x -> x.getInterfaceCli().equals(venda.getReferenciaCliente())).findFirst();
                             // Se existir, realiza a compra/venda para o par
@@ -146,15 +145,8 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
                             // Também dispara uma notificação aos dois envolvidos do par para
                             // sinalizar a conclusão do processo.
                             if(comprador.isPresent() && vendedor.isPresent()) {
-                                comprador.get().addAcao(compra.getId(), compra.getQtd());
-                                vendedor.get().removeAcao(compra.getId(), compra.getQtd());
-                                comprador.get().getInterfaceCli().notificarEventos("\nCompra da ação " + compra.getId() + " quantidade: " + compra.getQtd() + " Preço: " + compra.getPreco() + " efetuada com sucesso!\n");
-                                vendedor.get().getInterfaceCli().notificarEventos("\nVenda da ação " + venda.getId() + " quantidade: " + venda.getQtd() + " Preço: " + venda.getPreco() + " efetuada com sucesso!\n");
-                                comprador.get().getCotacoes().add(compra.getId()); // adicionando a compra na lista de cotações do cliente
-                                this.compras.remove(compra);
-                                this.vendas.remove(venda);
-                                compra.setEfetuado(true);
-                                venda.setEfetuado(true);
+                                Coordenador coordenador = new Coordenador();
+                                coordenador.abrirTransacao(compra, venda, comprador.get(), vendedor.get());
                                 return;
                             }
                         }
@@ -196,23 +188,15 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
                                 if(compra.getReferenciaCliente() != venda.getReferenciaCliente() &&
                                    compra.getPreco() == venda.getPreco() &&
                                    compra.getId() == venda.getId() &&
-                                   compra.getQtd() == venda.getQtd() &&
-                                   !compra.getEfetuado()) {
+                                   compra.getQtd() == venda.getQtd()) {
                                         // Se existir, realiza a compra/venda para o par
                                         // e adiciona a ação na lista de cotações do comprador.
                                         // Também dispara uma notificação aos dois envolvidos do par para
                                         // sinalizar a conclusão do processo.
                                         Optional<Cliente> comprador = this.clientes.stream().filter(x -> x.getInterfaceCli().equals(compra.getReferenciaCliente())).findFirst();
                                         if(comprador.isPresent()) {
-                                            comprador.get().addAcao(compra.getId(), compra.getQtd());
-                                            vendedor.get().removeAcao(compra.getId(), compra.getQtd());
-                                            comprador.get().getInterfaceCli().notificarEventos("\nCompra da ação " + compra.getId() + " quantidade: " + compra.getQtd() + " Preço: " + compra.getPreco() + " efetuada com sucesso!\n");
-                                            vendedor.get().getInterfaceCli().notificarEventos("\nVenda da ação " + venda.getId() + " quantidade: " + venda.getQtd() + " Preço: " + venda.getPreco() + " efetuada com sucesso!\n");
-                                            comprador.get().getCotacoes().add(compra.getId()); // adicionando a compra na lista de cotações do cliente
-                                            this.compras.remove(compra);
-                                            this.vendas.remove(venda);
-                                            compra.setEfetuado(true);
-                                            venda.setEfetuado(true);
+                                            Coordenador coordenador = new Coordenador();
+                                            coordenador.abrirTransacao(compra, venda, comprador.get(), vendedor.get());
                                             return "";
                                         }
                                 }

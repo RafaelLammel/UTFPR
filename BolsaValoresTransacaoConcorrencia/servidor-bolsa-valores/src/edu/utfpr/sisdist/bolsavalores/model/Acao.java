@@ -41,4 +41,9 @@ public class Acao implements Serializable {
         this.qtd = qtd;
     }
     
+    @Override
+    public String toString() {
+        return this.id + ";" + this.qtd;
+    }
+
 }
