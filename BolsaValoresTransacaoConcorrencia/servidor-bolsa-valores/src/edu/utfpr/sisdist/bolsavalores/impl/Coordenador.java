@@ -26,26 +26,28 @@ public class Coordenador implements InterfaceCo {
             logCoordenador.createNewFile();
             FileWriter fileWriter = new FileWriter("Log_TransacoesCoordenador.txt", true);
             fileWriter.write(dtf.format(LocalDateTime.now()) + " - " + this.Id + " - " + this.status + "\n");
-            if(comprador.preparar(venda, 0) && vendedor.preparar(compra, 1)) {
+            if(comprador.preparar(venda, 0, this) && vendedor.preparar(compra, 1, this)) {
                 // Gravar log Transação preparada
                 this.status = "PREPARADA";
                 fileWriter.write(dtf.format(LocalDateTime.now()) + " - " + this.Id + " - " + this.status + "\n");
-                if(comprador.efetuar() && vendedor.efetuar()) {
+                if(comprador.efetuar(this) && vendedor.efetuar(this)) {
                     this.status = "EFETUADA";
                     fileWriter.write(dtf.format(LocalDateTime.now()) + " - " + this.Id + " - " + this.status + "\n");
                     retorno = true;
+                    comprador.registrarLogEfetuado(this);
+                    vendedor.registrarLogEfetuado(this);
                 }
                 else{
                     this.status = "ABORTADA";
-                    comprador.abortar();
-                    vendedor.abortar();
+                    comprador.abortar(this);
+                    vendedor.abortar(this);
                     fileWriter.write(dtf.format(LocalDateTime.now()) + " - " + this.Id + " - " + this.status + "\n");
                 }
             }
             else{
                 this.status = "ABORTADA";
-                comprador.abortar();
-                vendedor.abortar();
+                comprador.abortar(this);
+                vendedor.abortar(this);
                 fileWriter.write(dtf.format(LocalDateTime.now()) + " - " + this.Id + " - " + this.status + "\n");
                 fileWriter.close();
             }
@@ -59,7 +61,11 @@ public class Coordenador implements InterfaceCo {
 
     @Override
     public String obterEstadoTransacao() {
-        return status;
+        return this.status;
+    }
+
+    public String getId() {
+        return this.Id;
     }
     
 }
