@@ -127,6 +127,10 @@ public class Cliente {
             File f = new File("CarteiraIntermediaria_" + interfaceCli.hashCode() + ".txt");
             f.delete();
             this.carteira = carteiraNova;
+            Optional<Integer> cotacao = this.cotacoes.stream().filter(x -> x == this.carteira.get(this.carteira.size()-1).getId()).findFirst();
+            if(!cotacao.isPresent()) {
+                this.cotacoes.add(this.carteira.get(this.carteira.size()-1).getId());
+            }
             return true;
         }
         catch(Exception e) {

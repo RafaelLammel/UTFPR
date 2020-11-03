@@ -53,8 +53,11 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
     @Override
     public void adicionaCliente(InterfaceCli interfaceCli) throws RemoteException{
         Cliente cliente = new Cliente(interfaceCli);
-        cliente.addAcao(idAcaoAtual++, 50);
-        cliente.addAcao(idAcaoAtual++, 50);
+        cliente.addAcao(idAcaoAtual, 50);
+        cliente.addAcao(idAcaoAtual+1, 50);
+        cliente.getCotacoes().add(idAcaoAtual);
+        cliente.getCotacoes().add(idAcaoAtual+1);
+        idAcaoAtual += 2;
         clientes.add(cliente);
         for (Acao acao : cliente.getCarteira()){
             acoes.put(acao.getId(), (float)gerador.nextInt(100));
@@ -146,7 +149,10 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
                             // sinalizar a conclusão do processo.
                             if(comprador.isPresent() && vendedor.isPresent()) {
                                 Coordenador coordenador = new Coordenador();
-                                coordenador.abrirTransacao(compra, venda, comprador.get(), vendedor.get());
+                                if(coordenador.abrirTransacao(compra, venda, comprador.get(), vendedor.get())) {
+                                    this.compras.remove(compra);
+                                    this.vendas.remove(venda);
+                                }
                                 return;
                             }
                         }
@@ -196,7 +202,10 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
                                         Optional<Cliente> comprador = this.clientes.stream().filter(x -> x.getInterfaceCli().equals(compra.getReferenciaCliente())).findFirst();
                                         if(comprador.isPresent()) {
                                             Coordenador coordenador = new Coordenador();
-                                            coordenador.abrirTransacao(compra, venda, comprador.get(), vendedor.get());
+                                            if(coordenador.abrirTransacao(compra, venda, comprador.get(), vendedor.get())) {
+                                                this.compras.remove(compra);
+                                                this.vendas.remove(venda);
+                                            }
                                             return "";
                                         }
                                 }
