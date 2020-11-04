@@ -99,6 +99,10 @@ public class Cliente {
     }
 
     /**
+     * Realiza a preparação da transação de compra/venda, criando um arquivo
+     * de carteira intermediária com as alterações da transação, retornando true
+     * quando tudo ocorre com sucesso e false quando ocorre algum erro, gerando
+     * um pedido para abortar a transação no coordenador
      * statusCompraVenda = 0 -> compra
      * statusCompraVenda = 1 -> venda
      */
@@ -138,6 +142,9 @@ public class Cliente {
         }
     }
 
+    /**
+     * Apaga o arquivo temporário criado
+     */
     public void abortar(Coordenador coordenador) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
         //log abortado
@@ -152,6 +159,10 @@ public class Cliente {
         }
     }
 
+    /**
+     * Pega o arquivo temporário e atualiza o arquivo final do cliente de acordo com
+     * as alterações presentes no arquivo temporário
+     */
     public boolean efetuar(Coordenador coordenador) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
         List<Acao> carteiraNova = new ArrayList<>();
@@ -184,6 +195,10 @@ public class Cliente {
         }
     }
 
+    /**
+     * Registra o status efetuado no log do participante
+     * 
+     */
     public void registrarLogEfetuado(Coordenador coordenador) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
         try {

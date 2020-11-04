@@ -15,6 +15,10 @@ public class Coordenador implements InterfaceCo {
     private String status = "NÃO INICIADA";
     private String Id = UUID.randomUUID().toString();
 
+    /**
+     * Executa a transação, seguindo os passos de pedir preparo dos participantes,
+     * executar a transação após sucesso ou abortar transação no caso de alguma falha
+     */
     @Override
     public boolean abrirTransacao(Transacao compra, Transacao venda, Cliente comprador, Cliente vendedor) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");

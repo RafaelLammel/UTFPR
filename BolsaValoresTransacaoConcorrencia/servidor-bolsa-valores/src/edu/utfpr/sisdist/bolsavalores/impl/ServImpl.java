@@ -152,6 +152,8 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
                                 if(coordenador.abrirTransacao(compra, venda, comprador.get(), vendedor.get())) {
                                     this.compras.remove(compra);
                                     this.vendas.remove(venda);
+                                    comprador.get().getInterfaceCli().notificarEventos("\nCompra da ação " + compra.getId() + " quantidade: " + compra.getQtd() + " Preço: " + compra.getPreco() + " efetuada com sucesso!\n");
+                                    vendedor.get().getInterfaceCli().notificarEventos("\nVenda da ação " + venda.getId() + " quantidade: " + venda.getQtd() + " Preço: " + venda.getPreco() + " efetuada com sucesso!\n");
                                 }
                                 return;
                             }
@@ -205,6 +207,8 @@ public class ServImpl extends UnicastRemoteObject implements InterfaceServ {
                                             if(coordenador.abrirTransacao(compra, venda, comprador.get(), vendedor.get())) {
                                                 this.compras.remove(compra);
                                                 this.vendas.remove(venda);
+                                                comprador.get().getInterfaceCli().notificarEventos("\nCompra da ação " + compra.getId() + " quantidade: " + compra.getQtd() + " Preço: " + compra.getPreco() + " efetuada com sucesso!\n");
+                                                vendedor.get().getInterfaceCli().notificarEventos("\nVenda da ação " + venda.getId() + " quantidade: " + venda.getQtd() + " Preço: " + venda.getPreco() + " efetuada com sucesso!\n");
                                             }
                                             return "";
                                         }
