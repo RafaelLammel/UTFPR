@@ -38,8 +38,6 @@ public class Coordenador implements InterfaceCo {
                     this.status = "EFETUADA";
                     fileWriter.write(dtf.format(LocalDateTime.now()) + " - " + this.Id + " - " + this.status + "\n");
                     retorno = true;
-                    comprador.registrarLogEfetuado(this);
-                    vendedor.registrarLogEfetuado(this);
                 }
                 else{
                     this.status = "ABORTADA";

@@ -132,6 +132,7 @@ public class Cliente {
                     fileWriter.write(compraVenda.getId()+";"+compraVenda.getQtd()+"\n");
                 }
             }
+            fileWriterLog.write(dtf.format(LocalDateTime.now()) + " - " + coordenador.getId() + " - " + "PREPARADO" + "\n");
             fileWriter.close();
             fileWriterLog.close();
             return true;
@@ -168,6 +169,7 @@ public class Cliente {
         List<Acao> carteiraNova = new ArrayList<>();
         try {
             FileReader arq = new FileReader("CarteiraIntermediaria_" + interfaceCli.hashCode() + ".txt");
+            FileWriter fileWriterLog = new FileWriter("Log_Transacoes_" + this.interfaceCli.hashCode() + ".txt", true);
             BufferedReader lerArq = new BufferedReader(arq);
             String linha = lerArq.readLine();
             while(linha != null){
@@ -183,31 +185,14 @@ public class Cliente {
             if(!cotacao.isPresent()) {
                 this.cotacoes.add(this.carteira.get(this.carteira.size()-1).getId());
             }
-            FileWriter fileWriterLog = new FileWriter("Log_Transacoes_" + this.interfaceCli.hashCode() + ".txt", true);
-            fileWriterLog.write(dtf.format(LocalDateTime.now()) + " - " + coordenador.getId() + " - " + coordenador.obterEstadoTransacao() + "\n");
-            fileWriterLog.close();
             atualizaRegistroCarteira();
+            fileWriterLog.write(dtf.format(LocalDateTime.now()) + " - " + coordenador.getId() + " - " + "EFETUADA" + "\n");
+            fileWriterLog.close();
             return true;
         }
         catch(Exception e) {
             System.out.println("An error occurred.");
             return false;
-        }
-    }
-
-    /**
-     * Registra o status efetuado no log do participante
-     * 
-     */
-    public void registrarLogEfetuado(Coordenador coordenador) {
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-        try {
-            FileWriter fileWriterLog = new FileWriter("Log_Transacoes_" + this.interfaceCli.hashCode() + ".txt", true);
-            fileWriterLog.write(dtf.format(LocalDateTime.now()) + " - " + coordenador.getId() + " - " + coordenador.obterEstadoTransacao() + "\n");
-            fileWriterLog.close();
-        }
-        catch (Exception e) {
-
         }
     }
 
