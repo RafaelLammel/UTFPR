@@ -11,19 +11,22 @@ server.bind(ADDR)
 
 def handle_client(conn, addr):
     print(f"[NOVA CONEXÃO] {addr} conectado.")
+    str_data = ''
     while True:
         msg = conn.recv(1024)
         if msg.decode(FORMAT) == DISCONNECT:
             break
         # TODO: Apresentar o gráfico
         # TODO: Aplicar o algoritmo de codificação de linha (Manchester Diferencial) modo inverso
-        str_data = ''
+
+        #Convertendo o binário  
         binary = msg.decode(FORMAT)
         for i in range(0, len(binary), 8):
             temp_data = binary[i:i + 8]     
             decimal_data = int(temp_data, 2)
             str_data = str_data + chr(decimal_data) 
         print("O valor binário após a conversão é:" + str_data)
+        
         # TODO: Algoritmo de criptografia inverso
         # TODO: Mostrar a mensagem
     conn.close()
