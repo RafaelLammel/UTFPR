@@ -87,4 +87,4 @@ if __name__ == "__main__":
     server.listen()
     print(f"[ESCUTANDO] Servidor ouvindo em {SERVER}:{PORT}")
     conn, addr = server.accept()
-    handle_client(conn, addr)
+    handleClient(conn, addr)
