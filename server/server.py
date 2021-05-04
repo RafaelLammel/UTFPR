@@ -21,6 +21,7 @@ def difManchesterDecoding(binario_codificado):
     primeiraVez = True
     binario = ""
     anterior = ""
+    binario_codificado = binario_codificado[1:]
     for i in range(0, len(binario_codificado)-1, 2):
         b = binario_codificado[i] + binario_codificado[i+1]
         if primeiraVez:
@@ -52,14 +53,22 @@ def handleClient(conn, addr):
         
         # Apresentar o gráfico
         bits = list(map(int, [c for c in msg_codificada]))
-        plt.plot(bits, drawstyle="steps-pre")
-        plt.ylabel('Manchester Diferencial')
+        binario = difManchesterDecoding(msg_codificada)
+        for i in range(0, len(bits)+1, 2):
+            plt.axvline(i, color=".5", linewidth=2)
+        plt.axhline(2.5, color='.5', linewidth=2)
+        plt.plot([b+2 for b in bits], color="r", linewidth=2, drawstyle="steps-pre")
+        plt.ylim([-1,6])
+        step = 0.9
+        for tbit, bit in enumerate(list(map(int, [c for c in binario]))):
+            plt.text(tbit + step, 3.5, str(bit))
+            step += 1
+        plt.gca().axis('off')
         plt.show()
-
+        
         # Aplicar o algoritmo de codificação de linha (Manchester Diferencial) modo inverso
         print()
         print("Mensagem codificada em Manchester Diferencial: " + msg_codificada)
-        binario = difManchesterDecoding(msg_codificada)
 
         # Convertendo o binário
         print()

@@ -16,7 +16,7 @@ def ceaserCipherEncoding(msg):
 
 def difManchesterEncoding(bits):
     primeiraVez = True
-    msg_codificada = ""
+    msg_codificada = "1"
     anterior = ""
     for b in bits:
         if primeiraVez:
@@ -66,8 +66,16 @@ if __name__ == "__main__":
 
     # Apresentação do gráfico
     bits = list(map(int, [c for c in msg_codificada]))
-    plt.plot(bits, drawstyle="steps-pre")
-    plt.ylabel('Manchester Diferencial')
+    for i in range(0, len(bits)+1, 2):
+        plt.axvline(i, color=".5", linewidth=2)
+    plt.axhline(2.5, color='.5', linewidth=2)
+    plt.plot([b+2 for b in bits], color="r", linewidth=2, drawstyle="steps-pre")
+    plt.ylim([-1,6])
+    step = 0.9
+    for tbit, bit in enumerate(list(map(int, [c for c in binary]))):
+        plt.text(tbit + step, 3.5, str(bit))
+        step += 1
+    plt.gca().axis('off')
     plt.show()
 
     # Enviar para o servidor
