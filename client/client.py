@@ -1,4 +1,6 @@
 import socket, pickle
+import tkinter as tk
+from tkinter.constants import END
 import matplotlib.pyplot as plt
   
 PORT = 12345
@@ -6,6 +8,30 @@ SERVER = socket.gethostbyname(socket.gethostname())
 ADDR = (SERVER, PORT)
 DISCONNECT = "!DISCONNECT"
 CHAVE_CRIPTO = 5
+
+root = tk.Tk()
+
+msgEntry = tk.Entry(root, width=80)
+criptoEntry = tk.Entry(root, width=80)
+binarioEntry = tk.Entry(root, width=80)
+manchesterEntry = tk.Entry(root, width=80)
+
+def gui():
+
+    tk.Label(root, text="Digite a mensagem: ").grid(row=0)
+    tk.Label(root, text="Mensagem Criptografada: ").grid(row=1)
+    tk.Label(root, text="Mensagem em Binário: ").grid(row=2)
+    tk.Label(root, text="Mensagem aplicado código manchester: ").grid(row=3)
+
+    msgEntry.grid(row=0, column=1)
+    criptoEntry.grid(row=1, column=1)
+    binarioEntry.grid(row=2, column=1)
+    manchesterEntry.grid(row=3, column=1)
+
+    button = tk.Button(root, text="Enviar", command=start)
+    button.grid(row=4)
+
+    root.mainloop()
 
 def ceaserCipherEncoding(msg):
     cripto = ""
@@ -39,30 +65,26 @@ def difManchesterEncoding(bits):
                 msg_codificada += anterior
     return msg_codificada
 
-if __name__ == "__main__":
+def start():
+    msg = msgEntry.get()
     # Iniciando conexão
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect(ADDR)
 
-    # Digitar 
-    print("Escreva sua mensagem: ", end="")
-    msg = input()
-    print()
-
     # Criptografia
     cripto = ceaserCipherEncoding(msg)
-    print("Mensagem Criptografada: " + cripto)
-    print()
+    criptoEntry.delete(0,END)
+    criptoEntry.insert(0,cripto)
 
     # Transforma em binário
     binary = ''.join(format(ord(i), '08b') for i in cripto)
-    print("Binario: " + binary)
-    print()
+    binarioEntry.delete(0,END)
+    binarioEntry.insert(0,binary)
 
     # Algorítmo de codificação de Linha (Manchester Diferencial)
     msg_codificada = difManchesterEncoding(binary)
-    print("Mensagem codificada em Manchester Diferencial: " + msg_codificada)
-    print()
+    manchesterEntry.delete(0,END)
+    manchesterEntry.insert(0,msg_codificada)
 
     # Apresentação do gráfico
     bits = list(map(int, [c for c in msg_codificada]))
@@ -83,3 +105,5 @@ if __name__ == "__main__":
 
     # Enviando mensagem para desconectar
     client.send(pickle.dumps(DISCONNECT))
+
+gui()
