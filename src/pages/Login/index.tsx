@@ -13,11 +13,11 @@ export default function Login() {
         <Container>
             <AppTitle>Notas</AppTitle>
             <Field placeholder="Login" placeholderTextColor={theme.placeholderColor}/>
-            <Field placeholder="Senha" placeholderTextColor={theme.placeholderColor}/>
+            <Field placeholder="Senha" placeholderTextColor={theme.placeholderColor} secureTextEntry={true}/>
             <LoginButton>
                 <LoginButtonText>Login</LoginButtonText>
             </LoginButton>
-            <RegisterLink>
+            <RegisterLink onPress={() => navigation.navigate("Register")}>
                 <RegisterLinkText>Não tem uma conta? Cadastre-se aqui!</RegisterLinkText>
             </RegisterLink>
         </Container>
