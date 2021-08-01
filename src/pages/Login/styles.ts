@@ -46,3 +46,7 @@ export const RegisterLinkText = styled.Text`
     color: ${props => props.theme.color};
     text-decoration: underline;
 `;
+
+export const ErrorText = styled.Text`
+    color: red;
+`;

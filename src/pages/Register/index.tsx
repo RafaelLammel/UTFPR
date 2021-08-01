@@ -32,9 +32,9 @@ export default function Register() {
             setIsLoading(false);
             if(res.error) {
                 Alert.alert(
+                    "Erro",
                     res.error
                 );
-                setEmailError(res.error);
             }
             else if(res.userToken)
                 Alert.alert(
@@ -97,9 +97,9 @@ export default function Register() {
             <AppTitle>Registrar</AppTitle>
             <Field style={nameError === "" ? null : {borderBottomColor: 'red'}} onChangeText={text => setName(text)} placeholder="Nome" placeholderTextColor={theme.placeholderColor}/>
             {nameError === "" ? null : <ErrorText>{nameError}</ErrorText>}
-            <Field style={emailError === "" ? null : {borderBottomColor: 'red'}} onChangeText={text => setEmail(text)} placeholder="Email" keyboardType="email-address" placeholderTextColor={theme.placeholderColor}/>
+            <Field style={emailError === "" ? null : {borderBottomColor: 'red'}} onChangeText={text => setEmail(text)} placeholder="Email" autoCapitalize="none" keyboardType="email-address" placeholderTextColor={theme.placeholderColor}/>
             {emailError === "" ? null : <ErrorText>{emailError}</ErrorText>}
-            <Field style={passwordError === "" ? null : {borderBottomColor: 'red'}} onChangeText={text => setPassword(text)} placeholder="Senha" secureTextEntry={true} placeholderTextColor={theme.placeholderColor}/>
+            <Field style={passwordError === "" ? null : {borderBottomColor: 'red'}} onChangeText={text => setPassword(text)} placeholder="Senha" autoCapitalize="none" secureTextEntry={true} placeholderTextColor={theme.placeholderColor}/>
             {passwordError === "" ? null : <ErrorText>{passwordError}</ErrorText>}
             <RegisterButton onPress={handleRegister}>
                 <RegisterButtonText>Registrar</RegisterButtonText>
