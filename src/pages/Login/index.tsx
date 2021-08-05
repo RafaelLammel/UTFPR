@@ -28,12 +28,16 @@ export default function Login() {
         if(validate()) {
             setIsLoading(true);
             const res: LoginResult = await login(email, password);
-            setIsLoading(false);
             if(res.error) {
+                setIsLoading(false);
                 Alert.alert(
                     "Erro",
                     res.error
                 );
+                if(res.errorType == "email")
+                    setEmailError(res.error);
+                else if(res.errorType == "password")
+                    setPasswordError(res.error);
             }
         }
         else {

@@ -29,14 +29,18 @@ export default function Register() {
         if(validate()) {
             setIsLoading(true);
             const res: RegisterResult = await register(email, name, password);
-            setIsLoading(false);
             if(res.error) {
+                setIsLoading(false);
                 Alert.alert(
                     "Erro",
                     res.error
                 );
+                if(res.errorType == "email")
+                    setEmailError(res.error);
+                else if(res.errorType == "password")
+                    setPasswordError(res.error);
             }
-            else if(res.userToken)
+            else
                 Alert.alert(
                     "Sucesso",
                     "Conta criada com sucesso!",
@@ -47,11 +51,6 @@ export default function Register() {
                         }
                     ],
                     {cancelable: false}
-                )
-            else
-                Alert.alert(
-                    "Erro",
-                    "Algum erro aconteceu!"
                 )
         }
         else {

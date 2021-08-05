@@ -1,4 +1,4 @@
 export default interface Register {
     error?: string,
-    userToken?: string
+    errorType?: string
 }
