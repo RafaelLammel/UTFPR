@@ -1,4 +1,5 @@
 export default {
-    background: '#333',
-    color: '#f5f5f5'
+    background: '#000',
+    color: '#f5f5f5',
+    placeholderColor: '#808080'
 }

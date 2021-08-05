@@ -1,18 +1,15 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import Login from '../pages/Login';
-import Home from '../pages/Home';
-
-const AppStack = createStackNavigator();
+import React, { useState, useContext } from 'react';
+import AuthRoutes from './authRoutes';
+import AppRoutes from './appRoutes';
+import AuthContext from '../contexts/auth';
 
 export default function Routes() {
+    
+    const { user } = useContext(AuthContext);
+
     return (
-        <NavigationContainer>
-            <AppStack.Navigator>
-                <AppStack.Screen name="Login" component={Login}/>
-                <AppStack.Screen name="Home" component={Home}/>
-            </AppStack.Navigator>
-        </NavigationContainer>
+        <>
+            {user ? <AppRoutes/> : <AuthRoutes/>}
+        </> 
     )
 }
