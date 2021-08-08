@@ -6,8 +6,13 @@ export async function register(email: string, name: string, password: string): P
     let registerResult: RegisterResult = {};
     try {
         const userAuth = await firebase.auth().createUserWithEmailAndPassword(email, password);
-        firebase.firestore().collection("users").doc(userAuth.user?.uid).set({
-            name: name
+        await userAuth.user?.updateProfile({
+            displayName: name
+        });
+        await firebase.firestore().collection("users").doc(userAuth.user?.uid).set({
+            notasUsuario: [],
+            notasCompartilhadas: [],
+            tags: []
         });
     }
     catch (e) {
