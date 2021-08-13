@@ -2,6 +2,7 @@ import React from 'react';
 import { Text, TouchableOpacity, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { logout } from '../../services/auth';
+import firebase from 'firebase';
 
 export default function Home() {
 
@@ -9,7 +10,7 @@ export default function Home() {
 
     return (
         <SafeAreaView>
-            <Text>Bem vindo ao Home!</Text>
+            <Text>Bem vindo ao Home! {firebase.auth().currentUser?.displayName}</Text>
             <TouchableOpacity onPress={() => navigation.navigate("Configuration")}>
                 <Text>Configurações</Text>
             </TouchableOpacity>

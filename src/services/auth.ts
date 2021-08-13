@@ -2,8 +2,8 @@ import firebase from "./firebase"
 import RegisterResult from "../interfaces/RegisterResult";
 import LoginResult from "../interfaces/LoginResult";
 
-export async function register(email: string, name: string, password: string): Promise<RegisterResult> {
-    let registerResult: RegisterResult = {};
+export async function register(email: string, name: string = "", password: string): Promise<RegisterResult> {
+    let registerResult: RegisterResult = {user: null};
     try {
         const userAuth = await firebase.auth().createUserWithEmailAndPassword(email, password);
         await userAuth.user?.updateProfile({
@@ -14,6 +14,7 @@ export async function register(email: string, name: string, password: string): P
             notasCompartilhadas: [],
             tags: []
         });
+        registerResult = { user: userAuth.user }
     }
     catch (e) {
         let error: string;
@@ -32,7 +33,7 @@ export async function register(email: string, name: string, password: string): P
         }
         else
             error = "Ocorreu algum erro no servidor!"
-        registerResult = { error, errorType }
+        registerResult = { error, errorType, user: null }
     }
     return registerResult;
 }
