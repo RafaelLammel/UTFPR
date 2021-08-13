@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { ActivityIndicator, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { useTheme } from 'styled-components';
+import AuthContext from '../../contexts/auth';
 import RegisterResult from '../../interfaces/RegisterResult';
 import { register } from '../../services/auth';
 import { AppTitle, Container, ErrorText, Field, GrayScreen, RegisterButton, RegisterButtonText } from './styles';
@@ -21,7 +21,7 @@ export default function Register() {
     // Símbolo de carregando
     const [isLoading, setIsLoading] = useState(false);
 
-    const navigation = useNavigation();
+    const { handleAuth } = useContext(AuthContext);
 
     const theme = useTheme();
 
@@ -29,8 +29,8 @@ export default function Register() {
         if(validate()) {
             setIsLoading(true);
             const res: RegisterResult = await register(email, name, password);
+            setIsLoading(false);
             if(res.error) {
-                setIsLoading(false);
                 Alert.alert(
                     "Erro",
                     res.error
@@ -40,14 +40,14 @@ export default function Register() {
                 else if(res.errorType == "password")
                     setPasswordError(res.error);
             }
-            else
+            else if(res.user)
                 Alert.alert(
                     "Sucesso",
                     "Conta criada com sucesso!",
                     [
                         {
                             text: "OK",
-                            onPress: () => navigation.navigate("Login")
+                            onPress: () => handleAuth(res.user)
                         }
                     ],
                     {cancelable: false}

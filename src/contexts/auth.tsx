@@ -3,7 +3,9 @@ import firebase from '../services/firebase';
 
 interface AuthData {
     signed: boolean,
-    user: object | null
+    user: object | null,
+    loading: boolean,
+    handleAuth(u: firebase.User | null): void
 };
 
 const AuthContext = createContext<AuthData>({} as AuthData);
@@ -11,12 +13,17 @@ const AuthContext = createContext<AuthData>({} as AuthData);
 export const AuthProvider: React.FC = ({children}) => {
 
     const [user, setUser] = useState<object | null>(null);
+    const [loading, setLoading] = useState(true);
 
     function handleAuth(u: firebase.User | null) {
-        if(u)
-            setUser(u);
+        if(u) {
+            if(u.displayName)
+                setUser(u);
+        }
         else
             setUser(null);
+        if(loading)
+            setLoading(false);
     }
 
     useEffect(() => {
@@ -25,7 +32,7 @@ export const AuthProvider: React.FC = ({children}) => {
     }, []);
 
     return (
-        <AuthContext.Provider value={{signed: !!user, user}}>
+        <AuthContext.Provider value={{signed: !!user, user, loading, handleAuth}}>
             {children}
         </AuthContext.Provider>
     )
