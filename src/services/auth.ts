@@ -9,10 +9,12 @@ export async function register(email: string, name: string = "", password: strin
         await userAuth.user?.updateProfile({
             displayName: name
         });
-        await firebase.firestore().collection("users").doc(userAuth.user?.uid).set({
+        await firebase.firestore().collection("usuarios").doc(userAuth.user?.uid).set({
+            email,
             notasUsuario: [],
             notasCompartilhadas: [],
-            tags: []
+            tags: [],
+            usuariosBanidos: []
         });
         registerResult = { user: userAuth.user }
     }

@@ -14,6 +14,12 @@ export const Section = styled.View`
     border-color: ${props => props.theme.placeholderColor};
 `;
 
+export const HeaderTitle = styled.Text`
+    color: ${props => props.theme.color};
+    font-size: 32px;
+    font-weight: bold;
+`;
+
 export const SectionTitle = styled.Text`
     color: ${props => props.theme.color};
     font-size: 20px;
