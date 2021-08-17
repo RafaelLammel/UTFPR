@@ -3,7 +3,7 @@ import firebase from '../services/firebase';
 
 interface AuthData {
     signed: boolean,
-    user: object | null,
+    user: firebase.User | null,
     loading: boolean,
     handleAuth(u: firebase.User | null): void
 };
@@ -12,7 +12,7 @@ const AuthContext = createContext<AuthData>({} as AuthData);
 
 export const AuthProvider: React.FC = ({children}) => {
 
-    const [user, setUser] = useState<object | null>(null);
+    const [user, setUser] = useState<firebase.User | null>(null);
     const [loading, setLoading] = useState(true);
 
     function handleAuth(u: firebase.User | null) {

@@ -4,6 +4,8 @@ import { ActivityIndicator, FlatList, TouchableOpacity, Modal, Alert } from "rea
 import { Ionicons } from '@expo/vector-icons';
 import { getBannedUsers, addBannedUser, removeBannedUser } from "../../services/user";
 import { Container, Section, HeaderTitle, FloatingButton, FloatingButtonIcon, CenterView, NothingText, ListItem, ListItemText, ModalContainer, ModalText, ModalBox, ModalInput, ModalFooter } from "./styles";
+import { useContext } from "react";
+import AuthContext from "../../contexts/auth";
 
 const ShareConfig: React.FC = () => {
 
@@ -12,6 +14,8 @@ const ShareConfig: React.FC = () => {
     const [modal, setModal] = useState(false);
     const [email, setEmail] = useState('');
     const [error, setError] = useState('');
+
+    const { user } = useContext(AuthContext);
 
     const getUsers = async () => {
         const res = await getBannedUsers();
@@ -44,12 +48,6 @@ const ShareConfig: React.FC = () => {
                 await getUsers();
             }
         }
-        else {
-            Alert.alert(
-                "Erro",
-                "Email inválido!"
-            );
-        }
     }
 
     const handleRemoveBan = async (e: string) => {
@@ -69,7 +67,30 @@ const ShareConfig: React.FC = () => {
     }
 
     const validate = (): boolean => {
-        return email !== '' && email !== undefined && email !== null;
+        if(email === '' || email === undefined || email === null) {
+            Alert.alert(
+                "Erro",
+                "Email inválido!"
+            );
+            return false;
+        }
+        if(user) {
+            if(email === user.email) {
+                Alert.alert(
+                    "Erro",
+                    "Você não pode banir a si mesmo!"
+                );
+                return false;
+            }
+        }
+        else {
+            Alert.alert(
+                "Erro",
+                "Ocorreu algum erro com sua conta!"
+            );
+            return false;
+        }
+        return true
     }
 
     const UserListItem: React.FC = ({ children }) => (
