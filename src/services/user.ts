@@ -1,6 +1,19 @@
 import firebase from "firebase";
 import User from "../interfaces/User";
 
+export async function addTag(tag: string) {
+    try {
+        const user = await firebase.firestore().collection('usuarios').doc(firebase.auth().currentUser?.uid);
+        user.update({
+            tags: firebase.firestore.FieldValue.arrayUnion(tag)
+        });
+        return { ok: 'ok' };
+    }
+    catch(e) {
+        return { error: "Falha no servidor!" };
+    }
+}
+
 export async function getBannedUsers() {
     try {
         const user = await firebase.firestore().collection('usuarios').doc(firebase.auth().currentUser?.uid).get();
