@@ -1,7 +1,10 @@
-import sys, getopt, unicodedata
+import sys, getopt, unicodedata, string
 
 
-def cripto(k, fileName, cipher):    
+ACCEPTED = list(string.ascii_uppercase+string.ascii_lowercase+string.digits)
+
+
+def cripto(k, fileName, cipher):
     try:
         f = open(fileName, encoding="utf-8")
         text = unicodedata.normalize('NFD', f.read()).encode('ascii', 'ignore').decode("utf-8")
@@ -9,14 +12,10 @@ def cripto(k, fileName, cipher):
         cipherdText = ""
         k = cipher * k
         for c in text:
-            asciiChar = ord(c)
-            if asciiChar >= 65 and asciiChar <= 90:
-                asciiChar = (asciiChar + k - 65) % 26 + 65
-            elif asciiChar >= 97 and asciiChar <= 122:
-                asciiChar = (asciiChar + k - 97) % 26 + 97
-            elif asciiChar >= 48 and asciiChar <= 57:
-                asciiChar = (asciiChar + k - 48) % 10 + 48
-            cipherdText += chr(asciiChar)
+            letter = c
+            if c in ACCEPTED:
+                letter = ACCEPTED[(ACCEPTED.index(letter) + k) % 62]
+            cipherdText += letter
         if cipher == 1:
             f = open("texto-cifrado.txt", "w")
         else:
@@ -26,7 +25,7 @@ def cripto(k, fileName, cipher):
     except FileNotFoundError:
         print("Erro: arquivo não encontrado!")
     except:
-        print("Erro desconhecido na hora de decifrar!")
+        print("Erro desconhecido na hora de aplicar o algoritmo!")
 
 
 def main(argv):
