@@ -1,2 +1,4 @@
 *.txt
 !mensagem.txt
+!mensagem-aberta.txt
+chave.dat
