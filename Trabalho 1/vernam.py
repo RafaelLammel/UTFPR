@@ -1,10 +1,25 @@
 import sys, getopt, unicodedata, string, random
 
 
+# Lista de caracteres aceitaveis na criptografia
 ACCEPTED = list(string.ascii_uppercase+string.ascii_lowercase+string.digits)
 
 
-def generateKey(keyFileName, textLen):
+def generateKey(keyFileName, text):
+    """Função para gerar a chave aleatória usada na criptografia de Vernam
+
+    Args:
+        keyFileName (string): Caminho onde deve ser criado o arquivo que irá conter a chave, em formato '.dat'. (Se não existir, será criado)
+        text (string): Texto a ser criptografado
+
+    Returns:
+        string: a chave gerada aleatóriamente
+    """
+
+    textLen = 0
+    for c in text:
+        if c in ACCEPTED:
+            textLen += 1
     key = ""
     for x in range(textLen):
         key += random.choice(ACCEPTED)
@@ -14,16 +29,20 @@ def generateKey(keyFileName, textLen):
     return key
 
 
-def cripto(keyFileName, fileName, cipher):
+def vernam(keyFileName, fileName, cipher):
+    """Função utilizada para criptografar ou descriptografar um arquivo txt com a cifra de cesar.
+
+    Args:
+        k (int): Chave para a cifra de cesar
+        fileName (string): Caminho do arquivo a ser criptografado/descriptografado
+        cipher (int): Recebe 1 para quando a função é criptografar e -1 quando descriptografar
+    """
+
     file = open(fileName, "r")
     text = unicodedata.normalize('NFD', file.read()).encode('ascii', 'ignore').decode("utf-8")
     file.close()
-    textLen = 0
-    for c in text:
-        if c in ACCEPTED:
-            textLen += 1
     if cipher == 1:
-        key = generateKey(keyFileName, textLen)
+        key = generateKey(keyFileName, text)
     else:
         keyFile = open(keyFileName, "r")
         key = keyFile.read()
@@ -62,7 +81,7 @@ def main(argv):
         if len(args) < 2:
             print("Erro: Apenas 1 arquivo foi referenciado! Precisa de um arquivo chave e outro texto")
         else:
-            cripto(args[0], args[1], 1 if ("-c" in dicto) else -1)
+            vernam(args[0], args[1], 1 if ("-c" in dicto) else -1)
     else:
         print("Erro! Nenhuma opção fornecida! Passe uma opção:\n-c: cifrar\n-d: decifrar")
 

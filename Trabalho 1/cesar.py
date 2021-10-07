@@ -1,12 +1,22 @@
 import sys, getopt, unicodedata, string
 
 
+# Lista de caracteres aceitaveis na criptografia
 ACCEPTED = list(string.ascii_uppercase+string.ascii_lowercase+string.digits)
 
 
-def cripto(k, fileName, cipher):
+def cesar(k, fileName, cipher):
+    """Função utilizada para criptografar ou descriptografar um arquivo txt com a cifra de cesar.
+
+    Args:
+        k (int): Chave para a cifra de cesar
+        fileName (string): Caminho do arquivo a ser criptografado/descriptografado
+        cipher (int): Recebe 1 para quando a função é criptografar e -1 quando descriptografar
+    """
+
     try:
         f = open(fileName, encoding="utf-8")
+        # Pegando texto sem acentos do arquivo
         text = unicodedata.normalize('NFD', f.read()).encode('ascii', 'ignore').decode("utf-8")
         f.close()
         cipherdText = ""
@@ -47,7 +57,7 @@ def main(argv):
             else:
                 try:
                     k = int(dicto["-k"])
-                    cripto(k, args[0], 1 if ("-c" in dicto) else -1)
+                    cesar(k, args[0], 1 if ("-c" in dicto) else -1)
                 except ValueError:
                     print("Erro: chave inválida!")
         else:
