@@ -19,8 +19,8 @@ def criar_usuario():
     if next((item for item in user if item["usuario"] == usuario), False):
         print("\nNome de usuario ja cadastrado!")
         return
-    senha_semente = input("Favor entre com uma senha semente: ")
     senha_local = input("Favor entre com uma senha local: ")
+    senha_semente = input("Favor entre com uma senha semente: ")
     user.append({ "usuario": usuario, "senha_local": hashlib.sha512(senha_local.encode()).hexdigest() })
     seed.append({ "usuario": usuario, "senha_semente": hashlib.sha512(senha_semente.encode()).hexdigest() })
     with open(USER_DATA, "w") as file:
@@ -46,27 +46,20 @@ def login():
     return False
 
 
-def criar_token(usuario):
+def criar_tokens(usuario, hora_date):
     with open(SEED_DATA, "r") as file:
         data = json.load(file)
     user = next((item for item in data if item["usuario"] == usuario), False)
     if user:
         senha_hash = user["senha_semente"]
-        hora_date = datetime.now()
         hora = hora_date.strftime("%d/%m/%Y %H:%M")
         hora_hash = hashlib.sha256(hora.encode()).hexdigest()
         senha_atual = hashlib.sha256(str(senha_hash + hora_hash).encode()).hexdigest()
-        print("\nSenhas Geradas: ")
-        print("----------------------------------------------------")
+        tokens = []
         for x in range(5):
-            print(str(x+1) + ": " + senha_atual[0:6])
+            tokens.append(senha_atual[0:6])
             senha_atual = hashlib.sha256(senha_atual.encode()).hexdigest()
-        print("----------------------------------------------------")
-        print("As senhas acima serão expiradas em: " + datetime.fromtimestamp(float(hora_date.timestamp() + 60)).strftime("%d/%m/%Y %H:%M"))
-    try:
-        pass
-    except:
-        print("Erro!")
+        return tokens
 
 
 def main():
@@ -89,7 +82,16 @@ def main():
                     try:
                         opcao_logado = int(input())
                         if opcao_logado == 1:
-                            criar_token(usuario)
+                            hora_date = datetime.now()
+                            tokens = criar_tokens(usuario, hora_date)
+                            x = 1
+                            print("\nSenhas Geradas: ")
+                            print("----------------------------------------------------")
+                            for token in tokens:
+                                print(str(x) + ": " + token)
+                                x += 1
+                            print("----------------------------------------------------")
+                            print("As senhas acima serão expiradas em: " + datetime.fromtimestamp(float(hora_date.timestamp() + 60)).strftime("%d/%m/%Y %H:%M"))
                         elif opcao_logado != 2:
                             print("Opcao invalida!")
                     except ValueError:
