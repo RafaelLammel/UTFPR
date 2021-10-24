@@ -5,6 +5,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 SEED_DATA = "seed_data.json"
 TOKENS_DATA = "tokens_data.json"
+SALT = "184143fd945d8e33e251a0cf7e6a0e5d3e838fb096d3824f880874a0ed61392f"
 
 
 def criar_tokens():
@@ -20,11 +21,11 @@ def criar_tokens():
         senha_hash = user["senha_semente"]
         hora = hora_date.strftime("%d/%m/%Y %H:%M")
         hora_hash = hashlib.sha256(hora.encode()).hexdigest()
-        senha_atual = hashlib.sha256(str(senha_hash + hora_hash).encode()).hexdigest()
+        senha_atual = hashlib.sha256(str(senha_hash + hora_hash + SALT).encode()).hexdigest()
         tokens = []
         for x in range(5):
             tokens.append(senha_atual[0:6])
-            senha_atual = hashlib.sha256(senha_atual.encode()).hexdigest()
+            senha_atual = hashlib.sha256(str(senha_atual + SALT).encode()).hexdigest()
         token_user = next((item for item in tokens_data if item["usuario"] == user["usuario"]), False)
         if token_user:
             tokens_data[tokens_data.index(token_user)]["tokens"] = tokens
@@ -56,13 +57,14 @@ def main():
         sched.add_job(criar_tokens, "cron", minute="*")
         sched.start()
         criar_tokens()
-        print("Por favor, insira login e senha descartavel: ")
-        usuario = input("Usuario: ")
-        token = input("Senha descartável: ")
-        if login(usuario, token):
-            print("\nSenha válida!")
-        else:
-            print("\nSenha invalida!")
+        while True:
+            print("Por favor, insira login e senha descartavel: ")
+            usuario = input("Usuario: ")
+            token = input("Senha descartável: ")
+            if login(usuario, token):
+                print("\nSenha válida!")
+            else:
+                print("\nSenha invalida!")
     except KeyboardInterrupt:
         pass
 

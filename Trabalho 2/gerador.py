@@ -4,6 +4,7 @@ from datetime import datetime
 
 USER_DATA = "user_data.json"
 SEED_DATA = "seed_data.json"
+SALT = "184143fd945d8e33e251a0cf7e6a0e5d3e838fb096d3824f880874a0ed61392f"
 
 
 def criar_usuario():
@@ -20,7 +21,9 @@ def criar_usuario():
         print("\nNome de usuario ja cadastrado!")
         return
     senha_local = input("Favor entre com uma senha local: ")
+    senha_local += SALT
     senha_semente = input("Favor entre com uma senha semente: ")
+    senha_semente += SALT
     user.append({ "usuario": usuario, "senha_local": hashlib.sha512(senha_local.encode()).hexdigest() })
     seed.append({ "usuario": usuario, "senha_semente": hashlib.sha512(senha_semente.encode()).hexdigest() })
     with open(USER_DATA, "w") as file:
@@ -32,7 +35,7 @@ def criar_usuario():
 def login():
     usuario = input("\nFavor entre com o usuario: ")
     senha_local = input("Favor entre com a senha local: ")
-    senha_hash = hashlib.sha512(senha_local.encode()).hexdigest()
+    senha_hash = hashlib.sha512(str(senha_local + SALT).encode()).hexdigest()
     try:
         with open(USER_DATA, "r") as file:
             data = json.load(file)
@@ -54,11 +57,11 @@ def criar_tokens(usuario, hora_date):
         senha_hash = user["senha_semente"]
         hora = hora_date.strftime("%d/%m/%Y %H:%M")
         hora_hash = hashlib.sha256(hora.encode()).hexdigest()
-        senha_atual = hashlib.sha256(str(senha_hash + hora_hash).encode()).hexdigest()
+        senha_atual = hashlib.sha256(str(senha_hash + hora_hash + SALT).encode()).hexdigest()
         tokens = []
         for x in range(5):
             tokens.append(senha_atual[0:6])
-            senha_atual = hashlib.sha256(senha_atual.encode()).hexdigest()
+            senha_atual = hashlib.sha256(str(senha_atual + SALT).encode()).hexdigest()
         return tokens
 
 
