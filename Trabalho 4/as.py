@@ -1,20 +1,17 @@
-import socket, threading
+import socket, threading, random, sqlite3
 from base64 import b64encode, b64decode
 from Crypto.Cipher import DES
 
 
 # Configurações do SOCKET
 HEADER = 64
-PORT = 4001
+PORT = 3001
 SERVER = socket.gethostbyname(socket.gethostname())
 ADDR = (SERVER, PORT)
 FORMAT = "utf-8"
 SEPARADOR = "."
 
-
-# Chave do serviço
-CHAVE = "1cbec737"
-
+CHAVE_TGS = "d486dfbd"
 
 #Inicialização do Socket
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -34,34 +31,26 @@ def decifra(chave: str, msg_cifrada: str, iv: str) -> str:
     return msg_decifrada
 
 
-# Prepara resposta de retorno para o cliente
-def prepara_resposta(servico: int, nmr_randomico: int, chave_sessao: str) -> bytes:
-    msg = ""
-    if servico == 1:
-        msg = "Você requisitou pelo serviço 1 do servidor 1!"
-    else:
-        msg = "Você requisitou pelo serviço 2 do servidor 1!"
-    resposta = f"{msg}{SEPARADOR}{nmr_randomico}"
-    resposta_cifrado, iv = cifra(chave_sessao, resposta)
-    return f"{resposta_cifrado}{SEPARADOR}{iv}".encode(FORMAT)
+def prepara_resposta(numero_randomico: str, chave_cliente: str, id_cliente: str, validade: str) -> bytes:
+    chave_sessao_tgs = random.randbytes(8).hex()[0:8]
+    parte1 = f"{chave_sessao_tgs}{SEPARADOR}{numero_randomico}"
+    parte1_cifra, iv_parte1 = cifra(chave_cliente, parte1)
+    parte2 = f"{id_cliente}{SEPARADOR}{validade}{SEPARADOR}{chave_sessao_tgs}"
+    parte2_cifra, iv_parte2 = cifra(CHAVE_TGS, parte2)
+    return f"{parte1_cifra}{SEPARADOR}{parte2_cifra}{SEPARADOR}{iv_parte1}{SEPARADOR}{iv_parte2}".encode(FORMAT)
 
 
-def recebe_mensagem(msg: str) -> tuple[int, int, str]:
-    # Separa dados da mensagem
+def recebe_mensagem(msg: str) -> tuple[str, str, str, str]:
     dados_msg = msg.split(SEPARADOR)
 
-    # Decifra dados do TGS
-    dados_tgs = decifra(CHAVE, dados_msg[1], dados_msg[3])
-    dados_tgs_split = dados_tgs.split(SEPARADOR)
-    chave_sessao = dados_tgs_split[2]
+    con = sqlite3.connect("as.db")
+    chave_cliente = con.cursor().execute("SELECT chave FROM usuario WHERE nome = ?", [dados_msg[0]]).fetchone()[0]
+    con.close()
 
-    # Decifra dados do cliente
-    dados_cliente = decifra(chave_sessao, dados_msg[0], dados_msg[2])
-    dados_cliente_split = dados_cliente.split(SEPARADOR)
-    servico = dados_cliente_split[2]
-    nmr_randomico = dados_cliente_split[3]
+    msg_cliente = decifra(chave_cliente, dados_msg[1], dados_msg[2])
+    msg_cliente_split = msg_cliente.split(SEPARADOR)
 
-    return int(servico), int(nmr_randomico), chave_sessao
+    return msg_cliente_split[2], chave_cliente, dados_msg[0], msg_cliente_split[1]
 
 
 # Trata cada conexão nova em Thread separada
@@ -74,8 +63,8 @@ def trata_cliente(conn: socket.socket, addr: socket.AddressFamily):
         if tamanho_msg:
             tamanho_msg = int(tamanho_msg)
             msg = conn.recv(tamanho_msg).decode(FORMAT)
-            servico, nmr_randomico, chave_cliente = recebe_mensagem(msg)
-            resposta = prepara_resposta(servico, nmr_randomico, chave_cliente)
+            numero_randomico, chave_cliente, id_cliente, validade = recebe_mensagem(msg)
+            resposta = prepara_resposta(numero_randomico, chave_cliente, id_cliente, validade)
             conn.send(resposta)
             connected = False
     conn.close()
@@ -83,7 +72,7 @@ def trata_cliente(conn: socket.socket, addr: socket.AddressFamily):
 
 def main():
     server.listen()
-    print(f"[RODANDO] Servidor está ouvindo em {SERVER}:{PORT}")
+    print(f"[RODANDO] TGS está ouvindo em {SERVER}:{PORT}")
     while True:
         conn, addr = server.accept()
         thread = threading.Thread(target=trata_cliente, args=(conn, addr))
@@ -92,5 +81,5 @@ def main():
 
 
 if __name__ == "__main__":
-    print("[INICIANDO] Servidor está iniciando...")
+    print("[INICIANDO] TGS está iniciando...")
     main()

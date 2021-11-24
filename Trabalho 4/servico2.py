@@ -13,7 +13,7 @@ SEPARADOR = "."
 
 
 # Chave do serviço
-CHAVE = "d486df"
+CHAVE = "c8fd0ec3"
 
 
 #Inicialização do Socket
@@ -51,7 +51,7 @@ def recebe_mensagem(msg: str) -> tuple[int, int, str]:
     dados_msg = msg.split(SEPARADOR)
 
     # Decifra dados do TGS
-    dados_tgs = decifra(CHAVE, dados_msg[1], dados_msg[2])
+    dados_tgs = decifra(CHAVE, dados_msg[1], dados_msg[3])
     dados_tgs_split = dados_tgs.split(SEPARADOR)
     chave_sessao = dados_tgs_split[2]
 
