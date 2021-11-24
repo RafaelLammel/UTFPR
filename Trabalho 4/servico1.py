@@ -3,6 +3,7 @@ from base64 import b64encode, b64decode
 from Crypto.Cipher import DES
 
 
+# Configurações do SOCKET
 HEADER = 64
 PORT = 4001
 SERVER = socket.gethostbyname(socket.gethostname())
@@ -11,9 +12,11 @@ FORMAT = "utf-8"
 SEPARADOR = "."
 
 
+# Chave do serviço
 CHAVE = "5da05cfa"
 
 
+#Inicialização do Socket
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(ADDR)
 
@@ -31,6 +34,7 @@ def decifra(chave: str, msg_cifrada: str, iv: str) -> str:
     return msg_decifrada
 
 
+# Prepara resposta de retorno para o cliente
 def prepara_resposta(servico: int, nmr_randomico: int, chave_sessao: str) -> bytes:
     msg = ""
     if servico == 1:
@@ -43,7 +47,6 @@ def prepara_resposta(servico: int, nmr_randomico: int, chave_sessao: str) -> byt
 
 
 def recebe_mensagem(msg: str) -> tuple[int, int, str]:
-
     # Separa dados da mensagem
     dados_msg = msg.split(SEPARADOR)
 
@@ -61,6 +64,7 @@ def recebe_mensagem(msg: str) -> tuple[int, int, str]:
     return int(servico), int(nmr_randomico), chave_sessao
 
 
+# Trata cada conexão nova em Thread separada
 def trata_cliente(conn: socket.socket, addr: socket.AddressFamily):
     print(f"[NOVA CONEXÃO] {addr} conectou")
     connected = True
