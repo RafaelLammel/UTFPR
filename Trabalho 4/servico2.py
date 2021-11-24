@@ -13,7 +13,7 @@ SEPARADOR = "."
 
 
 # Chave do serviço
-CHAVE = "5da05cfa"
+CHAVE = "d486df"
 
 
 #Inicialização do Socket
