@@ -9,7 +9,7 @@ PORT = 3001
 SERVER = socket.gethostbyname(socket.gethostname())
 ADDR = (SERVER, PORT)
 FORMAT = "utf-8"
-SEPARADOR = "."
+SEPARADOR = "\n"
 
 CHAVE_TGS = "d486dfbd"
 IV = "bomuoN9Q4P4="

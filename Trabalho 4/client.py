@@ -11,8 +11,8 @@ PORTS = {
 }
 SERVER = socket.gethostbyname(socket.gethostname())
 FORMAT = "utf-8"
-SEPARADOR = "."
-TEMPO_TOKEN = 60
+SEPARADOR = "\n"
+TEMPO_TOKEN = 3600
 IV = "bomuoN9Q4P4="
 
 

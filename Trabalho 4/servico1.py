@@ -1,4 +1,4 @@
-import socket, threading
+import socket, threading, datetime
 from base64 import b64encode, b64decode
 from Crypto.Cipher import DES
 
@@ -9,7 +9,7 @@ PORT = 4001
 SERVER = socket.gethostbyname(socket.gethostname())
 ADDR = (SERVER, PORT)
 FORMAT = "utf-8"
-SEPARADOR = "."
+SEPARADOR = "\n"
 
 
 # Chave do serviço
@@ -35,9 +35,11 @@ def decifra(chave: str, msg_cifrada: str) -> str:
 
 
 # Prepara resposta de retorno para o cliente
-def prepara_resposta(servico: str, nmr_randomico: str, chave_sessao: str) -> bytes:
+def prepara_resposta(servico: int, nmr_randomico: str, chave_sessao: str) -> bytes:
     msg = ""
-    if servico == 1:
+    if servico == -1:
+        msg = "Seu token expirou!"
+    elif servico == 1:
         msg = "Você requisitou pelo serviço 1 do servidor 1!"
     else:
         msg = "Você requisitou pelo serviço 2 do servidor 1!"
@@ -58,7 +60,9 @@ def recebe_mensagem(msg: str) -> tuple[str, str, str]:
     # Decifra dados do cliente
     dados_cliente = decifra(chave_sessao, dados_msg[0])
     dados_cliente_split = dados_cliente.split(SEPARADOR)
-    servico = dados_cliente_split[2]
+    servico = "-1"
+    if(float(dados_tgs_split[1]) > datetime.datetime.now().timestamp()):
+        servico = dados_cliente_split[2]
     nmr_randomico = dados_cliente_split[3]
 
     return servico, nmr_randomico, chave_sessao
@@ -75,7 +79,7 @@ def trata_cliente(conn: socket.socket, addr: socket.AddressFamily):
             tamanho_msg = int(tamanho_msg)
             msg = conn.recv(tamanho_msg).decode(FORMAT)
             servico, nmr_randomico, chave_cliente = recebe_mensagem(msg)
-            resposta = prepara_resposta(servico, nmr_randomico, chave_cliente)
+            resposta = prepara_resposta(int(servico), nmr_randomico, chave_cliente)
             conn.send(resposta)
             connected = False
     conn.close()

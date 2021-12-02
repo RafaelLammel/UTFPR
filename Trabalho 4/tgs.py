@@ -1,4 +1,4 @@
-import socket, threading, random, sqlite3
+import socket, threading, random, sqlite3, datetime
 from base64 import b64encode, b64decode
 from Crypto.Cipher import DES
 
@@ -9,7 +9,7 @@ PORT = 3002
 SERVER = socket.gethostbyname(socket.gethostname())
 ADDR = (SERVER, PORT)
 FORMAT = "utf-8"
-SEPARADOR = "."
+SEPARADOR = "\n"
 
 
 # Chave do TGS
@@ -61,7 +61,7 @@ def recebe_mensagem(msg: str) -> tuple[str, str, str, str, str]:
     dados_cliente = decifra(chave_sessao, dados_msg[0])
     dados_cliente_split = dados_cliente.split(SEPARADOR)
 
-    return dados_cliente_split[2], dados_cliente_split[3], dados_cliente_split[0], dados_cliente_split[1], chave_sessao
+    return f"{datetime.datetime.now().timestamp() + float(dados_cliente_split[2])}", dados_cliente_split[3], dados_cliente_split[0], dados_cliente_split[1], chave_sessao
 
 
 # Trata cada conexão nova em Thread separada
