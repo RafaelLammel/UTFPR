@@ -12,21 +12,21 @@ FORMAT = "utf-8"
 SEPARADOR = "."
 
 CHAVE_TGS = "d486dfbd"
+IV = "bomuoN9Q4P4="
 
 #Inicialização do Socket
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(ADDR)
 
 
-def cifra(chave: str, msg: str) -> tuple[str, str]:
-    des = DES.new(chave.encode(FORMAT), DES.MODE_OFB)
+def cifra(chave: str, msg: str) -> str:
+    des = DES.new(chave.encode(FORMAT), DES.MODE_OFB, iv=b64decode(IV))
     msg_cifrada = b64encode(des.encrypt(msg.encode(FORMAT))).decode(FORMAT)
-    iv = b64encode(des.iv).decode(FORMAT)
-    return msg_cifrada, iv
+    return msg_cifrada
 
 
-def decifra(chave: str, msg_cifrada: str, iv: str) -> str:
-    des = DES.new(chave.encode(FORMAT), DES.MODE_OFB, iv=b64decode(iv))
+def decifra(chave: str, msg_cifrada: str) -> str:
+    des = DES.new(chave.encode(FORMAT), DES.MODE_OFB, iv=b64decode(IV))
     msg_decifrada = des.decrypt(b64decode(msg_cifrada)).decode(FORMAT)
     return msg_decifrada
 
@@ -34,10 +34,10 @@ def decifra(chave: str, msg_cifrada: str, iv: str) -> str:
 def prepara_resposta(numero_randomico: str, chave_cliente: str, id_cliente: str, validade: str) -> bytes:
     chave_sessao_tgs = random.randbytes(8).hex()[0:8]
     parte1 = f"{chave_sessao_tgs}{SEPARADOR}{numero_randomico}"
-    parte1_cifra, iv_parte1 = cifra(chave_cliente, parte1)
+    parte1_cifra = cifra(chave_cliente, parte1)
     parte2 = f"{id_cliente}{SEPARADOR}{validade}{SEPARADOR}{chave_sessao_tgs}"
-    parte2_cifra, iv_parte2 = cifra(CHAVE_TGS, parte2)
-    return f"{parte1_cifra}{SEPARADOR}{parte2_cifra}{SEPARADOR}{iv_parte1}{SEPARADOR}{iv_parte2}".encode(FORMAT)
+    parte2_cifra = cifra(CHAVE_TGS, parte2)
+    return f"{parte1_cifra}{SEPARADOR}{parte2_cifra}".encode(FORMAT)
 
 
 def recebe_mensagem(msg: str) -> tuple[str, str, str, str]:
@@ -47,7 +47,7 @@ def recebe_mensagem(msg: str) -> tuple[str, str, str, str]:
     chave_cliente = con.cursor().execute("SELECT chave FROM usuario WHERE nome = ?", [dados_msg[0]]).fetchone()[0]
     con.close()
 
-    msg_cliente = decifra(chave_cliente, dados_msg[1], dados_msg[2])
+    msg_cliente = decifra(chave_cliente, dados_msg[1])
     msg_cliente_split = msg_cliente.split(SEPARADOR)
 
     return msg_cliente_split[2], chave_cliente, dados_msg[0], msg_cliente_split[1]

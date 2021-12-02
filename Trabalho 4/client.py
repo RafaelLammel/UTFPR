@@ -13,17 +13,17 @@ SERVER = socket.gethostbyname(socket.gethostname())
 FORMAT = "utf-8"
 SEPARADOR = "."
 TEMPO_TOKEN = 60
+IV = "bomuoN9Q4P4="
 
 
-def cifra(chave: str, msg: str) -> tuple[str, str]:
-    des = DES.new(chave.encode(FORMAT), DES.MODE_OFB)
+def cifra(chave: str, msg: str) -> str:
+    des = DES.new(chave.encode(FORMAT), DES.MODE_OFB, iv=b64decode(IV))
     msg_cifrada = b64encode(des.encrypt(msg.encode(FORMAT))).decode(FORMAT)
-    iv = b64encode(des.iv).decode(FORMAT)
-    return msg_cifrada, iv
+    return msg_cifrada
 
 
-def decifra(chave: str, msg_cifrada: str, iv: str) -> str:
-    des = DES.new(chave.encode(FORMAT), DES.MODE_OFB, iv=b64decode(iv))
+def decifra(chave: str, msg_cifrada: str) -> str:
+    des = DES.new(chave.encode(FORMAT), DES.MODE_OFB, iv=b64decode(IV))
     msg_decifrada = des.decrypt(b64decode(msg_cifrada)).decode(FORMAT)
     return msg_decifrada
 
@@ -37,63 +37,63 @@ def envia_msg(client: socket.socket, msg: str):
     client.send(mensagem)
 
 
-def autenticar_as(user_id: str, service_id: str, password: str) -> tuple[str, str, str]:
+def autenticar_as(user_id: str, service_id: str, password: str) -> tuple[str, str]:
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect((SERVER, PORTS["AS"]))
 
     chave_cliente = hashlib.sha256(password.encode(FORMAT)).hexdigest()[0:8]
     parte2 = f"{service_id}{SEPARADOR}{TEMPO_TOKEN}{SEPARADOR}{651231564}"
 
-    parte2_cifra, iv = cifra(chave_cliente, parte2)
+    parte2_cifra = cifra(chave_cliente, parte2)
 
     # 2. Obtém um ticket de acesso ao serviço de tickets TGS.
-    envia_msg(client, f"{user_id}{SEPARADOR}{parte2_cifra}{SEPARADOR}{iv}")
+    envia_msg(client, f"{user_id}{SEPARADOR}{parte2_cifra}")
     resposta_as = client.recv(1024).decode(FORMAT)
     client.close()
 
     resposta_as_split = resposta_as.split(SEPARADOR)
 
-    resposta_cliente = decifra(chave_cliente, resposta_as_split[0], resposta_as_split[2])
+    resposta_cliente = decifra(chave_cliente, resposta_as_split[0])
     resposta_cliente_split = resposta_cliente.split(SEPARADOR)
 
-    return resposta_cliente_split[0], resposta_as_split[1], resposta_as_split[3]
+    return resposta_cliente_split[0], resposta_as_split[1]
 
 
-def autenticar_tgs(user_id: str, service_id: str, chave_sessao_tgs: str, token_tgs: str, iv_tgs) -> tuple[str, str, str]:
+def autenticar_tgs(user_id: str, service_id: str, chave_sessao_tgs: str, token_tgs: str) -> tuple[str, str]:
     parte1 = f"{user_id}{SEPARADOR}{service_id}{SEPARADOR}{TEMPO_TOKEN}{SEPARADOR}{321654987}"
-    parte1_cifra, iv_parte1 = cifra(chave_sessao_tgs, parte1)
+    parte1_cifra = cifra(chave_sessao_tgs, parte1)
 
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect((SERVER, PORTS["TGS"]))
 
     # 4. Obtém um ticket de acesso ao serviço.
-    envia_msg(client, f"{parte1_cifra}{SEPARADOR}{token_tgs}{SEPARADOR}{iv_parte1}{SEPARADOR}{iv_tgs}")
+    envia_msg(client, f"{parte1_cifra}{SEPARADOR}{token_tgs}")
     resposta_tgs = client.recv(1024).decode(FORMAT)
     client.close()
     
     resposta_tgs_split = resposta_tgs.split(SEPARADOR)
 
-    resposta_cliente = decifra(chave_sessao_tgs, resposta_tgs_split[0], resposta_tgs_split[2])
+    resposta_cliente = decifra(chave_sessao_tgs, resposta_tgs_split[0])
     resposta_cliente_split = resposta_cliente.split(SEPARADOR)
 
-    return resposta_cliente_split[0], resposta_tgs_split[1], resposta_tgs_split[3]
+    return resposta_cliente_split[0], resposta_tgs_split[1]
 
 
-def autenticar_servico(user_id: str, service_id: str, token_servico: str, chave_sessao_servico: str, iv_servico: str):
+def autenticar_servico(user_id: str, service_id: str, token_servico: str, chave_sessao_servico: str):
     parte1 = f"{user_id}{SEPARADOR}{TEMPO_TOKEN}{SEPARADOR}{service_id}{SEPARADOR}{87946461}"
-    parte1_cifra, iv_parte1 = cifra(chave_sessao_servico, parte1)
+    parte1_cifra = cifra(chave_sessao_servico, parte1)
 
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect((SERVER, PORTS["SERVICOS"] + int(service_id)))
 
     # 6. Recebe retorno do servidor desejado.
-    envia_msg(client, f"{parte1_cifra}{SEPARADOR}{token_servico}{SEPARADOR}{iv_parte1}{SEPARADOR}{iv_servico}")
+    envia_msg(client, f"{parte1_cifra}{SEPARADOR}{token_servico}")
     resposta_servico = client.recv(1024).decode(FORMAT)
     client.close()
 
     resposta_servico_split = resposta_servico.split(SEPARADOR)
 
-    resposta = decifra(chave_sessao_servico, resposta_servico_split[0], resposta_servico_split[1])
+    resposta = decifra(chave_sessao_servico, resposta_servico_split[0])
 
     print(resposta)
 
@@ -110,13 +110,13 @@ def main():
     #1. O cliente se autentica junto ao AS
     user_id = input("Entre com o seu usuário: ")
     password = input("Entre com sua senha: ")
-    chave_sessao_tgs, token_tgs, iv_tgs = autenticar_as(user_id, service_id, password)
+    chave_sessao_tgs, token_tgs = autenticar_as(user_id, service_id, password)
 
     #3. Solicita ao TGS um ticket de acesso ao serviço (servidor) desejado.
-    chave_sessao_servico, token_servico, iv_servico = autenticar_tgs(user_id, service_id, chave_sessao_tgs, token_tgs, iv_tgs)
+    chave_sessao_servico, token_servico = autenticar_tgs(user_id, service_id, chave_sessao_tgs, token_tgs)
     
     #5. Com esse novo ticket, ele pode se autenticar junto ao servidor desejado e solicitar serviços.
-    autenticar_servico(user_id, service_id, token_servico, chave_sessao_servico, iv_servico)
+    autenticar_servico(user_id, service_id, token_servico, chave_sessao_servico)
     # except ValueError as e:
     #     print("Opção invalida!")
     #     print(e)
