@@ -1,4 +1,4 @@
-import socket, hashlib
+import socket, hashlib, random
 from base64 import b64decode, b64encode
 from Crypto.Cipher import DES
 
@@ -38,11 +38,12 @@ def envia_msg(client: socket.socket, msg: str):
 
 
 def autenticar_as(user_id: str, service_id: str, password: str) -> tuple[str, str]:
+    numero_random = random.randint(1000, 10000)
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect((SERVER, PORTS["AS"]))
 
     chave_cliente = hashlib.sha256(password.encode(FORMAT)).hexdigest()[0:8]
-    parte2 = f"{service_id}{SEPARADOR}{TEMPO_TOKEN}{SEPARADOR}{651231564}"
+    parte2 = f"{service_id}{SEPARADOR}{TEMPO_TOKEN}{SEPARADOR}{numero_random}"
 
     parte2_cifra = cifra(chave_cliente, parte2)
 
@@ -55,12 +56,15 @@ def autenticar_as(user_id: str, service_id: str, password: str) -> tuple[str, st
 
     resposta_cliente = decifra(chave_cliente, resposta_as_split[0])
     resposta_cliente_split = resposta_cliente.split(SEPARADOR)
-
+    
+    if(resposta_cliente_split[1] != str(numero_random)):
+        raise ValueError("Falha no retorno do AS: Número randomico não confere.")
     return resposta_cliente_split[0], resposta_as_split[1]
 
 
 def autenticar_tgs(user_id: str, service_id: str, chave_sessao_tgs: str, token_tgs: str) -> tuple[str, str]:
-    parte1 = f"{user_id}{SEPARADOR}{service_id}{SEPARADOR}{TEMPO_TOKEN}{SEPARADOR}{321654987}"
+    numero_random = random.randint(1000, 10000)
+    parte1 = f"{user_id}{SEPARADOR}{service_id}{SEPARADOR}{TEMPO_TOKEN}{SEPARADOR}{numero_random}"
     parte1_cifra = cifra(chave_sessao_tgs, parte1)
 
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -76,11 +80,14 @@ def autenticar_tgs(user_id: str, service_id: str, chave_sessao_tgs: str, token_t
     resposta_cliente = decifra(chave_sessao_tgs, resposta_tgs_split[0])
     resposta_cliente_split = resposta_cliente.split(SEPARADOR)
 
+    if(resposta_cliente_split[2] != str(numero_random)):
+        raise ValueError("Falha no retorno do TGS: Número randomico não confere.")
     return resposta_cliente_split[0], resposta_tgs_split[1]
 
 
 def autenticar_servico(user_id: str, service_id: str, token_servico: str, chave_sessao_servico: str):
-    parte1 = f"{user_id}{SEPARADOR}{TEMPO_TOKEN}{SEPARADOR}{service_id}{SEPARADOR}{87946461}"
+    numero_random = random.randint(1000, 10000)
+    parte1 = f"{user_id}{SEPARADOR}{TEMPO_TOKEN}{SEPARADOR}{service_id}{SEPARADOR}{numero_random}"
     parte1_cifra = cifra(chave_sessao_servico, parte1)
 
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -95,31 +102,36 @@ def autenticar_servico(user_id: str, service_id: str, token_servico: str, chave_
 
     resposta = decifra(chave_sessao_servico, resposta_servico_split[0])
 
-    print(resposta)
+    resposta_split = resposta.split(SEPARADOR)
+
+    if(resposta_split[1] != str(numero_random)):
+        raise ValueError("Falha no retorno do Serviço: Número randomico não confere.")
+    print(resposta_split[0])
 
 
 def main():
     print("Qual serviço gostaria de acessar?")
     print("1 - Serviço 1")
     print("2 - Serviço 2")
-    #try:
-    service_id = int(input())
-    if service_id != 1 and service_id != 2:
-        raise ValueError
-    
-    #1. O cliente se autentica junto ao AS
-    user_id = input("Entre com o seu usuário: ")
-    password = input("Entre com sua senha: ")
-    chave_sessao_tgs, token_tgs = autenticar_as(user_id, service_id, password)
+    try:
+        service_id = input()
+        if service_id != "1" and service_id != "2":
+            raise ValueError("Valor inválido!")
 
-    #3. Solicita ao TGS um ticket de acesso ao serviço (servidor) desejado.
-    chave_sessao_servico, token_servico = autenticar_tgs(user_id, service_id, chave_sessao_tgs, token_tgs)
-    
-    #5. Com esse novo ticket, ele pode se autenticar junto ao servidor desejado e solicitar serviços.
-    autenticar_servico(user_id, service_id, token_servico, chave_sessao_servico)
-    # except ValueError as e:
-    #     print("Opção invalida!")
-    #     print(e)
+        service_id = int(service_id)
+        
+        #1. O cliente se autentica junto ao AS
+        user_id = input("Entre com o seu usuário: ")
+        password = input("Entre com sua senha: ")
+        chave_sessao_tgs, token_tgs = autenticar_as(user_id, service_id, password)
+
+        #3. Solicita ao TGS um ticket de acesso ao serviço (servidor) desejado.
+        chave_sessao_servico, token_servico = autenticar_tgs(user_id, service_id, chave_sessao_tgs, token_tgs)
+        
+        #5. Com esse novo ticket, ele pode se autenticar junto ao servidor desejado e solicitar serviços.
+        autenticar_servico(user_id, service_id, token_servico, chave_sessao_servico)
+    except ValueError as e:
+        print(e)
 
 
 if __name__ == "__main__":
