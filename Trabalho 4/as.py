@@ -47,10 +47,13 @@ def recebe_mensagem(msg: str) -> tuple[str, str, str, str]:
     chave_cliente = con.cursor().execute("SELECT chave FROM usuario WHERE nome = ?", [dados_msg[0]]).fetchone()[0]
     con.close()
 
-    msg_cliente = decifra(chave_cliente, dados_msg[1])
-    msg_cliente_split = msg_cliente.split(SEPARADOR)
-
-    return msg_cliente_split[2], chave_cliente, dados_msg[0], msg_cliente_split[1]
+    try:
+        msg_cliente = decifra(chave_cliente, dados_msg[1])
+        msg_cliente_split = msg_cliente.split(SEPARADOR)
+        
+        return msg_cliente_split[2], chave_cliente, dados_msg[0], msg_cliente_split[1], True
+    except:
+        return "", "", "", "", False
 
 
 # Trata cada conexão nova em Thread separada
@@ -63,8 +66,11 @@ def trata_cliente(conn: socket.socket, addr: socket.AddressFamily):
         if tamanho_msg:
             tamanho_msg = int(tamanho_msg)
             msg = conn.recv(tamanho_msg).decode(FORMAT)
-            numero_randomico, chave_cliente, id_cliente, validade = recebe_mensagem(msg)
-            resposta = prepara_resposta(numero_randomico, chave_cliente, id_cliente, validade)
+            numero_randomico, chave_cliente, id_cliente, validade, sucesso = recebe_mensagem(msg)
+            if(sucesso):
+                resposta = prepara_resposta(numero_randomico, chave_cliente, id_cliente, validade)
+            else:
+                resposta = "Senha inválida.".encode(FORMAT)
             conn.send(resposta)
             connected = False
     conn.close()

@@ -14,6 +14,7 @@ FORMAT = "utf-8"
 SEPARADOR = "\n"
 TEMPO_TOKEN = 3600
 IV = "bomuoN9Q4P4="
+SALT = "adb7289508113adc02e0fa0cf8279c6ef932f1b06830fcc19d0653d73f4a4347"
 
 
 def cifra(chave: str, msg: str) -> str:
@@ -42,7 +43,7 @@ def autenticar_as(user_id: str, service_id: str, password: str) -> tuple[str, st
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect((SERVER, PORTS["AS"]))
 
-    chave_cliente = hashlib.sha256(password.encode(FORMAT)).hexdigest()[0:8]
+    chave_cliente = hashlib.sha256(f"{password}{SALT}".encode(FORMAT)).hexdigest()[0:8]
     parte2 = f"{service_id}{SEPARADOR}{TEMPO_TOKEN}{SEPARADOR}{numero_random}"
 
     parte2_cifra = cifra(chave_cliente, parte2)
@@ -51,6 +52,9 @@ def autenticar_as(user_id: str, service_id: str, password: str) -> tuple[str, st
     envia_msg(client, f"{user_id}{SEPARADOR}{parte2_cifra}")
     resposta_as = client.recv(1024).decode(FORMAT)
     client.close()
+
+    if(resposta_as == "Senha inválida."):
+        raise Exception(resposta_as)
 
     resposta_as_split = resposta_as.split(SEPARADOR)
 
@@ -130,7 +134,7 @@ def main():
         
         #5. Com esse novo ticket, ele pode se autenticar junto ao servidor desejado e solicitar serviços.
         autenticar_servico(user_id, service_id, token_servico, chave_sessao_servico)
-    except ValueError as e:
+    except Exception as e:
         print(e)
 
 

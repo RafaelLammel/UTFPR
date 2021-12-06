@@ -39,10 +39,8 @@ def prepara_resposta(servico: int, nmr_randomico: str, chave_sessao: str) -> byt
     msg = ""
     if servico == -1:
         msg = "Seu token expirou!"
-    elif servico == 1:
-        msg = "Você requisitou pelo serviço 1 do servidor 1!"
     else:
-        msg = "Você requisitou pelo serviço 2 do servidor 1!"
+        msg = "Você requisitou pelo serviço 1!"
     resposta = f"{msg}{SEPARADOR}{nmr_randomico}"
     resposta_cifrado = cifra(chave_sessao, resposta)
     return f"{resposta_cifrado}".encode(FORMAT)
