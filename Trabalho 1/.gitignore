@@ -1,0 +1,3 @@
+*.txt
+!mensagem.txt
+chave.dat
